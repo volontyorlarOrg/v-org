@@ -1,0 +1,837 @@
+{
+  "common": {
+    "organizationName": "Volontyorlar",
+    "portalName": "Tashkilot portali",
+    "skipToContent": "Asosiy qismga oʻtish",
+    "openMenu": "Menyuni ochish",
+    "closeMenu": "Menyuni yopish",
+    "language": "Interfeys tili",
+    "theme": "Yorugʻ va qorongʻi rejimni almashtirish",
+    "signOut": "Chiqish",
+    "signingOut": "Chiqilmoqda…",
+    "signedIn": "Tizimdasiz",
+    "apply": "Qoʻllash",
+    "reset": "Filtrlarni tozalash",
+    "previous": "Orqaga",
+    "next": "Keyingi",
+    "pageOf": "{last} sahifadan {page} · {total} ta yozuv",
+    "pagination": "Sahifalash",
+    "search": "Qidiruv",
+    "save": "Saqlash",
+    "saving": "Saqlanmoqda…",
+    "cancel": "Bekor qilish",
+    "create": "Yaratish",
+    "creating": "Yaratilmoqda…",
+    "back": "Orqaga",
+    "actions": "Amallar",
+    "status": "Holat",
+    "notSet": "Kiritilmagan",
+    "never": "Hech qachon",
+    "none": "Yoʻq",
+    "all": "Barchasi",
+    "yes": "Ha",
+    "no": "Yoʻq",
+    "loading": "Yuklanmoqda…",
+    "close": "Yopish",
+    "fixFields": "Bu maydonlarni tekshiring",
+    "roleName": "Tashkilot"
+  },
+  "nav": {
+    "label": "Portal boʻlimlari",
+    "dashboard": "Bugun",
+    "vacancies": "Mening imkoniyatlarim",
+    "applications": "Arizalar",
+    "users": "Volontyorlar",
+    "attendance": "Ishtirok",
+    "activity": "Mening amallarim",
+    "waiting": {
+      "pendingApproval": "tasdiqlashni kutmoqda",
+      "changesRequested": "tuzatish uchun qaytarilgan",
+      "pendingReview": "qaror kutayotgan ariza",
+      "attendanceDue": "koʻngillining davomati belgilanmagan"
+    }
+  },
+  "auth": {
+    "metaTitle": "Kirish",
+    "title": "Tashkilot uchun kirish",
+    "subtitle": "Administrator bergan tashkilot identifikatori va parol bilan kiring.",
+    "email": "Elektron pochta",
+    "password": "Parol",
+    "showPassword": "Parolni koʻrsatish",
+    "hidePassword": "Parolni yashirish",
+    "submit": "Kirish",
+    "submitting": "Kirilmoqda…",
+    "accessNotice": "Tashkilot hisobini administrator yaratadi va parolini almashtira oladi. Kirish uchun administratorga murojaat qiling.",
+    "status": {
+      "expired": "Seans tugadi. Davom etish uchun qaytadan kiring.",
+      "signedOut": "Portaldan chiqdingiz.",
+      "wrongRole": "Bu hisob portaldan foydalana olmaydi."
+    },
+    "handle": "Tashkilot identifikatori"
+  },
+  "states": {
+    "awaitingContract": {
+      "title": "API kutilmoqda",
+      "description": "Bu boʻlimga {endpoint} kerak, lekin v-backend uni hali eʼlon qilmagan. Oʻylab topilgan maʼlumot oʻrniga hech narsa koʻrsatilmaydi."
+    },
+    "expired": {
+      "title": "Seans tugadi",
+      "description": "Toʻxtagan joyingizdan davom etish uchun qaytadan kiring.",
+      "action": "Kirish"
+    },
+    "denied": {
+      "title": "Buni ocholmaysiz",
+      "description": "Hisobingizga bu yozuvni koʻrishga ruxsat yoʻq. Xato boʻlsa, administratorga murojaat qiling."
+    },
+    "missing": {
+      "title": "Topilmadi",
+      "description": "Bunday yozuv yoʻq yoki u endi sizga tegishli emas."
+    },
+    "unconfigured": {
+      "title": "Portal sozlanmagan",
+      "description": "VOLONTYORLAR_API_URL belgilanmagan, shuning uchun hech narsa oʻqilmaydi. Bu joylashtirish sozlamasi, uni bu yerdan tuzatib boʻlmaydi."
+    },
+    "failed": {
+      "title": "Yuklanmadi",
+      "description": "API yoʻlida nimadir notoʻgʻri ketdi. Sahifani yangilab, qayta urinib koʻring."
+    },
+    "loading": {
+      "list": "Roʻyxat yuklanmoqda…",
+      "panel": "Yuklanmoqda…",
+      "queue": "Sizni kutayotgan ishlar yuklanmoqda…"
+    },
+    "passwordChangeRequired": {
+      "title": "Administratorga murojaat qiling",
+      "description": "Portalga kirishdan oldin bu hisobga administrator eʼtibor berishi kerak.",
+      "action": "Qayta kirish"
+    }
+  },
+  "errors": {
+    "server": "Nimadir notoʻgʻri ketdi. Qayta urinib koʻring.",
+    "network": "API bilan bogʻlanib boʻlmadi. Ulanishni tekshirib, qayta urinib koʻring.",
+    "timeout": "API juda uzoq javob berdi. Qayta urinib koʻring.",
+    "rateLimited": "Urinishlar juda koʻp. Biroz kutib, qayta urinib koʻring.",
+    "unavailable": "API hozir mavjud emas. Birozdan soʻng urinib koʻring.",
+    "forbidden": "Bunga ruxsatingiz yoʻq.",
+    "notFound": "Bunday yozuv endi mavjud emas.",
+    "conflict": "Bu oʻzgarish yozuvning hozirgi holatiga zid.",
+    "invalidCredentials": "Tashkilot identifikatori yoki parol notoʻgʻri yoxud hisob faol emas.",
+    "wrongRole": "Bu hisob portaldan foydalana olmaydi.",
+    "portalUnavailable": "Portal toʻliq sozlanmagani uchun kirish mumkin emas.",
+    "accountDisabled": "Bu hisob bloklangan. Administratordan blokni ochishni soʻrang.",
+    "sessionExpired": "Seans tugadi. Qaytadan kiring.",
+    "awaitingContract": "API bu amalni hali eʼlon qilmagan, shuning uchun uni bajarib boʻlmaydi.",
+    "validationFailed": "Belgilangan maydonlarni tekshirib, qayta urinib koʻring.",
+    "passwordChangeRequired": "Bu hisob boʻyicha administratorga murojaat qiling.",
+    "required": "Buni toʻldiring.",
+    "email": "Toʻgʻri elektron pochta manzilini kiriting.",
+    "emailLong": "Bu pochta manzili juda uzun.",
+    "passwordShort": "Kamida 8 ta belgi ishlating.",
+    "passwordLong": "Koʻpi bilan 128 ta belgi ishlating.",
+    "passwordMismatch": "Ikki parol bir xil emas.",
+    "passwordUnchanged": "Joriy paroldan farqli parol tanlang.",
+    "weakPassword": "API bu parolni juda oson deb rad etdi. Boshqasini tanlang.",
+    "nameLong": "Bu ism juda uzun.",
+    "tooLong": "Bu juda uzun.",
+    "slug": "Kichik lotin harflari, raqamlar va bitta chiziqchadan foydalaning.",
+    "url": "https:// bilan toʻliq manzil kiriting.",
+    "date": "Toʻgʻri sana va vaqt kiriting.",
+    "deadlineAfterStart": "Arizalar vakansiya boshlanishidan oldin yopilishi kerak.",
+    "endBeforeStart": "Tugash vaqti boshlanishdan keyin boʻlishi kerak.",
+    "capacity": "Kamida bitta, butun sondagi joy kiriting.",
+    "hours": "Soatlarni 0 va 999 orasidagi son bilan kiriting.",
+    "confirmedHoursRequired": "Ishtirokni tasdiqlashdan oldin soatlarni kiriting.",
+    "emailUnavailable": "Bu pochta manzili boshqa hisobda band.",
+    "slugUnavailable": "Bu manzil boshqa yozuvda band.",
+    "opportunityNotFound": "Bunday vakansiya yoʻq yoki u sizniki emas.",
+    "organizationNotVerified": "Tashkilot tasdiqlanmaguncha vakansiyani eʼlon qilib boʻlmaydi.",
+    "applicationNotFound": "Bunday ariza yoʻq yoki u sizniki emas.",
+    "applicationCannotBeReviewed": "Bu arizani endi koʻrib chiqib boʻlmaydi.",
+    "attendanceNotFound": "Bu ariza uchun ishtirok yozuvi yoʻq.",
+    "attendanceOutcomeNotResolved": "Keldi, sababli yoki bekor qilindi variantidan birini tanlang.",
+    "adminWorkflowsDisabled": "API da bu jarayonlar oʻchirilgan.",
+    "userNotFound": "Bunday volontyor yoʻq yoki yozuvni ochishga ruxsatingiz yoʻq.",
+    "coordinatorNotFound": "Bunday koordinator endi mavjud emas.",
+    "coordinatorHasActiveOpportunities": "Bu koordinatorda faol vakansiyalar qolgan. Avval ularni kim olishini tanlang.",
+    "invalidCoordinatorReassignment": "Vakansiyalarni qabul qilish uchun boshqa koordinatorni tanlang.",
+    "organizationNotFound": "Bunday tashkilot endi mavjud emas.",
+    "rateLimitExceeded": "Urinishlar juda koʻp. Biroz kutib, qayta urinib koʻring.",
+    "estimatedHours": "Soatlarni 0 dan katta va 999 dan oshmaydigan son bilan kiriting.",
+    "cityRequired": "Koʻngillilar keladigan shaharni kiriting.",
+    "venueRequired": "Koʻngillilar yigʻiladigan joyni kiriting.",
+    "onlineLocationRequired": "Ish onlayn qayerda boʻlishini tavsiflang.",
+    "onlineLocationCredentials": "Uchrashuv parolini olib tashlang. Bu maydonni har bir koʻngilli koʻradi.",
+    "opportunityNotReadyForApproval": "Bu vakansiyada tasdiqlash uchun zarur narsa yetishmaydi.",
+    "opportunityNotSubmittable": "Bu vakansiyani hozirgi holatida tasdiqlashga yuborib boʻlmaydi.",
+    "opportunityNotPending": "Bu vakansiya qaror kutmayapti.",
+    "decisionNoteRequired": "Qarorni tushuntiruvchi izoh yozing.",
+    "opportunityIncomplete": "Tasdiqlashga yuborishdan oldin vakansiyaning majburiy maʼlumotlarini toʻldiring.",
+    "opportunityCannotBeSubmitted": "Bu vakansiyani joriy holatida tasdiqlashga yuborib boʻlmaydi.",
+    "opportunityNotPendingApproval": "Bu vakansiya tasdiqlash qarorini kutmayapti.",
+    "opportunityNotEditable": "Vakansiya joriy tasdiqlash holatida tahrirlash uchun yopiq.",
+    "opportunityImageInvalid": "Yaroqli rasm faylini tanlang.",
+    "opportunityImageTooLarge": "2 MB dan kichik rasm tanlang.",
+    "opportunityImageFormatUnsupported": "JPEG, PNG yoki WebP formatidagi rasmni tanlang.",
+    "opportunityImageTooSmall": "Kamida 640 × 360 pikselli rasm tanlang.",
+    "opportunityImageStorageUnavailable": "Rasmlar xotirasi hozircha mavjud emas. Keyinroq urinib koʻring.",
+    "vacancyImageAfterSaveFailed": "Vakansiya maʻlumotlari saqlandi, ammo rasm saqlanmadi. Rasmni tekshirib, qayta saqlang.",
+    "approvalNoteRequired": "Qarorni tushuntiruvchi izoh yozing.",
+    "deadlinePassed": "Ariza topshirish muddati allaqachon tugagan.",
+    "duplicateAttendanceApplication": "Har bir koʻngilli ishtirok yangilanishida faqat bir marta koʻrsatilishi mumkin.",
+    "noVolunteersSelected": "Kamida bitta koʻngillini tanlang.",
+    "tooManyVolunteers": "Kamroq koʻngilli tanlab, qaytadan urinib koʻring.",
+    "attendanceNotOpen": "Tasdiqlash tadbir tugagach ochiladi.",
+    "attendanceBatchFailed": "Hech narsa saqlanmadi. Tanlagan koʻngillilaringizni tekshirib, qayta urinib koʻring.",
+    "applicationNotAccepted": "Bu koʻngilli ushbu vakansiyaga qabul qilinmagan.",
+    "attendanceAlreadyResolved": "Bu volontyorning davomati allaqachon belgilangan, shuning uchun qabulni bekor qilib boʻlmaydi. Natijani davomat roʻyxatida tuzating.",
+    "invalidOpportunityDates": "Sanalar mos kelmaydi: arizalar boshlanishdan oldin yopilishi, tugash esa boshlanishdan keyin boʻlishi kerak.",
+    "opportunityAlreadyArchived": "Bu vakansiya allaqachon arxivda.",
+    "opportunityArchived": "Bu vakansiya arxivda, shuning uchun hech kimni yangidan qabul qilib boʻlmaydi.",
+    "opportunityAtCapacity": "Barcha oʻrinlar band. Boshqa kishini qabul qilishdan oldin oʻrin boʻshating.",
+    "opportunityCannotBePublished": "Bu vakansiyani joriy holatida eʼlon qilib boʻlmaydi."
+  },
+  "vacancies": {
+    "title": "Mening imkoniyatlarim",
+    "description": "Siz yaratgan vakansiyalar — qoralamadan arxivgacha.",
+    "new": "Yangi vakansiya",
+    "manage": "Imkoniyatni boshqarish",
+    "empty": {
+      "title": "Hali vakansiya yoʻq",
+      "description": "Vakansiya yarating, tashkilot tasdiqlangach eʼlon qiling — arizalar shu yerda paydo boʻladi."
+    },
+    "noMatches": {
+      "title": "Filtrlarga mos yozuv yoʻq",
+      "description": "Barcha vakansiyalarni qayta koʻrish uchun filtrlarni tozalang."
+    },
+    "filters": {
+      "search": "Nomi yoki manzili boʻyicha qidirish",
+      "state": "Holat"
+    },
+    "state": {
+      "all": "Har qanday holat",
+      "draft": "Qoralama",
+      "pending_review": "Tasdiqlash kutilmoqda",
+      "changes_requested": "Oʻzgartirish soʻralgan",
+      "approved": "Tasdiqlangan va eʼlon qilingan",
+      "rejected": "Rad etilgan",
+      "archived": "Arxivda"
+    },
+    "table": {
+      "caption": "Siz yaratgan vakansiyalar",
+      "title": "Vakansiya",
+      "state": "Holat",
+      "deadline": "Arizalar yopiladi",
+      "starts": "Boshlanishi",
+      "applications": "Arizalar",
+      "waiting": "{count} tasi qaror kutmoqda"
+    },
+    "detail": {
+      "sections": "Imkoniyat boʻlimlari",
+      "results": "Ishtirok natijalari",
+      "description": "Tavsif",
+      "requirements": "Talablar",
+      "questions": "Ariza savollari",
+      "details": "Tafsilotlar",
+      "applications": "Ushbu vakansiyaga arizalar",
+      "noApplications": "Hali hech kim ariza bermagan.",
+      "questionsLegacy": "Eski vakansiyadan qolgan. Yangi vakansiya profildan boshqa hech narsa soʻramaydi.",
+      "applicationsList": "Arizalar",
+      "noLimit": "Cheklanmagan",
+      "places": "{capacity} oʻrindan {taken} tasi band",
+      "span": "{from} – {to}"
+    },
+    "fields": {
+      "title": "Nomi",
+      "description": "Tavsif",
+      "organization": "Tashkilot",
+      "organizationHelp": "Faqat tasdiqlangan tashkilotning vakansiyalari eʼlon qilinadi.",
+      "region": "Viloyat",
+      "format": "Format",
+      "city": "Shahar yoki tuman",
+      "locationName": "Joy",
+      "startsAt": "Boshlanishi",
+      "endsAt": "Tugashi",
+      "applicationDeadline": "Arizalar yopiladi",
+      "capacity": "Joylar",
+      "capacityHelp": "Ixtiyoriy. Aniq chegara boʻlmasa, boʻsh qoldiring.",
+      "requirements": "Talablar",
+      "requirementsHelp": "Har bir talab alohida qatorda.",
+      "estimatedTotalHours": "Taxminiy soatlar",
+      "estimatedTotalHoursHelp": "Ixtiyoriy. Koʻngilli butun tadbir uchun olishi kutilayotgan soatlar.",
+      "acceptanceMode": "Arizalarni tasdiqlash",
+      "acceptanceModeHelp": "Har qanday holatda qabul qilingan koʻngillini uning arizasi sahifasida rad etish mumkin.",
+      "acceptanceModes": {
+        "manual": "Har bir arizani siz koʻrib chiqasiz va qabul qilasiz yoki rad etasiz.",
+        "automatic": "Ariza berganlar darhol qabul qilinadi. Joylar soni faqat chegarani belgilasangiz hisobga olinadi."
+      },
+      "locationNameHelp": "Ixtiyoriy. Joy nomi yoki onlayn ishning ochiq tavsifi. Uchrashuv parolini yozmang.",
+      "cityHelp": "Ixtiyoriy. Volontyorlar boradigan shahar yoki tuman.",
+      "essayRequired": "Arizada esse talab qilish",
+      "essayRequiredNo": "Talab qilinmaydi",
+      "essayRequiredYes": "Majburiy",
+      "essayRequiredHelp": "Koʻngilli arizani yuborishdan oldin esse yozishi kerak."
+    },
+    "form": {
+      "createTitle": "Yangi vakansiya",
+      "createDescription": "Vakansiya maʻlumotlarini va xohlasangiz rasmini qoʻshing. Tasdiqlashga yubormaguningizcha u qoralama boʻlib qoladi.",
+      "photoUploadAfterCreateFailed": "Qoralama yaratildi, ammo rasmi saqlanmadi. Rasmni tanlab, shu yerda qayta saqlang.",
+      "editTitle": "Vakansiyani tahrirlash",
+      "submitCreate": "Qoralamani yaratish",
+      "submitUpdate": "Oʻzgarishlarni saqlash",
+      "pending": "Saqlanmoqda…",
+      "created": "Qoralama yaratildi.",
+      "updated": "Oʻzgarishlar saqlandi.",
+      "noOrganizations": "Hali birorta tashkilot yoʻq, shuning uchun vakansiya yaratib boʻlmaydi. Administratordan tashkilot qoʻshishni soʻrang.",
+      "sections": {
+        "about": "Vakansiya",
+        "organization": "Tashkilot",
+        "place": "Qayerda oʻtadi",
+        "when": "Qachon oʻtadi",
+        "volunteers": "Koʻngillilar"
+      },
+      "unverified": "tasdiqlanmagan",
+      "unverifiedNotice": "Bu tashkilot hali tasdiqlanmagan. Administrator uni tasdiqlamaguncha uning vakansiyasi maʻqullanmaydi.",
+      "backToVacancy": "Vakansiyaga qaytish",
+      "locked": "Bu vakansiya hozirgi holatida qulflangan va endi tahrirlanmaydi.",
+      "choose": "Tanlang…",
+      "sectionHelp": {
+        "about": "Volontyorlar nima qilishini oʻn olti yoshli kishi tushunadigan soʻzlar bilan yozing.",
+        "organization": "Faqat tasdiqlangan tashkilotning vakansiyalarini tasdiqlash mumkin.",
+        "place": "Volontyorlar qayerga boradi yoki onlayn qanday qatnashadi.",
+        "when": "Arizalar boshlanishdan oldin yopiladi. Davomat tadbir tugagach ochiladi.",
+        "volunteers": "Oʻrinlar, soatlar va arizalar qanday qabul qilinishi."
+      },
+      "editDescription": "Eʼlon qilingan vakansiya oʻzgartirilsa, uni qayta tasdiqlashga yubormaguningizcha u koʻngillilardan yashiriladi."
+    },
+    "image": {
+      "title": "Vakansiya rasmi",
+      "description": "Ixtiyoriy. Rasm koʻngillilar uchun vakansiya kartasi va tafsilotlarida koʻrinadi. JPEG, PNG yoki WebP, 2 MB gacha va kamida 640 × 360 piksel.",
+      "choose": "Rasm tanlash",
+      "remove": "Rasmni olib tashlash",
+      "undoRemove": "Rasmni saqlab qolish",
+      "noImage": "Hozircha rasm yoʻq"
+    },
+    "archive": {
+      "trigger": "Arxivga",
+      "title": "Vakansiya arxivga olinsinmi?",
+      "description": "Arizalar qabul qilinmaydi va vakansiya ochiq roʻyxatdan yoʻqoladi. Buni bu yerdan qaytarib boʻlmaydi.",
+      "confirm": "Arxivga olish",
+      "pending": "Arxivlanmoqda…",
+      "success": "Vakansiya arxivlandi.",
+      "closes": "{count, plural, other {Qaror chiqarilmagan # ta ariza yopiladi va har bir volontyorga xabar beriladi.}} Qabul qilingan volontyorlar qoladi, ularning davomatini baribir belgilash mumkin. Buni ortga qaytarib boʻlmaydi."
+    },
+    "archivedNotice": "Bu vakansiya arxivda. Uni endi tahrirlab boʻlmaydi.",
+    "submit": {
+      "trigger": "Tasdiqlashga yuborish",
+      "confirm": "Yuborish",
+      "success": "Vakansiya maʻqullash uchun yuborildi.",
+      "prompt": "Hozir administratorga yuborilsinmi?"
+    },
+    "approval": {
+      "met": "Tayyor",
+      "unmet": "Hali kerak",
+      "title": "Tasdiqlash",
+      "submitted": "Tasdiqlashga yuborilgan",
+      "decided": "Qaror qabul qilingan",
+      "reviewer": "Qaror qabul qilgan",
+      "pendingTitle": "Administrator kutilmoqda",
+      "pendingDescription": "Koʻrib chiqilayotganda vakansiya qulflanadi. Uni arxivga olish mumkin, tahrirlash esa mumkin emas.",
+      "changesTitle": "Oʻzgartirish soʻraldi",
+      "rejectedTitle": "Bu vakansiya rad etildi",
+      "rejectedDescription": "U faqat oʻqish uchun qoladi. Yangi vakansiya yarating.",
+      "missingDescription": "Yuborishdan oldin quyidagilarni toʻldiring:",
+      "requirements": {
+        "organization": "tasdiqlangan tashkilot",
+        "title": "nomi",
+        "description": "tavsif",
+        "format": "format",
+        "region": "viloyat",
+        "startsAt": "boshlanish vaqti",
+        "endsAt": "tugash vaqti",
+        "applicationDeadline": "boshlanishdan oldingi ariza muddati",
+        "capacity": "joylar soni",
+        "estimatedTotalHours": "taxminiy soatlar",
+        "location": "oʻtkaziladigan joy"
+      },
+      "readyLine": "Maʻqullash uchun kerak boʻlgan hamma narsa joyida.",
+      "note": "Koordinatorga izoh",
+      "draftTitle": "Tasdiqlashga yuborish"
+    },
+    "record": "Vakansiya",
+    "countLabel": "vakansiya",
+    "listTitle": "Sizning vakansiyalaringiz"
+  },
+  "applications": {
+    "title": "Arizalar",
+    "description": "Siz yaratgan vakansiyalarga kelgan arizalar.",
+    "empty": {
+      "title": "Hali ariza yoʻq",
+      "description": "Volontyorlar eʼlon qilingan vakansiyalaringizga ariza bergach, ular shu yerda koʻrinadi."
+    },
+    "noMatches": {
+      "title": "Filtrlarga mos ariza yoʻq",
+      "description": "Barcha arizalarni qayta koʻrish uchun filtrlarni tozalang."
+    },
+    "filters": {
+      "search": "Volontyor yoki vakansiya boʻyicha qidirish",
+      "status": "Holat"
+    },
+    "status": {
+      "all": "Har qanday holat",
+      "draft": "Qoralama",
+      "submitted": "Yuborilgan",
+      "under_review": "Koʻrib chiqilmoqda",
+      "accepted": "Qabul qilingan",
+      "rejected": "Rad etilgan",
+      "withdrawn": "Qaytarib olingan",
+      "closed": "Yopilgan"
+    },
+    "table": {
+      "caption": "Qaror kutayotgan arizalar",
+      "volunteer": "Volontyor",
+      "vacancy": "Vakansiya",
+      "status": "Holat",
+      "submitted": "Yuborilgan"
+    },
+    "detail": {
+      "snapshot": "Ariza yuborilgandagi profil",
+      "snapshotNote": "Bu volontyor ariza bilan yuborgan profil, uning bugungi profili emas.",
+      "answers": "Javoblar",
+      "history": "Tarix",
+      "reviewerNote": "Volontyorga izoh",
+      "volunteer": "Volontyor yozuvi",
+      "essay": "Ariza essesi"
+    },
+    "history": {
+      "createdAt": "Boshlangan",
+      "submittedAt": "Yuborilgan",
+      "reviewedAt": "Koʻrib chiqilgan",
+      "acceptedAutomatically": "Avtomatik qabul qilindi",
+      "withdrawnAt": "Qaytarib olingan",
+      "updatedAt": "Oxirgi oʻzgarish"
+    },
+    "review": {
+      "title": "Bu ariza boʻyicha qaror",
+      "final": {
+        "draft": {
+          "title": "Hali yuborilmagan",
+          "description": "Volontyor arizani boshlagan, lekin yubormagan, shuning uchun hozircha qaror kerak emas."
+        },
+        "withdrawn": {
+          "title": "Volontyor qaytarib olgan",
+          "description": "Volontyor arizani qaytarib oldi, qaror talab qilinmaydi."
+        },
+        "rejected": {
+          "title": "Rad etilgan",
+          "description": "Bu qaror yakuniy. Volontyor uni «Tanlanmadi» deb koʻradi."
+        },
+        "closed": {
+          "title": "Yopilgan",
+          "description": "Bu qaror yakuniy. Volontyor uni «Yopilgan» deb koʻradi."
+        }
+      },
+      "description": "Quyidagi esse va profilni oʻqing, soʻng qaror qiling. Volontyorga darhol xabar beriladi.",
+      "acceptedTitle": "Qabul qilingan",
+      "acceptedDescription": "Volontyorning davomati belgilanmaguncha bu qarorni bekor qilish mumkin.",
+      "recordedTitle": "Davomat belgilangan",
+      "recordedDescription": "Bu qabulni endi bekor qilib boʻlmaydi. Natijani vakansiyaning davomat roʻyxatida tuzating."
+    },
+    "snapshotFields": {
+      "fullName": "Toʻliq ism",
+      "bio": "Oʻzi haqida",
+      "region": "Viloyat",
+      "languages": "Tillar",
+      "school": "Oʻquv muassasasi",
+      "phone": "Telefon",
+      "telegram": "Telegram",
+      "username": "Foydalanuvchi nomi",
+      "city": "Shahar yoki tuman",
+      "gradeYear": "Sinf yoki kurs",
+      "instagram": "Instagram",
+      "linkedin": "LinkedIn",
+      "links": "Portfolio"
+    },
+    "record": "Ariza",
+    "sentOn": "{when} yuborilgan",
+    "countLabel": "ariza",
+    "listTitle": "Barcha arizalar",
+    "views": {
+      "waiting": "Qaror kutmoqda",
+      "accepted": "Qabul qilingan",
+      "rejected": "Tanlanmagan",
+      "withdrawn": "Qaytarib olingan",
+      "closed": "Yopilgan",
+      "all": "Hammasi"
+    }
+  },
+  "users": {
+    "title": "Volontyorlar",
+    "description": "Siz yaratgan vakansiyalarga ariza bergan volontyorlar.",
+    "empty": {
+      "title": "Hali volontyor yoʻq",
+      "description": "Volontyor sizning vakansiyangizga ariza bergandan keyin shu yerda paydo boʻladi."
+    },
+    "noMatches": {
+      "title": "Bu qidiruvga mos volontyor yoʻq",
+      "description": "Hammani qayta koʻrish uchun qidiruvni tozalang."
+    },
+    "filters": {
+      "search": "Ism yoki pochta boʻyicha qidirish"
+    },
+    "table": {
+      "caption": "Siz ocha oladigan volontyorlar",
+      "name": "Volontyor",
+      "email": "Pochta",
+      "applications": "Arizalar",
+      "passwordLogin": "Parol bilan kirish",
+      "joined": "Qoʻshilgan",
+      "passwordChangedAt": "Parol oxirgi marta oʻzgartirilgan",
+      "accepted": "Qabul qilingan"
+    },
+    "detail": {
+      "account": "Hisob",
+      "applications": "Sizning vakansiyalaringizga arizalar",
+      "noApplications": "Bu volontyorning vakansiyalaringizga arizasi yoʻq.",
+      "openVacancy": "Vakansiyani ochish"
+    },
+    "passwordState": {
+      "none": "Parol bilan kirish sozlanmagan",
+      "set": "Parol oʻrnatilgan",
+      "neverChanged": "Hech qachon oʻzgartirilmagan",
+      "required": "Keyingi kirishda oʻzgartirilishi shart"
+    },
+    "password": {
+      "title": "Vaqtinchalik parol berish",
+      "description": "Bu volontyorning parolini almashtiradi va keyingi kirishda yangi parol tanlashga majbur qiladi. Joriy seanslar darhol tugaydi.",
+      "privacy": "Mavjud parolni hech kim — na bu yerda, na API da — oʻqiy olmaydi. Faqat almashtirish mumkin.",
+      "label": "Vaqtinchalik parol",
+      "help": "Kamida 8 ta belgi. Uni volontyorga ishonchli kanal orqali yetkazing.",
+      "confirm": "Berish",
+      "pending": "Berilmoqda…",
+      "success": "Vaqtinchalik parol berildi."
+    },
+    "figures": {
+      "sent": "Arizalar",
+      "accepted": "Qabul qilingan",
+      "attended": "Qatnashgan tadbirlar",
+      "hours": "Tasdiqlangan soatlar",
+      "awaiting": "Davomat kutilmoqda"
+    },
+    "joinedOn": "{when} qoʻshilgan",
+    "noEmail": "Email yoʻq",
+    "record": "Volontyor",
+    "countLabel": "volontyor",
+    "found": "Topilgan volontyorlar",
+    "listTitle": "Barcha volontyorlar"
+  },
+  "attendance": {
+    "title": "Ishtirok",
+    "description": "Qabul qilgan volontyorlaringizning ishtiroki va soatlarini tasdiqlang.",
+    "empty": {
+      "title": "Tasdiqlanadigan yozuv yoʻq",
+      "description": "Qabul qilingan arizalar ishtiroki hal qilinmagunicha shu yerda turadi."
+    },
+    "table": {
+      "volunteer": "Volontyor",
+      "outcome": "Natija",
+      "hours": "Soatlar",
+      "resolved": "Belgilangan"
+    },
+    "outcome": {
+      "attended": "Keldi",
+      "excused": "Sababli",
+      "cancelled": "Bekor qilindi",
+      "awaiting_confirmation": "Tasdiq kutilmoqda",
+      "unknown": "API bu maydonni eʼlon qilmagan"
+    },
+    "resolve": {
+      "outcome": "Natija",
+      "hours": "Tasdiqlangan soatlar",
+      "hoursHelp": "Volontyor kelgan boʻlsa, majburiy.",
+      "confirm": "Qarorni saqlash",
+      "pending": "Saqlanmoqda…",
+      "success": "Ishtirok tasdiqlandi."
+    },
+    "resolved": "{when} da hal qilingan",
+    "queue": {
+      "waiting": "{count, plural, other {# koʻngillini tasdiqlash kerak}}",
+      "opensAt": "Tadbir tugagach, {when} da ochiladi.",
+      "opensUnknown": "Tadbir tugagach ochiladi.",
+      "resolvedCount": "{count, plural, other {# koʻngilli allaqachon tasdiqlangan}}",
+      "take": "Davomatni belgilash",
+      "view": "Ochish",
+      "ended": "{when} tugagan",
+      "accepted": "{count, plural, other {# koʻngilli qabul qilingan}}",
+      "number": "Raqam"
+    },
+    "roster": {
+      "title": "Ishtirok",
+      "emptyTitle": "Hali qabul qilingan volontyor yoʻq",
+      "emptyDescription": "Qabul qilingan volontyorlar ishtirokni belgilash uchun shu yerda koʻrinadi.",
+      "description": "Tadbir tugagach, kim kelganini tasdiqlang.",
+      "caption": "Qabul qilingan koʻngillilar va ularning ishtiroki",
+      "closedTitle": "Tasdiqlash hali ochilmagan",
+      "closedDescription": "U tadbir tugagach, {when} da ochiladi.",
+      "closedUnknown": "U tadbir tugagach ochiladi.",
+      "select": "Tanlash",
+      "selectAll": "Barcha koʻngillilarni tanlash",
+      "selected": "{count, plural, =0 {Hech kim tanlanmagan} other {# tanlandi}}",
+      "correct": "Tuzatish",
+      "batchTitle": "Tanlangan koʻngillilarni tasdiqlash",
+      "batchHelp": "Tanlanganlarning barchasi uchun bitta natija va bitta soat qiymati. Keyin alohida qatorni tuzatish mumkin.",
+      "submit": "Tanlanganlarni tasdiqlash",
+      "pending": "Tasdiqlanmoqda…",
+      "success": "Ishtirok tasdiqlandi.",
+      "outcome": "Tanlanganlarning barchasi uchun natija",
+      "hours": "Tanlanganlarning barchasi uchun soatlar",
+      "hoursHelp": "Vakansiyadagi taxminiy soatlar oldindan yozilgan. Tadbir qisqaroq yoki uzoqroq boʻlsa, oʻzgartiring.",
+      "countLabel": "qabul qilingan volontyor"
+    },
+    "record": "Davomat",
+    "sections": {
+      "due": "Davomat belgilanishi kerak",
+      "dueLabel": "kutmoqda",
+      "dueDescription": "Tugagan, lekin hali belgilanmagan volontyorlari bor tadbirlar.",
+      "upcoming": "Oldinda",
+      "upcomingLabel": "oldinda",
+      "upcomingDescription": "Har bir davomat oʻz tadbiri tugagach ochiladi.",
+      "recorded": "Belgilangan",
+      "recordedLabel": "belgilangan"
+    },
+    "hoursLine": "Soat: {hours}"
+  },
+  "activity": {
+    "title": "Mening amallarim",
+    "description": "Portalda qilgan barcha ishlaringiz, eng yangisidan boshlab.",
+    "empty": {
+      "title": "Hali amal yoʻq",
+      "description": "Vakansiyani eʼlon qilish, arizani koʻrib chiqish yoki ishtirokni tasdiqlash shu yerda qayd etiladi."
+    },
+    "noMatches": {
+      "title": "Filtrlarga mos yozuv yoʻq",
+      "description": "Butun tarixni koʻrish uchun filtrlarni tozalang."
+    },
+    "filters": {
+      "action": "Amal"
+    },
+    "table": {
+      "caption": "Qayd etilgan amallaringiz"
+    },
+    "listTitle": "Mening amallarim"
+  },
+  "account": {
+    "title": "Parolni oʻzgartirish",
+    "description": "Koordinator hisobingiz uchun yangi parol tanlang.",
+    "required": {
+      "title": "Yangi parol tanlang",
+      "description": "Administrator sizga vaqtinchalik parol berdi. Portaldan foydalanish uchun uni oʻzgartiring."
+    },
+    "currentPassword": "Joriy parol",
+    "newPassword": "Yangi parol",
+    "newPasswordHelp": "Kamida 8 ta belgi. Boshqa joyda ishlatgan parolni takrorlamang.",
+    "confirmPassword": "Yangi parolni takrorlang",
+    "submit": "Parolni oʻzgartirish",
+    "pending": "Oʻzgartirilmoqda…",
+    "success": "Parolingiz oʻzgartirildi.",
+    "continue": "Boshqaruv paneliga oʻtish"
+  },
+  "vocabulary": {
+    "regions": {
+      "andijan": "Andijon viloyati",
+      "bukhara": "Buxoro viloyati",
+      "fergana": "Fargʻona viloyati",
+      "jizzakh": "Jizzax viloyati",
+      "kashkadarya": "Qashqadaryo viloyati",
+      "khorezm": "Xorazm viloyati",
+      "namangan": "Namangan viloyati",
+      "navoiy": "Navoiy viloyati",
+      "samarkand": "Samarqand viloyati",
+      "sirdaryo": "Sirdaryo viloyati",
+      "surkhandarya": "Surxondaryo viloyati",
+      "tashkent-region": "Toshkent viloyati",
+      "tashkent-city": "Toshkent shahri",
+      "karakalpakstan": "Qoraqalpogʻiston"
+    },
+    "formats": {
+      "onsite": "Joyida",
+      "remote": "Masofadan",
+      "hybrid": "Aralash"
+    },
+    "acceptanceModes": {
+      "manual": "Qoʻlda",
+      "automatic": "Avtomatik"
+    }
+  },
+  "seal": {
+    "issuer": "Volontyorlar",
+    "approved": "Tasdiqlandi",
+    "accepted": "Qabul qilindi",
+    "returned": "Qaytarildi",
+    "rejected": "Rad etildi",
+    "closed": "Yopildi",
+    "recorded": "Qayd etildi",
+    "clear": "Bajarildi",
+    "label": "{word} — {date}"
+  },
+  "decisions": {
+    "group": "Qaror",
+    "cancel": "Bekor qilish",
+    "pending": "Saqlanmoqda…",
+    "application": {
+      "accept": {
+        "trigger": "Qabul qilish",
+        "prompt": "{name} qabul qilinsinmi?",
+        "confirm": "Qabul qilish",
+        "success": "{name} qabul qilindi."
+      },
+      "reject": {
+        "trigger": "Rad etish",
+        "confirm": "Rad etish",
+        "success": "{name} tanlanmadi."
+      },
+      "look": {
+        "trigger": "Koʻrib chiqilmoqda deb belgilash",
+        "success": "{name} arizasi koʻrib chiqilmoqda deb belgilandi."
+      },
+      "note": "Volontyor uchun izoh",
+      "noteHelp": "Ixtiyoriy. Volontyor buni qaror bilan birga oʻqiydi."
+    }
+  },
+  "today": {
+    "title": "Bugun",
+    "number": "Raqam",
+    "waitingLabel": "kutmoqda",
+    "requirements": {
+      "organization": "tasdiqlangan tashkilot",
+      "title": "sarlavha",
+      "description": "tavsif",
+      "format": "format",
+      "region": "hudud",
+      "startsAt": "boshlanish vaqti",
+      "applicationDeadline": "boshlanishdan oldingi, hali oʻtmagan muddat"
+    },
+    "decide": {
+      "title": "Qaror kutayotgan arizalar",
+      "countLabel": "ariza qaror kutmoqda",
+      "all": "Barcha arizalar",
+      "sent": "{when} yuborilgan",
+      "essay": "Esse ilova qilingan",
+      "looking": "Koʻrib chiqilmoqda",
+      "unnamed": "Ismi koʻrsatilmagan volontyor"
+    },
+    "rollCalls": {
+      "title": "Davomat belgilanishi kerak",
+      "countLabel": "davomat belgilanishi kerak",
+      "ended": "{when} tugagan",
+      "waiting": "{count, plural, other {# ta volontyorni belgilash kerak}}",
+      "resolved": "{count, plural, other {# tasi allaqachon belgilangan}}",
+      "open": "Davomatni belgilash"
+    },
+    "cleared": {
+      "title": "Bugun hal qilingan",
+      "countLabel": "bugungi qaror",
+      "vacancy": {
+        "approved": "Tasdiqlandi va eʼlon qilindi",
+        "changes_requested": "Tuzatish uchun qaytarildi",
+        "rejected": "Rad etildi"
+      },
+      "application": "{decision} · {vacancy}",
+      "decision": {
+        "accepted": "Qabul qilindi",
+        "rejected": "Tanlanmadi",
+        "closed": "Yopildi"
+      },
+      "rollCall": "Davomat qayd etildi: {attended} kishi keldi, {other} kishi sababli yoki bekor"
+    },
+    "clear": {
+      "title": "Sizni hech narsa kutmayapti",
+      "description": "Qaytarilgan vakansiyalar, qoralamalar, arizalar va davomatlar kelishi bilan shu yerda paydo boʻladi."
+    },
+    "operation": {
+      "title": "Sizning ishingiz",
+      "line": {
+        "live": "{count, plural, other {<n>#</n> faol vakansiya}}",
+        "applications": "{count, plural, other {<n>#</n> ta ariza yuborilgan}}",
+        "accepted": "{count, plural, other {<n>#</n> koʻngilli qabul qilingan}}",
+        "attended": "{count, plural, other {<n>#</n> ta tadbirda qatnashilgan}}",
+        "hours": "{count, plural, other {<n>#</n> soat tasdiqlangan}}"
+      }
+    },
+    "dateline": "{date} · {count, plural, =0 {sizni hech narsa kutmayapti} other {sizni # ta ish kutmoqda}}",
+    "listTitle": "Ish stolingizda",
+    "returned": {
+      "title": "Tuzatish uchun qaytarilgan",
+      "countLabel": "tuzatish uchun qaytarilgan vakansiya",
+      "when": "{when} qaytarilgan",
+      "note": "Izoh: {note}"
+    },
+    "drafts": {
+      "title": "Yuboriladigan qoralamalar",
+      "countLabel": "qoralama",
+      "when": "{when} saqlangan"
+    },
+    "desk": {
+      "edit": "Tahrirlash",
+      "ready": "Yuborishga tayyor",
+      "needs": "Kerak: {items}"
+    },
+    "inReview": {
+      "line": "{count, plural, other {# ta vakansiya administratorda koʻrib chiqilmoqda}}",
+      "open": "Koʻrish"
+    }
+  },
+  "audit": {
+    "table": {
+      "caption": "Qayd etilgan amallar",
+      "action": "Amal",
+      "entity": "Yozuv",
+      "actor": "Kim",
+      "when": "Qachon"
+    },
+    "subjects": {
+      "vacancy": "Vakansiya",
+      "application": "Ariza",
+      "coordinator": "Koordinator",
+      "volunteer": "Volontyor",
+      "organization": "Tashkilot",
+      "attendance": "Davomat yozuvi",
+      "account": "Hisob"
+    },
+    "details": {
+      "closedByArchive": "Vakansiya arxivlanganda yopildi",
+      "automatic": "Avtomatik qabul qilindi",
+      "reassigned": "Vakansiyalar topshirildi"
+    },
+    "someone": "Boshqa hisob",
+    "unknownActor": "Qayd etilmagan",
+    "countLabel": "amal",
+    "actions": {
+      "application_submitted": "Ariza yuborildi",
+      "application_under_review": "Ariza koʻrib chiqilmoqda deb belgilandi",
+      "application_accepted": "Ariza qabul qilindi",
+      "application_rejected": "Ariza tanlanmadi",
+      "application_closed": "Ariza yopildi",
+      "application_withdrawn": "Ariza qaytarib olindi",
+      "attendance_resolved": "Davomat qayd etildi",
+      "coordinator_created": "Koordinator yaratildi",
+      "coordinator_blocked": "Koordinator bloklandi",
+      "coordinator_active": "Koordinator blokdan chiqarildi",
+      "coordinator_removed": "Koordinator olib tashlandi",
+      "opportunity_created": "Vakansiya yaratildi",
+      "opportunity_updated": "Vakansiya tahrirlandi",
+      "opportunity_submitted_for_approval": "Vakansiya tasdiqlashga yuborildi",
+      "opportunity_approved": "Vakansiya tasdiqlandi va eʼlon qilindi",
+      "opportunity_published": "Vakansiya toʻgʻridan-toʻgʻri eʼlon qilindi",
+      "opportunity_changes_requested": "Vakansiya tuzatish uchun qaytarildi",
+      "opportunity_rejected": "Vakansiya rad etildi",
+      "opportunity_archived": "Vakansiya arxivlandi",
+      "organization_created": "Tashkilot qoʻshildi",
+      "organization_updated": "Tashkilot yangilandi",
+      "user_password_replaced": "Vaqtinchalik parol berildi",
+      "user_username_changed": "Foydalanuvchi nomi oʻzgartirildi",
+      "user_avatar_updated": "Rasm yangilandi",
+      "user_avatar_removed": "Rasm olib tashlandi"
+    },
+    "you": "Siz"
+  }
+}
