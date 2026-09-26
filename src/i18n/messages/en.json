@@ -188,7 +188,9 @@
     "opportunityAlreadyArchived": "This vacancy is already archived.",
     "opportunityArchived": "This vacancy is archived, so nobody new can be accepted.",
     "opportunityAtCapacity": "Every place is taken. Free a place before accepting someone else.",
-    "opportunityCannotBePublished": "This vacancy cannot be published in its current state."
+    "opportunityCannotBePublished": "This vacancy cannot be published in its current state.",
+    "competitionHoursNotAllowed": "Competition opportunities cannot include volunteer hours.",
+    "opportunityKindLocked": "The type cannot change after publication or application."
   },
   "vacancies": {
     "title": "My opportunities",
@@ -269,7 +271,9 @@
       "essayRequired": "Require an application essay",
       "essayRequiredNo": "Not required",
       "essayRequiredYes": "Required",
-      "essayRequiredHelp": "Volunteers must write an essay before they can submit this application."
+      "essayRequiredHelp": "Volunteers must write an essay before they can submit this application.",
+      "kind": "Opportunity type",
+      "kindHelp": "Choose how the person will take part. Competitions earn event XP, but no volunteer hours."
     },
     "form": {
       "createTitle": "New vacancy",
@@ -359,7 +363,11 @@
     },
     "record": "Vacancy",
     "countLabel": "vacancies",
-    "listTitle": "Your vacancies"
+    "listTitle": "Your vacancies",
+    "kinds": {
+      "volunteering": "Volunteering",
+      "competition": "Competitions"
+    }
   },
   "applications": {
     "title": "Applications",

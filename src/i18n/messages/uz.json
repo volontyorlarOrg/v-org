@@ -188,7 +188,9 @@
     "opportunityAlreadyArchived": "Bu vakansiya allaqachon arxivda.",
     "opportunityArchived": "Bu vakansiya arxivda, shuning uchun hech kimni yangidan qabul qilib boʻlmaydi.",
     "opportunityAtCapacity": "Barcha oʻrinlar band. Boshqa kishini qabul qilishdan oldin oʻrin boʻshating.",
-    "opportunityCannotBePublished": "Bu vakansiyani joriy holatida eʼlon qilib boʻlmaydi."
+    "opportunityCannotBePublished": "Bu vakansiyani joriy holatida eʼlon qilib boʻlmaydi.",
+    "competitionHoursNotAllowed": "Tanlov uchun volontyorlik soatlarini kiritib boʻlmaydi.",
+    "opportunityKindLocked": "Nashr yoki arizadan keyin turni oʻzgartirib boʻlmaydi."
   },
   "vacancies": {
     "title": "Mening imkoniyatlarim",
@@ -269,7 +271,9 @@
       "essayRequired": "Arizada esse talab qilish",
       "essayRequiredNo": "Talab qilinmaydi",
       "essayRequiredYes": "Majburiy",
-      "essayRequiredHelp": "Koʻngilli arizani yuborishdan oldin esse yozishi kerak."
+      "essayRequiredHelp": "Koʻngilli arizani yuborishdan oldin esse yozishi kerak.",
+      "kind": "Imkoniyat turi",
+      "kindHelp": "Ishtirok turini tanlang. Tanlovlar tadbir uchun XP beradi, lekin volontyorlik soatlari hisoblanmaydi."
     },
     "form": {
       "createTitle": "Yangi vakansiya",
@@ -359,7 +363,11 @@
     },
     "record": "Vakansiya",
     "countLabel": "vakansiya",
-    "listTitle": "Sizning vakansiyalaringiz"
+    "listTitle": "Sizning vakansiyalaringiz",
+    "kinds": {
+      "volunteering": "Volontyorlik",
+      "competition": "Tanlovlar"
+    }
   },
   "applications": {
     "title": "Arizalar",

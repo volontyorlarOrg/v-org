@@ -200,6 +200,7 @@ export default async function VacancyPage({
         .filter(Boolean)
         .join(" · "),
     },
+    { term: t("fields.kind"), value: t(`kinds.${vacancy.kind}`) },
     { term: t("fields.format"), value: vocabulary(`formats.${vacancy.format}`) },
     {
       term: t("fields.capacity"),
@@ -285,6 +286,7 @@ export default async function VacancyPage({
     "required",
     "hours",
     "confirmedHoursRequired",
+    "competitionHoursNotAllowed",
     "attendanceNotFound",
     "attendanceNotOpen",
     "attendanceOutcomeNotResolved",

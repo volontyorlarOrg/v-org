@@ -1734,6 +1734,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/users/{id}/progress-adjustments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add or take away XP and hours outside attendance */
+        post: operations["AdminManagementController_adjustProgress"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/admin/statistics": {
         parameters: {
             query?: never;
@@ -2035,6 +2052,11 @@ export interface components {
             password: string;
         };
         CreateOrgOpportunityDto: {
+            /**
+             * @default volunteering
+             * @enum {string}
+             */
+            kind: "volunteering" | "competition";
             slug: string;
             title: string;
             /**
@@ -2074,6 +2096,11 @@ export interface components {
             sourcedByYvc: boolean;
         };
         UpdateOrgOpportunityDto: {
+            /**
+             * @default volunteering
+             * @enum {string}
+             */
+            kind: "volunteering" | "competition";
             slug?: string;
             title?: string;
             /**
@@ -2133,6 +2160,11 @@ export interface components {
         };
         Object: Record<string, never>;
         CreateOpportunityDto: {
+            /**
+             * @default volunteering
+             * @enum {string}
+             */
+            kind: "volunteering" | "competition";
             slug: string;
             title: string;
             /**
@@ -2173,6 +2205,11 @@ export interface components {
             organizationId: string;
         };
         UpdateOpportunityDto: {
+            /**
+             * @default volunteering
+             * @enum {string}
+             */
+            kind: "volunteering" | "competition";
             slug?: string;
             title?: string;
             /**
@@ -2234,6 +2271,11 @@ export interface components {
         };
         RemoveCoordinatorDto: {
             reassignToCoordinatorId?: string;
+        };
+        AdjustProgressDto: {
+            xpDelta: number;
+            hoursDelta: number;
+            reason: string;
         };
         SaveEssayDto: {
             title?: string;
@@ -3723,6 +3765,7 @@ export interface operations {
                 q?: string;
                 region?: "andijan" | "bukhara" | "fergana" | "jizzakh" | "kashkadarya" | "khorezm" | "namangan" | "navoiy" | "samarkand" | "sirdaryo" | "surkhandarya" | "tashkent-region" | "tashkent-city" | "karakalpakstan";
                 format?: "onsite" | "remote" | "hybrid";
+                kind?: "volunteering" | "competition";
                 status?: "open" | "closed" | "full";
                 sort?: "deadline" | "startDate" | "newest";
                 page?: components["schemas"]["Object"];
@@ -4889,6 +4932,29 @@ export interface operations {
         };
         responses: {
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminManagementController_adjustProgress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdjustProgressDto"];
+            };
+        };
+        responses: {
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };
