@@ -54,7 +54,7 @@
   "auth": {
     "metaTitle": "Kirish",
     "title": "Tashkilot uchun kirish",
-    "subtitle": "Administrator bergan tashkilot identifikatori va parol bilan kiring.",
+    "subtitle": "Administrator bergan kirish nomi va parol bilan kiring.",
     "email": "Elektron pochta",
     "password": "Parol",
     "showPassword": "Parolni koʻrsatish",
@@ -67,7 +67,7 @@
       "signedOut": "Portaldan chiqdingiz.",
       "wrongRole": "Bu hisob portaldan foydalana olmaydi."
     },
-    "handle": "Tashkilot identifikatori"
+    "handle": "Kirish nomi"
   },
   "states": {
     "awaitingContract": {

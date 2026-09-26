@@ -1,4 +1,4 @@
-import { ArrowRight, CalendarDays, MapPin, Plus, Users } from "lucide-react";
+import { CalendarDays, Plus } from "lucide-react";
 import Image from "next/image";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
@@ -165,7 +165,7 @@ export default async function VacanciesPage({
             />
           ) : (
             <>
-              <ul className="grid gap-4 p-4 sm:grid-cols-2 xl:grid-cols-3">
+              <ul className="divide-y divide-border">
                 {pageState.items.map((vacancy) => {
                   const current = vacancyStateOf(vacancy);
                   const status = vacancyStatus(current);
@@ -174,16 +174,19 @@ export default async function VacanciesPage({
                     ? storedVacancyImageUrl(vacancy.imageUrl)
                     : null;
                   return (
-                    <li key={vacancy.id} className="min-w-0">
-                      <article className="panel-surface flex h-full flex-col overflow-hidden rounded-xl border border-border">
-                        <div className="relative aspect-video bg-surface-sunk">
+                    <li
+                      key={vacancy.id}
+                      className="flex min-w-0 flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-5"
+                    >
+                      <div className="flex min-w-0 flex-1 items-center gap-3">
+                        <div className="relative h-12 w-16 shrink-0 overflow-hidden rounded-lg bg-surface-sunk">
                           {imageUrl ? (
                             <Image
                               unoptimized
                               src={imageUrl}
                               alt=""
                               fill
-                              sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                              sizes="64px"
                               className="object-cover"
                             />
                           ) : (
@@ -191,67 +194,39 @@ export default async function VacanciesPage({
                               className="grid h-full place-items-center text-primary-ink"
                               aria-hidden="true"
                             >
-                              <CalendarDays className="size-10" strokeWidth={1.5} />
+                              <CalendarDays className="size-5" strokeWidth={1.5} />
                             </div>
                           )}
-                          <div className="absolute top-3 right-3 rounded-full bg-surface px-2 py-1 shadow-(--sheet-shadow)">
-                            <StatusBadge
-                              label={t(`state.${current}`)}
-                              tone={status.tone}
-                              icon={status.icon}
-                            />
-                          </div>
                         </div>
-                        <div className="flex flex-1 flex-col gap-4 p-4">
-                          <div>
-                            <h3 className="text-lg leading-snug font-semibold text-ink">
+                        <div className="min-w-0">
+                          <h3 className="truncate text-sm font-semibold text-ink">
+                            <Link
+                              href={vacancyHref(vacancy.id)}
+                              className="hover:text-primary-ink hover:underline"
+                            >
                               {vacancy.title}
-                            </h3>
-                            <p className="mt-1 text-xs text-ink-muted">
-                              {vacancy.organization?.name}
-                            </p>
-                          </div>
-                          <dl className="flex flex-col gap-2 text-sm text-ink-muted">
-                            <div className="flex items-center gap-2">
-                              <CalendarDays
-                                className="size-4 shrink-0"
-                                aria-hidden="true"
-                              />
-                              <dt className="sr-only">{t("table.starts")}</dt>
-                              <dd>
-                                {format.dateTime(new Date(vacancy.startsAt), "day")}
-                              </dd>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <MapPin className="size-4 shrink-0" aria-hidden="true" />
-                              <dt className="sr-only">{t("fields.region")}</dt>
-                              <dd>{vocabulary(`regions.${vacancy.region}`)}</dd>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Users className="size-4 shrink-0" aria-hidden="true" />
-                              <dt className="sr-only">{t("table.applications")}</dt>
-                              <dd>
-                                {format.number(counted?.sent ?? 0)}{" "}
-                                {t("table.applications")}
-                                {counted?.waiting
-                                  ? ` · ${t("table.waiting", { count: counted.waiting })}`
-                                  : ""}
-                              </dd>
-                            </div>
-                          </dl>
-                          <Link
-                            href={vacancyHref(vacancy.id)}
-                            className={buttonClass({
-                              variant: "outline",
-                              size: "sm",
-                              className: "mt-auto w-full justify-between",
-                            })}
-                          >
-                            {t("manage")}
-                            <ArrowRight className="size-4" aria-hidden="true" />
-                          </Link>
+                            </Link>
+                          </h3>
+                          <p className="mt-1 truncate text-xs text-ink-muted">
+                            {format.dateTime(new Date(vacancy.startsAt), "day")}
+                            {" · "}
+                            {vocabulary(`regions.${vacancy.region}`)}
+                          </p>
                         </div>
-                      </article>
+                      </div>
+                      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 sm:justify-end">
+                        <StatusBadge
+                          label={t(`state.${current}`)}
+                          tone={status.tone}
+                          icon={status.icon}
+                        />
+                        <span className="tabular text-sm text-ink-muted">
+                          {format.number(counted?.sent ?? 0)} {t("table.applications")}
+                          {counted?.waiting
+                            ? ` · ${t("table.waiting", { count: counted.waiting })}`
+                            : ""}
+                        </span>
+                      </div>
                     </li>
                   );
                 })}

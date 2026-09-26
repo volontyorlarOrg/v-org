@@ -17,7 +17,7 @@ export type RouteArea = "auth" | "portal" | "account";
 
 export type RouteGuard = "guest" | "session";
 
-export const NAV_GROUPS = ["work", "people"] as const;
+export const NAV_GROUPS = ["work"] as const;
 
 export const NAV_COUNTS = [
   "pendingApproval",
@@ -92,8 +92,7 @@ export const appRoutes: readonly AppRoute[] = [
     path: "/attendance",
     area: "portal",
     guard: "session",
-    inNav: true,
-    group: "work",
+    inNav: false,
     count: "attendanceDue",
     icon: "calendar-check",
   },
@@ -102,8 +101,7 @@ export const appRoutes: readonly AppRoute[] = [
     path: "/users",
     area: "portal",
     guard: "session",
-    inNav: true,
-    group: "people",
+    inNav: false,
     icon: "users",
   },
   {
