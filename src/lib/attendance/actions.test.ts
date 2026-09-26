@@ -9,6 +9,23 @@ import {
 } from "@/lib/attendance/schema";
 
 describe("resolveAttendanceSchema", () => {
+  it("confirms competition participation without volunteer hours", () => {
+    const result = resolveAttendanceSchema.safeParse({
+      outcome: "attended",
+      kind: "competition",
+    });
+    expect(result.success).toBe(true);
+    if (result.success)
+      expect(attendanceBody(result.data)).toEqual({ outcome: "attended" });
+    expect(
+      resolveAttendanceSchema.safeParse({
+        outcome: "attended",
+        kind: "competition",
+        confirmedHours: "2",
+      }).success,
+    ).toBe(false);
+  });
+
   it("accepts attendance with confirmed hours", () => {
     expect(
       resolveAttendanceSchema.safeParse({ outcome: "attended", confirmedHours: "4" })

@@ -208,6 +208,8 @@ export default async function VacanciesPage({
                             </Link>
                           </h3>
                           <p className="mt-1 truncate text-xs text-ink-muted">
+                            {t(`kinds.${vacancy.kind}`)}
+                            {" · "}
                             {format.dateTime(new Date(vacancy.startsAt), "day")}
                             {" · "}
                             {vocabulary(`regions.${vacancy.region}`)}
