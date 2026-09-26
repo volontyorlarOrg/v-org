@@ -1,12 +1,12 @@
 # Volontyorlar Organization Portal
 
-The private portal for organizations that publish volunteering opportunities on Volontyorlar. An administrator creates one account for an organization and gives it its organization handle and permanent password. The organization cannot change that password; an administrator can replace it or block the account.
+The private portal for organizations that publish volunteering opportunities on Volontyorlar. An administrator creates the organization and its account together, with a permanent login name and password. The organization cannot change that password; an administrator can replace it or block the account.
 
 This repository owns the UI at `org.volontyorlar.uz`. `v-backend` owns authentication, permissions, approval, and records; `v-admin` owns account issuance and vacancy approval. The screenshots supplied for this project are approximate screen direction. This portal uses the component system and visual language of `v-staff` and `v-admin`.
 
 ## Workflow
 
-1. Sign in with the organization slug and admin-issued password.
+1. Sign in with the organization login name (its stable slug) and admin-issued password.
 2. Create a vacancy assigned to this organization. It starts as a draft.
 3. Submit it for administrator review. It becomes public only after approval in `v-admin`.
 4. Review applicants to vacancies created by this account.

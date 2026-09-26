@@ -16,6 +16,7 @@ import {
 } from "@/components/register/register";
 import { LoadFailure } from "@/components/states/load-failure";
 import { PageHeader } from "@/components/states/page-header";
+import { buttonClass } from "@/components/ui/button";
 import { Pagination } from "@/components/states/pagination";
 import {
   Table,
@@ -66,10 +67,11 @@ export default async function ApplicationsPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [t, attendance, common, format] = await Promise.all([
+  const [t, attendance, common, nav, format] = await Promise.all([
     getTranslations("applications"),
     getTranslations("attendance"),
     getTranslations("common"),
+    getTranslations("nav"),
     getFormatter(),
   ]);
 
@@ -101,7 +103,18 @@ export default async function ApplicationsPage({
 
   return (
     <>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        actions={
+          <Link
+            href={navHref("users")}
+            className={buttonClass({ size: "sm", variant: "outline" })}
+          >
+            {nav("users")}
+          </Link>
+        }
+      />
 
       {failure ? <LoadFailure failure={failure} /> : null}
 

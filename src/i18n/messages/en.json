@@ -54,7 +54,7 @@
   "auth": {
     "metaTitle": "Sign in",
     "title": "Organization sign-in",
-    "subtitle": "Sign in with the organization handle and password an administrator gave you.",
+    "subtitle": "Sign in with the login name and password given by an administrator.",
     "email": "Email",
     "password": "Password",
     "showPassword": "Show password",
@@ -67,7 +67,7 @@
       "signedOut": "You are signed out.",
       "wrongRole": "That account cannot use this portal."
     },
-    "handle": "Organization handle"
+    "handle": "Login name"
   },
   "states": {
     "awaitingContract": {

@@ -63,11 +63,12 @@ export default async function TodayPage({ params }: PageProps<"/[locale]/dashboa
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [t, submit, seal, vocabulary, format, session] = await Promise.all([
+  const [t, submit, seal, vocabulary, nav, format, session] = await Promise.all([
     getTranslations("today"),
     getTranslations("vacancies.submit"),
     getTranslations("seal"),
     getTranslations("vocabulary"),
+    getTranslations("nav"),
     getFormatter(),
     getSession(),
   ]);
@@ -219,6 +220,14 @@ export default async function TodayPage({ params }: PageProps<"/[locale]/dashboa
     <>
       <PageHeader
         title={t("title")}
+        actions={
+          <Link
+            href={navHref("attendance")}
+            className={buttonClass({ size: "sm", variant: "outline" })}
+          >
+            {nav("attendance")}
+          </Link>
+        }
         description={t("dateline", {
           date: format.dateTime(now, {
             weekday: "long",

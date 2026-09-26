@@ -2021,6 +2021,7 @@ export interface components {
         CreateOrganizationDto: {
             name: string;
             slug: string;
+            password: string;
             logoUrl?: string;
             /** @default false */
             verified: boolean;
