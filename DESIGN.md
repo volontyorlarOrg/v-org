@@ -235,11 +235,12 @@ tabular figures so the column lines up.
 
 A fixed navy rail of 15rem on the left from the large breakpoint; below it the
 rail becomes a drawer behind a menu button in a white header, and the content
-takes the width. The rail holds the stacked inverse lockup and three destinations:
-Today, Vacancies and Applications. Vacancies and Applications show waiting counts.
+takes the width. The rail holds the stacked inverse lockup and two destinations:
+Today and Vacancies. Vacancies show the changes requested count. Each vacancy
+record has its own Applicants section, with links to the application records.
 Attendance is linked from Today and each vacancy record; the volunteer directory
-is linked from Applications. At its foot are the identity card, My
-activity, language, theme, and Sign out.
+is linked from an application record. At its foot are My activity, language,
+theme, and Sign out.
 
 The content column is capped at 80rem with 16px side padding on phones, 24px on
 small screens and 32px on the desk, 20px between blocks. A screen is a page

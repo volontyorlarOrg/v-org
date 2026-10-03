@@ -82,9 +82,7 @@ export const appRoutes: readonly AppRoute[] = [
     path: "/applications",
     area: "portal",
     guard: "session",
-    inNav: true,
-    group: "work",
-    count: "pendingReview",
+    inNav: false,
     icon: "inbox",
   },
   {
