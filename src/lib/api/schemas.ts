@@ -79,6 +79,12 @@ export const approvalReviewerSchema = z.object({
   displayName: optional(z.string()),
 });
 
+export const scheduleSessionSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  startTime: z.string().regex(/^\d{2}:\d{2}$/),
+  endTime: z.string().regex(/^\d{2}:\d{2}$/),
+});
+
 export const vacancySchema = z.object({
   id,
   slug: z.string(),
@@ -99,6 +105,9 @@ export const vacancySchema = z.object({
   estimatedTotalHours: decimal,
   acceptanceMode: z.enum(ACCEPTANCE_MODES).default("manual"),
   essayRequired: z.boolean().default(false),
+  essayPrompt: optional(z.string()),
+  schedule: optional(z.array(scheduleSessionSchema)),
+  allDaysRequired: z.boolean().default(true),
   approvalStatus: optional(z.enum(OPPORTUNITY_APPROVAL_STATUSES)),
   approvalSubmittedAt: optional(isoDate),
   approvalReviewedAt: optional(isoDate),
@@ -117,8 +126,28 @@ export const vacancySchema = z.object({
 
 export type Vacancy = z.infer<typeof vacancySchema>;
 
+export const vacancyProgressSchema = z.object({
+  applications: z.number().int().default(0),
+  awaitingReview: z.number().int().default(0),
+  accepted: z.number().int().default(0),
+  attended: z.number().int().default(0),
+  attendanceResolved: z.number().int().default(0),
+});
+
+export type VacancyProgress = z.infer<typeof vacancyProgressSchema>;
+
+export const vacancyListItemSchema = vacancySchema.extend({
+  saved: z.boolean().default(false),
+  progress: optional(vacancyProgressSchema),
+});
+
+export type VacancyListItem = z.infer<typeof vacancyListItemSchema>;
+
 export const vacancyListSchema = z
-  .union([z.array(vacancySchema), z.object({ items: z.array(vacancySchema) })])
+  .union([
+    z.array(vacancyListItemSchema),
+    z.object({ items: z.array(vacancyListItemSchema) }),
+  ])
   .transform((value) => (Array.isArray(value) ? value : value.items));
 
 export const attendanceSchema = z.object({

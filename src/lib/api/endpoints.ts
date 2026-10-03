@@ -45,6 +45,16 @@ export const endpoints = {
     path: "/org/opportunities/{id}/image",
     contract: "published",
   },
+  saveVacancy: {
+    method: "PUT",
+    path: "/org/opportunities/{id}/saved",
+    contract: "published",
+  },
+  unsaveVacancy: {
+    method: "DELETE",
+    path: "/org/opportunities/{id}/saved",
+    contract: "published",
+  },
   submitVacancyForApproval: {
     method: "POST",
     path: "/org/opportunities/{id}/submit-for-approval",
