@@ -175,6 +175,10 @@ export function rollCallsDue(
       endsAt: application.opportunity?.endsAt,
     };
     if (!timing.startsAt || !isAttendanceOpen(timing, now)) continue;
+    // Results with an administrator, or verified, need nothing from today.
+    const sheet = vacancy?.attendanceSheet;
+    if (sheet?.status === "submitted") continue;
+    if (sheet?.status === "verified" && !sheet.correction) continue;
 
     const call = calls.get(application.opportunityId) ?? {
       vacancyId: application.opportunityId,

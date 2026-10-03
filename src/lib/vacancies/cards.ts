@@ -9,6 +9,7 @@ export const CARD_STAGES = [
   "changes_requested",
   "published",
   "ended",
+  "verifying",
   "results",
   "rejected",
   "archived",
@@ -28,7 +29,7 @@ export type CardAction =
 
 export type CardCount =
   | { key: "toReview" | "applications" | "attendanceDue" | "attended"; count: number }
-  | { key: "noApplications" };
+  | { key: "noApplications" | "resultsReturned" | "awaitingVerification" };
 
 export type VacancyCard = {
   stage: CardStage;
@@ -49,6 +50,10 @@ export function cardStageOf(vacancy: VacancyListItem, now: Date): CardStage {
   const state = vacancyStateOf(vacancy);
   if (state !== "approved") return state;
   if (!isAttendanceOpen(vacancy, now)) return "published";
+  const sheet = vacancy.attendanceSheet;
+  if (sheet?.status === "submitted") return "verifying";
+  if (sheet) return sheet.status === "verified" && !sheet.correction ? "results" : "ended";
+  // Vacancies recorded before results were verified carry no sheet.
   const progress = vacancy.progress ?? EMPTY;
   return progress.accepted > 0 && progress.attendanceResolved >= progress.accepted
     ? "results"
@@ -59,6 +64,7 @@ export function cardOf(vacancy: VacancyListItem, now: Date): VacancyCard {
   const stage = cardStageOf(vacancy, now);
   const progress = vacancy.progress ?? EMPTY;
   const detail = vacancyHref(vacancy.id);
+  const tab = (name: "applications" | "attendance") => `${detail}?tab=${name}`;
   const sent: CardCount | null =
     progress.applications > 0
       ? { key: "applications", count: progress.applications }
@@ -85,7 +91,7 @@ export function cardOf(vacancy: VacancyListItem, now: Date): VacancyCard {
       return {
         stage,
         action: "manage",
-        href: detail,
+        href: tab("applications"),
         count:
           progress.awaitingReview > 0
             ? { key: "toReview", count: progress.awaitingReview }
@@ -96,11 +102,14 @@ export function cardOf(vacancy: VacancyListItem, now: Date): VacancyCard {
         ? {
             stage,
             action: "attendance",
-            href: `${detail}#roll-call`,
-            count: {
-              key: "attendanceDue",
-              count: progress.accepted - progress.attendanceResolved,
-            },
+            href: tab("attendance"),
+            count:
+              vacancy.attendanceSheet?.status === "changes_requested"
+                ? { key: "resultsReturned" }
+                : {
+                    key: "attendanceDue",
+                    count: progress.accepted - progress.attendanceResolved,
+                  },
           }
         : {
             stage,
@@ -108,11 +117,18 @@ export function cardOf(vacancy: VacancyListItem, now: Date): VacancyCard {
             href: detail,
             count: sent ?? { key: "noApplications" },
           };
+    case "verifying":
+      return {
+        stage,
+        action: "results",
+        href: tab("attendance"),
+        count: { key: "awaitingVerification" },
+      };
     case "results":
       return {
         stage,
         action: "results",
-        href: `${detail}#roll-call`,
+        href: tab("attendance"),
         count: { key: "attended", count: progress.attended },
       };
     case "rejected":

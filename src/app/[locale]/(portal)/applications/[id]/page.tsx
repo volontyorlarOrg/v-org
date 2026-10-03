@@ -157,9 +157,10 @@ export default async function ApplicationPage({
     isReviewable(application.status) &&
     !(application.status === "accepted" && attendanceResolved);
 
-  const [labels, options] = await Promise.all([
+  const [labels, options, results] = await Promise.all([
     decisionLabels(),
     applicationDecisions(),
+    getTranslations("results"),
   ]);
   const choices = options({ name, status: application.status, withNote: true }).filter(
     (option) => (application.status === "accepted" ? option.key === "reject" : true),
@@ -242,20 +243,38 @@ export default async function ApplicationPage({
               <p className="mt-1 text-sm text-ink-muted">
                 {application.status === "accepted"
                   ? t("review.acceptedDescription")
-                  : t("review.description")}
+                  : results("list.decideDescription")}
               </p>
             </div>
           </div>
           <div className="flex w-full flex-col gap-3 lg:w-auto lg:items-end">
-            <InlineDecision
-              action={reviewApplicationAction}
-              hidden={{ id: application.id }}
-              subject={name}
-              labels={labels}
-              options={choices}
-              className="lg:justify-end"
-              expandClassName="w-full lg:w-[30rem]"
-            />
+            {application.status === "accepted" ? (
+              <InlineDecision
+                action={reviewApplicationAction}
+                hidden={{ id: application.id }}
+                subject={name}
+                labels={labels}
+                options={choices}
+                className="lg:justify-end"
+                expandClassName="w-full lg:w-[30rem]"
+              />
+            ) : application.opportunity ? (
+              <>
+                {application.stagedDecision ? (
+                  <span className="text-sm text-accent-ink">
+                    {results("list.staged", {
+                      decision: results(`decision.${application.stagedDecision}`),
+                    })}
+                  </span>
+                ) : null}
+                <Link
+                  href={`${vacancyHref(application.opportunity.id)}?tab=applications`}
+                  className={buttonClass({ size: "sm" })}
+                >
+                  {results("list.decide")}
+                </Link>
+              </>
+            ) : null}
           </div>
         </section>
       ) : application.status === "accepted" && attendanceResolved ? (

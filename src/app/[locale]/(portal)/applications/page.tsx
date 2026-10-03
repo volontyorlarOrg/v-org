@@ -7,7 +7,6 @@ import {
   applicationStatus,
   attendanceStatus,
 } from "@/components/portal/status-badge";
-import { InlineDecision } from "@/components/register/inline-decision";
 import {
   Register,
   RegisterNote,
@@ -29,7 +28,6 @@ import {
 } from "@/components/ui/table";
 import { Link } from "@/i18n/navigation";
 import { failureOf, isReady } from "@/lib/api/load";
-import { reviewApplicationAction } from "@/lib/applications/actions";
 import { loadApplications } from "@/lib/applications/data.server";
 import {
   APPLICATION_VIEWS,
@@ -39,7 +37,6 @@ import {
   sortApplications,
   volunteerNameOf,
 } from "@/lib/applications/filters";
-import { applicationDecisions, decisionLabels } from "@/lib/queue/decisions.server";
 import { applicationHref, navHref, vacancyHref } from "@/lib/routing/routes";
 import {
   DEFAULT_PAGE_SIZE,
@@ -88,10 +85,7 @@ export default async function ApplicationsPage({
   const pageState = paginate(rows, page, DEFAULT_PAGE_SIZE);
   const listPath = navHref("applications");
 
-  const [labels, options] = await Promise.all([
-    decisionLabels(),
-    applicationDecisions(),
-  ]);
+  const results = await getTranslations("results");
 
   const tabs = APPLICATION_VIEWS.map((value) => ({
     key: value,
@@ -228,16 +222,28 @@ export default async function ApplicationsPage({
                             : "—"}
                         </TableCell>
                         <TableCell className="text-right">
-                          {waiting ? (
-                            <InlineDecision
-                              action={reviewApplicationAction}
-                              hidden={{ id: application.id }}
-                              subject={name}
-                              labels={labels}
-                              options={options({ name, status: application.status })}
-                              className="justify-end lg:flex-nowrap"
-                              expandClassName="mt-2 text-left"
-                            />
+                          {waiting && application.opportunity ? (
+                            <span className="inline-flex items-center justify-end gap-2.5">
+                              {application.stagedDecision ? (
+                                <span className="text-xs whitespace-nowrap text-accent-ink">
+                                  {results("list.staged", {
+                                    decision: results(
+                                      `decision.${application.stagedDecision}`,
+                                    ),
+                                  })}
+                                </span>
+                              ) : null}
+                              <Link
+                                href={`${vacancyHref(application.opportunity.id)}?tab=applications`}
+                                className={buttonClass({
+                                  variant: "outline",
+                                  size: "row",
+                                })}
+                              >
+                                {results("list.review")}
+                                <span className="sr-only"> — {name}</span>
+                              </Link>
+                            </span>
                           ) : null}
                         </TableCell>
                       </TableRow>
