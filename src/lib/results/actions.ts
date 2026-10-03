@@ -114,8 +114,7 @@ export async function discardAttendanceDraftAction(
  */
 export async function finishAttendanceAction(
   vacancyId: string,
-  entries: SheetEntry[],
-  note: string,
+  { entries, note = "" }: { entries: SheetEntry[]; note?: string },
 ): Promise<CallResult<AttendanceSheet>> {
   if (entries.length > 0) {
     const saved = await call("saveAttendanceDraft", {
