@@ -94,10 +94,13 @@ export function AttendanceDesk({
   vacancyId,
   initial,
   dates,
+  startEditing = false,
 }: {
   vacancyId: string;
   initial: AttendanceSheet;
   dates: SheetDates;
+  /** An administrator adjusting a submission before verifying it. */
+  startEditing?: boolean;
 }) {
   const t = useTranslations("results.sheet");
   const outcomeLabel = useTranslations("attendance.outcome");
@@ -106,11 +109,12 @@ export function AttendanceDesk({
   const kind = view.kind;
   const verification = view.requiresVerification;
   const startsEditing =
-    view.editable &&
-    view.rows.length > 0 &&
-    (view.status === "draft" ||
-      view.status === "changes_requested" ||
-      (!verification && view.status !== "verified" && view.status !== "submitted"));
+    (startEditing && view.editable) ||
+    (view.editable &&
+      view.rows.length > 0 &&
+      (view.status === "draft" ||
+        view.status === "changes_requested" ||
+        (!verification && view.status !== "verified" && view.status !== "submitted")));
   const [editing, setEditing] = useState(startsEditing);
   const [saved, setSaved] = useState(() => view.rows.map(editableRow));
   const [rows, setRows] = useState(saved);
@@ -218,7 +222,7 @@ export function AttendanceDesk({
   function finish(note: string) {
     setFinishError(null);
     startTransition(async () => {
-      const result = await finishAttendanceAction(vacancyId, changes, note);
+      const result = await finishAttendanceAction(vacancyId, { entries: changes, note });
       if (!result.ok) {
         if (result.code === "attendanceIncomplete" && result.problems?.length) {
           setFinishError(
@@ -897,16 +901,18 @@ export function AttendanceDesk({
               </span>
             </p>
             <span className="flex flex-wrap gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={!dirty || pending}
-                onClick={save}
-              >
-                <FileText aria-hidden="true" />
-                {t("footer.save")}
-              </Button>
+              {view.status === "submitted" ? null : (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={!dirty || pending}
+                  onClick={save}
+                >
+                  <FileText aria-hidden="true" />
+                  {t("footer.save")}
+                </Button>
+              )}
               <Button
                 type="button"
                 size="sm"
