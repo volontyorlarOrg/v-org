@@ -5,16 +5,15 @@ import type { Metadata } from "next";
 import { LoadFailure } from "@/components/states/load-failure";
 import { PageHeader } from "@/components/states/page-header";
 import { StatePanel } from "@/components/states/state-panel";
-import { VacancyForm } from "@/components/vacancies/vacancy-form";
+import { VacancyWizard } from "@/components/vacancies/wizard/vacancy-wizard";
+import { WizardMessages } from "@/components/vacancies/wizard/wizard-messages";
 import { failureOf, isReady } from "@/lib/api/load";
-import { REGIONS, VACANCY_FORMATS } from "@/lib/domain/vocabulary";
+import { REGIONS } from "@/lib/domain/vocabulary";
 import { readOption, type SearchParams } from "@/lib/routing/search-params";
-import { vacancyHref } from "@/lib/routing/routes";
-import { canEditVacancy } from "@/lib/vacancies/approval";
-import { updateVacancyAction } from "@/lib/vacancies/actions";
+import { navHref, vacancyHref } from "@/lib/routing/routes";
+import { canEditVacancy, vacancyStateOf } from "@/lib/vacancies/approval";
 import { loadOrganizations, loadVacancy } from "@/lib/vacancies/data.server";
-import { toDateTimeLocal } from "@/lib/vacancies/form";
-import { vacancyFormLabels } from "@/lib/vacancies/labels.server";
+import { WIZARD_STEPS, draftFromVacancy } from "@/lib/vacancies/draft";
 
 export const dynamic = "force-dynamic";
 
@@ -22,8 +21,8 @@ export async function generateMetadata({
   params,
 }: PageProps<"/[locale]/vacancies/[id]/edit">): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "vacancies" });
-  return { title: t("form.editTitle") };
+  const t = await getTranslations({ locale, namespace: "vacancies.wizard" });
+  return { title: t("editTitle") };
 }
 
 export default async function EditVacancyPage({
@@ -34,83 +33,74 @@ export default async function EditVacancyPage({
   searchParams: Promise<SearchParams>;
 }) {
   const { locale, id } = await params;
-  const photoFailed = readOption(await searchParams, "photo", ["failed"]) === "failed";
   setRequestLocale(locale);
+  const query = await searchParams;
 
-  const t = await getTranslations("vacancies");
-  const [loaded, organizations] = await Promise.all([
+  const [t, vacancies, loaded, organizations] = await Promise.all([
+    getTranslations("vacancies.wizard"),
+    getTranslations("vacancies"),
     loadVacancy(id),
     loadOrganizations(),
   ]);
+  const back = { href: navHref("vacancies"), label: t("backToList") };
   const failure = failureOf(loaded) ?? failureOf(organizations);
-  const back = { href: vacancyHref(id), label: t("form.backToVacancy") };
 
   if (failure) {
     return (
       <>
-        <PageHeader back={back} title={t("form.editTitle")} />
+        <PageHeader back={back} title={t("editTitle")} />
         <LoadFailure failure={failure} />
       </>
     );
   }
 
-  if (!isReady(loaded) || !isReady(organizations)) notFound();
+  if (!isReady(loaded)) notFound();
 
   const vacancy = loaded.data;
-  const labels = await vacancyFormLabels(
-    t("form.submitUpdate"),
-    t("form.pending"),
-    t("form.updated"),
-  );
+  const state = vacancyStateOf(vacancy);
+  const organization =
+    (isReady(organizations)
+      ? organizations.data.find((item) => item.id === vacancy.organizationId)
+      : undefined) ?? vacancy.organization;
+
+  if (!canEditVacancy(vacancy) || !organization) {
+    return (
+      <>
+        <PageHeader
+          back={{
+            href: vacancyHref(vacancy.id),
+            label: vacancies("form.backToVacancy"),
+          }}
+          title={t("editTitle")}
+          description={vacancy.title}
+        />
+        <StatePanel role="status" title={vacancies("form.locked")} />
+      </>
+    );
+  }
 
   return (
     <>
-      <PageHeader back={back} title={t("form.editTitle")} description={vacancy.title} />
-
-      {canEditVacancy(vacancy) ? (
-        <VacancyForm
-          action={updateVacancyAction}
-          id={vacancy.id}
+      <PageHeader back={back} title={t("editTitle")} />
+      <WizardMessages>
+        <VacancyWizard
           locale={locale}
-          cancelHref={vacancyHref(vacancy.id)}
-          labels={labels}
-          kindLocked={Boolean(vacancy.publishedAt)}
-          defaults={{
-            kind: vacancy.kind,
-            title: vacancy.title,
-            description: vacancy.description,
-            organizationId: vacancy.organizationId,
-            region: vacancy.region,
-            format: vacancy.format,
-            city: vacancy.city ?? "",
-            locationName: vacancy.locationName ?? "",
-            startsAt: toDateTimeLocal(vacancy.startsAt),
-            endsAt: toDateTimeLocal(vacancy.endsAt),
-            applicationDeadline: toDateTimeLocal(vacancy.applicationDeadline),
-            capacity: vacancy.capacity === undefined ? "" : String(vacancy.capacity),
-            estimatedTotalHours:
-              vacancy.estimatedTotalHours === undefined
-                ? ""
-                : String(vacancy.estimatedTotalHours),
-            acceptanceMode: vacancy.acceptanceMode,
-            essayRequired: vacancy.essayRequired ? "on" : "",
-            requirements: vacancy.requirements.join("\n"),
+          vacancyId={vacancy.id}
+          initialDraft={draftFromVacancy(vacancy, t("questionPlaceholder"))}
+          initialStep={readOption(query, "step", WIZARD_STEPS) ?? "details"}
+          organization={{
+            name: organization.name,
+            verified: organization.verified,
+            logoUrl: organization.logoUrl,
           }}
-          imageUrl={vacancy.imageUrl}
-          initialNotice={
-            photoFailed ? t("form.photoUploadAfterCreateFailed") : undefined
-          }
-          organizations={organizations.data.map((item) => ({
-            id: item.id,
-            name: item.name,
-            verified: item.verified,
-          }))}
+          storedImageUrl={vacancy.imageUrl ?? null}
           regions={REGIONS}
-          formats={VACANCY_FORMATS}
+          kindLocked={Boolean(vacancy.publishedAt)}
+          published={state === "approved"}
+          feedback={state === "changes_requested" ? vacancy.approvalNote : undefined}
+          photoFailed={readOption(query, "photo", ["failed"]) === "failed"}
         />
-      ) : (
-        <StatePanel role="status" title={t("form.locked")} />
-      )}
+      </WizardMessages>
     </>
   );
 }

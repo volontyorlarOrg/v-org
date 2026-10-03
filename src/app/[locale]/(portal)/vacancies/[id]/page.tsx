@@ -48,6 +48,7 @@ import {
 } from "@/lib/domain/vocabulary";
 import { applicationDecisions, decisionLabels } from "@/lib/queue/decisions.server";
 import { applicationHref, navHref, vacancyEditHref } from "@/lib/routing/routes";
+import { readParam } from "@/lib/routing/search-params";
 import {
   APPROVAL_REQUIREMENTS,
   attendanceOpensAt,
@@ -77,10 +78,14 @@ export async function generateMetadata({
 
 export default async function VacancyPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/vacancies/[id]">) {
   const { locale, id } = await params;
   setRequestLocale(locale);
+  const justSent = readParam(await searchParams, "sent") === "1";
 
+  // The vacancy, its organization and its applications do not depend on each
+  // other, so all three are asked for at once.
   const [
     t,
     attendanceCopy,
@@ -90,6 +95,9 @@ export default async function VacancyPage({
     common,
     seal,
     format,
+    loaded,
+    organizations,
+    applications,
   ] = await Promise.all([
     getTranslations("vacancies"),
     getTranslations("attendance"),
@@ -99,10 +107,12 @@ export default async function VacancyPage({
     getTranslations("common"),
     getTranslations("seal"),
     getFormatter(),
+    loadVacancy(id),
+    loadOrganizations(),
+    loadApplications({ vacancyId: id }),
   ]);
 
   const back = { href: navHref("vacancies"), label: t("title") };
-  const loaded = await loadVacancy(id);
   const failure = failureOf(loaded);
 
   if (failure) {
@@ -120,11 +130,6 @@ export default async function VacancyPage({
   const now = new Date();
   const state = vacancyStateOf(vacancy);
   const status = vacancyStatus(state);
-
-  const [organizations, applications] = await Promise.all([
-    loadOrganizations(),
-    loadApplications({ vacancyId: vacancy.id }),
-  ]);
 
   const organization =
     (isReady(organizations)
@@ -180,6 +185,41 @@ export default async function VacancyPage({
         : `${vacancy.locationName} · ${vacancy.city}`
       : (vacancy.locationName ?? vacancy.city);
 
+  const schedule = vacancy.schedule ?? [];
+  const firstDay = schedule[0];
+  const sameTimes = schedule.every(
+    (day) => day.startTime === firstDay?.startTime && day.endTime === firstDay?.endTime,
+  );
+  const scheduleFacts: Fact[] = firstDay
+    ? [
+        {
+          term: t("wizard.facts.dailyTime"),
+          value: sameTimes
+            ? schedule.length > 1
+              ? t("wizard.eachDay", {
+                  time: `${firstDay.startTime}–${firstDay.endTime}`,
+                })
+              : `${firstDay.startTime}–${firstDay.endTime}`
+            : schedule
+                .map(
+                  (day) =>
+                    `${format.dateTime(new Date(`${day.date}T12:00:00+05:00`), "day")}: ${day.startTime}–${day.endTime}`,
+                )
+                .join(" · "),
+        },
+        ...(schedule.length > 1
+          ? [
+              {
+                term: t("wizard.facts.attendance"),
+                value: vacancy.allDaysRequired
+                  ? t("wizard.allDays", { count: schedule.length })
+                  : t("wizard.anyDays"),
+              },
+            ]
+          : []),
+      ]
+    : [];
+
   const facts: Fact[] = [
     {
       term: t("fields.startsAt"),
@@ -190,6 +230,7 @@ export default async function VacancyPage({
           })
         : format.dateTime(new Date(vacancy.startsAt), "stamp"),
     },
+    ...scheduleFacts,
     {
       term: t("fields.applicationDeadline"),
       value: format.dateTime(new Date(vacancy.applicationDeadline), "stamp"),
@@ -225,10 +266,10 @@ export default async function VacancyPage({
       value: vocabulary(`acceptanceModes.${vacancy.acceptanceMode}`),
     },
     {
-      term: t("fields.essayRequired"),
+      term: t("wizard.question"),
       value: vacancy.essayRequired
-        ? t("fields.essayRequiredYes")
-        : t("fields.essayRequiredNo"),
+        ? (vacancy.essayPrompt ?? t("wizard.questionPlaceholder"))
+        : t("wizard.noQuestion"),
     },
   ];
 
@@ -437,6 +478,10 @@ export default async function VacancyPage({
           {t("detail.results")}
         </a>
       </nav>
+
+      {justSent && state === "pending_review" ? (
+        <StatePanel role="status" tone="notice" title={t("wizard.sent")} />
+      ) : null}
 
       {state === "pending_review" ? (
         <section

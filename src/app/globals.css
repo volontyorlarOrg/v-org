@@ -310,6 +310,47 @@
     rotate: -8deg;
   }
 
+  .wizard-step-enter {
+    animation: wizard-step-enter 260ms var(--ease-press) both;
+  }
+
+  @keyframes wizard-step-enter {
+    from {
+      opacity: 0;
+      translate: 0 6px;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+
+  .card-rise {
+    transition:
+      translate 200ms var(--ease-press),
+      box-shadow 200ms var(--ease-press),
+      border-color 200ms var(--ease-press);
+  }
+
+  .card-rise:hover,
+  .card-rise:focus-within {
+    translate: 0 -2px;
+    box-shadow: var(--shadow-raised);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .wizard-step-enter {
+      animation: none;
+    }
+
+    .card-rise,
+    .card-rise:hover,
+    .card-rise:focus-within {
+      translate: none;
+      transition: none;
+    }
+  }
+
   .seal[data-fresh] {
     animation: seal-press 520ms var(--ease-press) both;
   }

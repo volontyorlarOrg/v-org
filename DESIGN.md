@@ -136,7 +136,7 @@ components:
 
 ## Overview
 
-The organization portal uses the same registry system as v-staff and v-admin: navy shell, paper and hairline surfaces, Source Serif 4 figures, Onest working text, approval seals, and the Uzbekistan terrain. Its audience sees only the work of its own account and organization. The opportunity list uses compact thumbnail rows as an entry point; detail pages use the shared sheets, registers, facts, statuses, and decisions.
+The organization portal uses the same registry system as v-staff and v-admin: navy shell, paper and hairline surfaces, Source Serif 4 figures, Onest working text, approval seals, and the Uzbekistan terrain. Its audience sees only the work of its own account and organization. The opportunity list is a grid of photo cards, led by a dashed Create tile; each card carries its stage on the photo, a bookmark, a menu, and one primary action for what the stage needs next. Creating or editing is a three-step wizard (Details, Schedule, Review) whose last step previews the card volunteers will see. Detail pages use the shared sheets, registers, facts, statuses, and decisions.
 
 The three visible stages are Details, Applicants, and Attendance results. Vacancy submission goes to an administrator for approval. Attendance results use the current hours and outcome workflow and do not imply a second approval process.
 

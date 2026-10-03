@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { read } from "@/lib/api/gateway.server";
 import {
   organizationListSchema,
@@ -7,16 +9,19 @@ import {
   vacancySchema,
 } from "@/lib/api/schemas";
 import type { Loaded } from "@/lib/api/load";
-import type { Organization, Vacancy } from "@/lib/api/schemas";
+import type { Organization, Vacancy, VacancyListItem } from "@/lib/api/schemas";
 
-export function loadVacancies(): Promise<Loaded<Vacancy[]>> {
-  return read("vacancies", { schema: vacancyListSchema });
-}
+// One request renders metadata, layout and page; each of them asks for the
+// same records, so every read is shared within the request.
 
-export function loadVacancy(id: string): Promise<Loaded<Vacancy>> {
-  return read("vacancy", { schema: vacancySchema, params: { id } });
-}
+export const loadVacancies = cache((): Promise<Loaded<VacancyListItem[]>> =>
+  read("vacancies", { schema: vacancyListSchema }),
+);
 
-export function loadOrganizations(): Promise<Loaded<Organization[]>> {
-  return read("organizations", { schema: organizationListSchema });
-}
+export const loadVacancy = cache((id: string): Promise<Loaded<Vacancy>> =>
+  read("vacancy", { schema: vacancySchema, params: { id } }),
+);
+
+export const loadOrganizations = cache((): Promise<Loaded<Organization[]>> =>
+  read("organizations", { schema: organizationListSchema }),
+);
