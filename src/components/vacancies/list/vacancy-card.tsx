@@ -30,6 +30,7 @@ const STAGE: Record<CardStage, { icon: LucideIcon; className: string }> = {
   changes_requested: { icon: Undo2, className: "bg-accent-ink text-white" },
   published: { icon: BadgeCheck, className: "bg-action text-knockout" },
   ended: { icon: Flag, className: "bg-black/60 text-white" },
+  verifying: { icon: Hourglass, className: "bg-knockout text-primary-deep" },
   results: { icon: CircleCheck, className: "bg-accent text-white" },
   rejected: { icon: Ban, className: "bg-danger-fill text-white" },
   archived: { icon: Archive, className: "bg-black/60 text-white" },
@@ -58,7 +59,9 @@ export function VacancyCard(props: VacancyCardProps) {
   const stage = STAGE[props.card.stage];
   const StageIcon = stage.icon;
   const highlight =
-    props.card.count?.key === "toReview" || props.card.count?.key === "attendanceDue";
+    props.card.count?.key === "toReview" ||
+    props.card.count?.key === "attendanceDue" ||
+    props.card.count?.key === "resultsReturned";
 
   return (
     <article

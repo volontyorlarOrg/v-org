@@ -179,12 +179,12 @@ export default async function VacanciesPage({
                     : []),
                   {
                     key: "applications",
-                    href: `${detail}#applications`,
+                    href: `${detail}?tab=applications`,
                     label: t("list.menuApplications"),
                   },
                   {
                     key: "attendance",
-                    href: `${detail}#roll-call`,
+                    href: `${detail}?tab=attendance`,
                     label: t("list.menuAttendance"),
                   },
                 ];

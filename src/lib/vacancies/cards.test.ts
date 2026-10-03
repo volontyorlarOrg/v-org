@@ -63,7 +63,7 @@ describe("cardOf", () => {
     expect(cardOf(item({ id: "c", ...live, progress }), AFTER)).toMatchObject({
       stage: "ended",
       action: "attendance",
-      href: "/vacancies/c#roll-call",
+      href: "/vacancies/c?tab=attendance",
       count: { key: "attendanceDue", count: 4 },
     });
   });
@@ -105,5 +105,49 @@ describe("filterCards", () => {
     expect(filterCards(vacancies, { stage: "draft" }, DURING).map((v) => v.id)).toEqual(
       ["other", "old"],
     );
+  });
+});
+
+describe("cardOf and verified results", () => {
+  const ended = { id: "r", ...live, progress: { ...progress, attendanceResolved: 4 } };
+
+  it("waits for an administrator once results are submitted", () => {
+    expect(
+      cardOf(
+        item({ ...ended, attendanceSheet: { status: "submitted", correction: false } }),
+        AFTER,
+      ),
+    ).toMatchObject({
+      stage: "verifying",
+      href: "/vacancies/r?tab=attendance",
+      count: { key: "awaitingVerification" },
+    });
+  });
+
+  it("asks for attention when results come back", () => {
+    expect(
+      cardOf(
+        item({
+          ...ended,
+          attendanceSheet: { status: "changes_requested", correction: false },
+        }),
+        AFTER,
+      ),
+    ).toMatchObject({ stage: "ended", count: { key: "resultsReturned" } });
+  });
+
+  it("calls results final only once they are verified", () => {
+    expect(
+      cardOf(
+        item({ ...ended, attendanceSheet: { status: "draft", correction: false } }),
+        AFTER,
+      ).stage,
+    ).toBe("ended");
+    expect(
+      cardOf(
+        item({ ...ended, attendanceSheet: { status: "verified", correction: false } }),
+        AFTER,
+      ).stage,
+    ).toBe("results");
   });
 });

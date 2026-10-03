@@ -138,7 +138,7 @@ components:
 
 The organization portal uses the same registry system as v-staff and v-admin: navy shell, paper and hairline surfaces, Source Serif 4 figures, Onest working text, approval seals, and the Uzbekistan terrain. Its audience sees only the work of its own account and organization. The opportunity list is a grid of photo cards, led by a dashed Create tile; each card carries its stage on the photo, a bookmark, a menu, and one primary action for what the stage needs next. Creating or editing is a three-step wizard (Details, Schedule, Review) whose last step previews the card volunteers will see. Detail pages use the shared sheets, registers, facts, statuses, and decisions.
 
-The three visible stages are Details, Applicants, and Attendance results. Vacancy submission goes to an administrator for approval. Attendance results use the current hours and outcome workflow and do not imply a second approval process.
+The opportunity detail has three tabs: Details, Applications and Attendance. Vacancy submission goes to an administrator for approval, and so do attendance results: the Attendance tab is a draft until it is submitted, and shows "Awaiting verification", "Changes requested" (with the administrator's flagged rows in danger tint) or "Verified" afterwards. Decisions on applicants are staged in the row (an accent "Not sent" dot) and leave only through a floating "Review and send" bar and its summary dialog; the same floating bar carries "Save draft" and "Review and submit" on the Attendance tab. An applicant opens in a right-hand side panel with previous/next, so the list stays in view.
 
 ## Colors
 

@@ -6,7 +6,7 @@ This repository is `v-org`, the private organization portal. Read `PRODUCT.md` f
 - `src/lib/api/endpoints.ts` is the endpoint registry. Keep it aligned with `v-backend` OpenAPI and regenerate `src/lib/api/generated/schema.d.ts` when contracts change.
 - Server reads and writes go through `src/lib/api/gateway.server.ts`. Parse responses through Zod schemas and render failures explicitly. Never use runtime fixture data.
 - The backend is the authorization boundary. Every org endpoint must check the active account and scope both creator ID and organization ID. The UI must never claim a successful publication before admin approval.
-- Never add organization password change, volunteer password reset, self-registration, results approval, XP tiers, or Telegram invitations without an explicit product decision and matching backend contract.
+- Never add organization password change, volunteer password reset, or self-registration without an explicit product decision and matching backend contract. Results verification, per-vacancy XP rewards and instructions with a Telegram group link were decided on 2026-10-03 (see `PRODUCT.md`); results never count before an administrator verifies them.
 - Use the semantic tokens and existing components inherited from `v-staff` and `v-admin`. Keep Uzbek, Russian, and English keys in parity, accessible controls, mobile layouts, dark mode, and reduced motion.
 - Keep secrets out of Git. Local development binds to loopback. Changes to production accounts or database require separate explicit approval.
 

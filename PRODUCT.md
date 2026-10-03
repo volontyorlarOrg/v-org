@@ -8,9 +8,16 @@ The account can see and act on vacancies it created under its own organization. 
 
 ## Work sequence
 
-Create draft → edit details and image → submit for administrator approval → publish after approval → review applicants → record attendance and hours after the event. Changes requested by the administrator return the draft for correction; rejection keeps it read-only. The account can archive its own vacancies.
+Create draft → edit details, image and XP rewards → submit for administrator approval → publish after approval → decide on applicants → send instructions → record attendance → submit results for administrator verification. Changes requested by the administrator return the draft for correction; rejection keeps it read-only. The account can archive its own vacancies.
 
-The dashboard, opportunity list, application list, attendance, activity, and volunteer directory reflect this same scope. The opportunity detail has Details, Applicants, and Attendance results sections. The results section records the existing attendance outcomes and confirmed hours; it is not a separate results-approval workflow.
+The opportunity detail has Details, Applications and Attendance tabs.
+
+- **Decisions** are staged per applicant (accept, reject, hold) and reach applicants only through "Review and send", which rechecks withdrawn applications and capacity first. Hold keeps an application pending.
+- **Instructions** (a message and an optional Telegram group link) go to every accepted applicant through the bot and in-app, with per-person delivery status and an explicit retry that never duplicates a delivered message.
+- **Attendance** is a draft until the organization submits it. Hours and XP count only after an administrator verifies it; the administrator can return it with flagged rows. Corrections to verified results go through the same verification and re-score only the rows that changed.
+- **XP rewards** belong to each vacancy: XP per verified hour for volunteering, winner / contributor / attendee XP for competitions, and an unexcused no-show penalty. They can change until the vacancy is published.
+
+The dashboard, opportunity list, application list, attendance, activity, and volunteer directory reflect this same scope.
 
 ## Privacy and language
 
@@ -18,4 +25,4 @@ Applicant data can include minors. Do not put personal data or tokens in URLs, l
 
 ## Out of scope for the first release
 
-Results-sheet approval, XP tiers, winner or contributor awards, no-show penalties, Telegram invitations, organization self-registration, multiple organization users, self-service password change, and access to other organizations' vacancies.
+Organization self-registration, multiple organization users, self-service password change, adding volunteers to Telegram groups on their behalf, and access to other organizations' vacancies.

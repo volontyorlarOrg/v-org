@@ -78,14 +78,50 @@ export const endpoints = {
     contract: "published",
   },
 
-  resolveAttendance: {
+  stageDecisions: {
     method: "PUT",
-    path: "/org/attendance/{applicationId}",
+    path: "/org/opportunities/{id}/decisions",
     contract: "published",
   },
-  resolveVacancyAttendance: {
+  sendDecisions: {
+    method: "POST",
+    path: "/org/opportunities/{id}/decisions/send",
+    contract: "published",
+  },
+  instructions: {
+    method: "GET",
+    path: "/org/opportunities/{id}/instructions",
+    contract: "published",
+  },
+  sendInstructions: {
+    method: "POST",
+    path: "/org/opportunities/{id}/instructions",
+    contract: "published",
+  },
+  retryInstructions: {
+    method: "POST",
+    path: "/org/opportunities/{id}/instructions/retry",
+    contract: "published",
+  },
+
+  attendanceSheet: {
+    method: "GET",
+    path: "/org/opportunities/{id}/attendance-sheet",
+    contract: "published",
+  },
+  saveAttendanceDraft: {
     method: "PUT",
-    path: "/org/opportunities/{id}/attendance",
+    path: "/org/opportunities/{id}/attendance-sheet",
+    contract: "published",
+  },
+  discardAttendanceDraft: {
+    method: "DELETE",
+    path: "/org/opportunities/{id}/attendance-sheet/draft",
+    contract: "published",
+  },
+  submitAttendance: {
+    method: "POST",
+    path: "/org/opportunities/{id}/attendance-sheet/submit",
     contract: "published",
   },
 
