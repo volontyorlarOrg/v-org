@@ -1,23 +1,27 @@
-import { PencilLine, Stamp } from "lucide-react";
+import { CalendarDays, MapPin, PencilLine, Stamp, Tag } from "lucide-react";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
-import {
-  AttendanceRoster,
-  type RosterRow,
-} from "@/components/attendance/attendance-roster";
-import { Avatar } from "@/components/portal/avatar";
 import { Panel } from "@/components/portal/panel";
 import {
   StatusBadge,
   applicationStatus,
-  attendanceStatus,
   vacancyStatus,
 } from "@/components/portal/status-badge";
 import { Facts, type Fact } from "@/components/register/facts";
 import { InlineDecision } from "@/components/register/inline-decision";
-import { Register, RegisterNote } from "@/components/register/register";
+import { Count } from "@/components/register/register";
+import { ApplicationsDesk } from "@/components/results/applications-desk";
+import { AttendanceDesk } from "@/components/results/attendance-desk";
+import { InstructionsPanel } from "@/components/results/instructions-panel";
+import { ResultsCopy } from "@/components/results/results-copy";
+import { RewardsPanel } from "@/components/results/rewards-panel";
+import {
+  VacancyTabs,
+  isVacancyTab,
+  type VacancyTab,
+} from "@/components/results/vacancy-tabs";
 import { Seal } from "@/components/register/seal";
 import { LoadFailure } from "@/components/states/load-failure";
 import { PageHeader } from "@/components/states/page-header";
@@ -26,35 +30,23 @@ import { ArchiveVacancy } from "@/components/vacancies/archive-vacancy";
 import { ReadinessList } from "@/components/vacancies/readiness-list";
 import { VacancyImage } from "@/components/vacancies/vacancy-image";
 import { buttonClass } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Link } from "@/i18n/navigation";
 import { failureOf, isReady } from "@/lib/api/load";
-import { reviewApplicationAction } from "@/lib/applications/actions";
 import { loadApplications } from "@/lib/applications/data.server";
-import { isAttendanceResolved, volunteerNameOf } from "@/lib/applications/filters";
 import { sealDate } from "@/lib/datetime";
+import { SENT_APPLICATION_STATUSES, canArchive } from "@/lib/domain/vocabulary";
+import { decisionLabels } from "@/lib/queue/decisions.server";
 import {
-  RESOLVABLE_ATTENDANCE_OUTCOMES,
-  SENT_APPLICATION_STATUSES,
-  canArchive,
-} from "@/lib/domain/vocabulary";
-import { applicationDecisions, decisionLabels } from "@/lib/queue/decisions.server";
-import { applicationHref, navHref, vacancyEditHref } from "@/lib/routing/routes";
+  deskApplicants,
+  loadAttendanceSheet,
+  loadInstructions,
+} from "@/lib/results/data.server";
+import { navHref, vacancyEditHref, vacancyHref } from "@/lib/routing/routes";
 import { readParam } from "@/lib/routing/search-params";
 import {
   APPROVAL_REQUIREMENTS,
-  attendanceOpensAt,
   canEditVacancy,
   canSubmitForApproval,
-  isAttendanceOpen,
   missingForApproval,
   vacancyStateOf,
 } from "@/lib/vacancies/approval";
@@ -82,13 +74,15 @@ export default async function VacancyPage({
 }: PageProps<"/[locale]/vacancies/[id]">) {
   const { locale, id } = await params;
   setRequestLocale(locale);
-  const justSent = readParam(await searchParams, "sent") === "1";
+  const query = await searchParams;
+  const justSent = readParam(query, "sent") === "1";
+  const requestedTab = readParam(query, "tab");
 
   // The vacancy, its organization and its applications do not depend on each
   // other, so all three are asked for at once.
   const [
     t,
-    attendanceCopy,
+    results,
     applicationsCopy,
     vocabulary,
     errors,
@@ -100,7 +94,7 @@ export default async function VacancyPage({
     applications,
   ] = await Promise.all([
     getTranslations("vacancies"),
-    getTranslations("attendance"),
+    getTranslations("results"),
     getTranslations("applications"),
     getTranslations("vocabulary"),
     getTranslations("errors"),
@@ -157,12 +151,24 @@ export default async function VacancyPage({
     (application) =>
       application.status === "submitted" || application.status === "under_review",
   );
-  const attendanceOpen = isAttendanceOpen(vacancy, now);
-  const opensAt = attendanceOpensAt(vacancy);
 
-  const [labels, applicationOptions] = await Promise.all([
+  // A vacancy opens on what needs doing: details until it is published,
+  // applications while it runs, attendance once the event has started.
+  const published = state === "approved" || state === "archived";
+  const started = new Date(vacancy.startsAt) <= now;
+  const tab: VacancyTab = isVacancyTab(requestedTab)
+    ? requestedTab
+    : !published
+      ? "details"
+      : started && accepted.length > 0
+        ? "attendance"
+        : "applications";
+  const tabHref = (value: VacancyTab) => `${vacancyHref(vacancy.id)}?tab=${value}`;
+
+  const [labels, instructions, sheet] = await Promise.all([
     decisionLabels(),
-    applicationDecisions(),
+    tab === "applications" && accepted.length > 0 ? loadInstructions(vacancy.id) : null,
+    tab === "attendance" ? loadAttendanceSheet(vacancy.id) : null,
   ]);
 
   const readinessLabels = {
@@ -305,72 +311,6 @@ export default async function VacancyPage({
     count: rows.filter((application) => application.status === value).length,
   })).filter((entry) => entry.count > 0);
 
-  const outcomeLabels = Object.fromEntries(
-    RESOLVABLE_ATTENDANCE_OUTCOMES.map((outcome) => [
-      outcome,
-      attendanceCopy(`outcome.${outcome}`),
-    ]),
-  );
-
-  const attendanceErrors = await errorCatalog([
-    "server",
-    "network",
-    "timeout",
-    "rateLimited",
-    "unavailable",
-    "forbidden",
-    "notFound",
-    "conflict",
-    "validationFailed",
-    "awaitingContract",
-    "sessionExpired",
-    "required",
-    "hours",
-    "confirmedHoursRequired",
-    "competitionHoursNotAllowed",
-    "attendanceNotFound",
-    "attendanceNotOpen",
-    "attendanceOutcomeNotResolved",
-    "attendanceBatchFailed",
-    "noVolunteersSelected",
-    "tooManyVolunteers",
-    "applicationNotAccepted",
-    "duplicateAttendanceApplication",
-  ]);
-
-  const rosterRows: RosterRow[] = accepted.map((application) => {
-    const attendance = application.attendance;
-    const detail = [
-      attendance?.resolvedAt
-        ? attendanceCopy("resolved", {
-            when: format.dateTime(new Date(attendance.resolvedAt), "date"),
-          })
-        : null,
-      attendance?.confirmedHours === undefined
-        ? null
-        : attendanceCopy("hoursLine", {
-            hours: format.number(attendance.confirmedHours),
-          }),
-    ]
-      .filter(Boolean)
-      .join(" · ");
-
-    return {
-      applicationId: application.id,
-      name: volunteerNameOf(application) || application.volunteerId,
-      outcome: attendance?.outcome ?? "awaiting_confirmation",
-      outcomeLabel: attendance
-        ? attendanceCopy(`outcome.${attendance.outcome}`)
-        : attendanceCopy("outcome.unknown"),
-      resolved: isAttendanceResolved(application),
-      detail,
-      hours:
-        attendance?.confirmedHours === undefined
-          ? ""
-          : String(attendance.confirmedHours),
-    };
-  });
-
   const approved = state === "approved" && vacancy.approvalReviewedAt;
   const readinessId = "vacancy-readiness";
 
@@ -387,6 +327,26 @@ export default async function VacancyPage({
               icon={status.icon}
             />
             {organization ? <span>{organization.name}</span> : null}
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarDays aria-hidden="true" className="size-4" />
+              {vacancy.endsAt
+                ? format.dateTimeRange(
+                    new Date(vacancy.startsAt),
+                    new Date(vacancy.endsAt),
+                    "date",
+                  )
+                : format.dateTime(new Date(vacancy.startsAt), "date")}
+            </span>
+            {location ? (
+              <span className="inline-flex items-center gap-1.5">
+                <MapPin aria-hidden="true" className="size-4" />
+                {location}
+              </span>
+            ) : null}
+            <span className="inline-flex items-center gap-1.5">
+              <Tag aria-hidden="true" className="size-4" />
+              {t(`kinds.${vacancy.kind}`)}
+            </span>
           </>
         }
         actions={
@@ -455,29 +415,38 @@ export default async function VacancyPage({
         <VacancyImage imageUrl={vacancy.imageUrl} title={t("image.title")} />
       ) : null}
 
-      <nav
-        aria-label={t("detail.sections")}
-        className="flex gap-1 overflow-x-auto border-b border-border"
-      >
-        <a
-          href="#details"
-          className="min-h-11 shrink-0 border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-ink-muted hover:border-primary hover:text-primary-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-        >
-          {t("detail.details")}
-        </a>
-        <a
-          href="#applications"
-          className="min-h-11 shrink-0 border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-ink-muted hover:border-primary hover:text-primary-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-        >
-          {t("detail.applicationsList")}
-        </a>
-        <a
-          href="#roll-call"
-          className="min-h-11 shrink-0 border-b-2 border-transparent px-4 py-3 text-sm font-semibold text-ink-muted hover:border-primary hover:text-primary-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-        >
-          {t("detail.results")}
-        </a>
-      </nav>
+      <VacancyTabs
+        label={t("detail.sections")}
+        active={tab}
+        items={[
+          { tab: "details", label: t("detail.details"), href: tabHref("details") },
+          {
+            tab: "applications",
+            label: t("detail.applicationsList"),
+            href: tabHref("applications"),
+            badge:
+              undecided.length > 0 ? (
+                <Count
+                  value={undecided.length}
+                  label={results("tabs.pending")}
+                  tone="waiting"
+                />
+              ) : undefined,
+          },
+          {
+            tab: "attendance",
+            label: t("detail.results"),
+            href: tabHref("attendance"),
+            badge: vacancy.attendanceSheet ? (
+              <span className="text-xs font-medium text-ink-muted">
+                {results(
+                  `tabs.sheet.${vacancy.attendanceSheet.correction && vacancy.attendanceSheet.status === "draft" ? "correction" : vacancy.attendanceSheet.status}`,
+                )}
+              </span>
+            ) : undefined,
+          },
+        ]}
+      />
 
       {justSent && state === "pending_review" ? (
         <StatePanel role="status" tone="notice" title={t("wizard.sent")} />
@@ -569,271 +538,182 @@ export default async function VacancyPage({
         <StatePanel role="status" title={t("archivedNotice")} />
       ) : null}
 
-      <div
-        id="details"
-        className="grid scroll-mt-6 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]"
-      >
-        <div className="flex min-w-0 flex-col gap-6">
-          <Panel title={t("detail.details")}>
-            <Facts items={facts} />
-          </Panel>
+      {tab === "details" ? (
+        <ResultsCopy>
+          <div
+            id="details"
+            className="grid scroll-mt-6 items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]"
+          >
+            <div className="flex min-w-0 flex-col gap-6">
+              <Panel title={t("detail.details")}>
+                <Facts items={facts} />
+              </Panel>
 
-          <Panel title={t("detail.description")}>
-            <p className="max-w-prose text-sm leading-relaxed whitespace-pre-line text-ink">
-              {vacancy.description}
-            </p>
-            {vacancy.requirements.length > 0 ? (
-              <>
-                <h3 className="mt-5 text-sm font-semibold text-ink">
-                  {t("detail.requirements")}
-                </h3>
-                <ul className="mt-2 list-disc pl-5 text-sm leading-relaxed text-ink">
-                  {vacancy.requirements.map((requirement) => (
-                    <li key={requirement}>{requirement}</li>
-                  ))}
-                </ul>
-              </>
-            ) : null}
-          </Panel>
+              <Panel title={t("detail.description")}>
+                <p className="max-w-prose text-sm leading-relaxed whitespace-pre-line text-ink">
+                  {vacancy.description}
+                </p>
+                {vacancy.requirements.length > 0 ? (
+                  <>
+                    <h3 className="mt-5 text-sm font-semibold text-ink">
+                      {t("detail.requirements")}
+                    </h3>
+                    <ul className="mt-2 list-disc pl-5 text-sm leading-relaxed text-ink">
+                      {vacancy.requirements.map((requirement) => (
+                        <li key={requirement}>{requirement}</li>
+                      ))}
+                    </ul>
+                  </>
+                ) : null}
+              </Panel>
 
-          {vacancy.questions.length > 0 ? (
-            <Panel
-              title={t("detail.questions")}
-              description={t("detail.questionsLegacy")}
-            >
-              <ol className="flex list-decimal flex-col gap-3 pl-5">
-                {[...vacancy.questions]
-                  .sort((a, b) => a.position - b.position)
-                  .map((question) => (
-                    <li key={question.id} className="text-sm text-ink">
-                      {question.prompt}
-                      {question.helpText ? (
-                        <span className="mt-0.5 block text-xs text-ink-muted">
-                          {question.helpText}
-                        </span>
-                      ) : null}
-                    </li>
-                  ))}
-              </ol>
-            </Panel>
-          ) : null}
-        </div>
+              {vacancy.questions.length > 0 ? (
+                <Panel
+                  title={t("detail.questions")}
+                  description={t("detail.questionsLegacy")}
+                >
+                  <ol className="flex list-decimal flex-col gap-3 pl-5">
+                    {[...vacancy.questions]
+                      .sort((a, b) => a.position - b.position)
+                      .map((question) => (
+                        <li key={question.id} className="text-sm text-ink">
+                          {question.prompt}
+                          {question.helpText ? (
+                            <span className="mt-0.5 block text-xs text-ink-muted">
+                              {question.helpText}
+                            </span>
+                          ) : null}
+                        </li>
+                      ))}
+                  </ol>
+                </Panel>
+              ) : null}
+            </div>
 
-        <aside className="flex min-w-0 flex-col gap-6">
-          {approvalFacts.length > 0 ? (
-            <Panel title={t("approval.title")}>
-              <Facts items={approvalFacts} />
-            </Panel>
-          ) : null}
+            <aside className="flex min-w-0 flex-col gap-6">
+              <RewardsPanel
+                vacancyId={vacancy.id}
+                kind={vacancy.kind}
+                rules={{
+                  xpPerHour: vacancy.xpPerHour,
+                  xpWinner: vacancy.xpWinner,
+                  xpContributor: vacancy.xpContributor,
+                  xpAttendee: vacancy.xpAttendee,
+                  xpNoShowPenalty: vacancy.xpNoShowPenalty,
+                }}
+                editable={!vacancy.publishedAt && canEditVacancy(vacancy)}
+              />
 
-          <Panel title={t("detail.applications")}>
-            {byStatus.length === 0 ? (
-              <p className="text-sm text-ink-muted">{t("detail.noApplications")}</p>
-            ) : (
-              <ul className="flex flex-col divide-y divide-border">
-                {byStatus.map((entry) => {
-                  const chip = applicationStatus(entry.value);
-                  return (
-                    <li
-                      key={entry.value}
-                      className="flex items-center justify-between gap-3 py-2"
-                    >
-                      <StatusBadge
-                        label={applicationsCopy(`status.${entry.value}`)}
-                        tone={chip.tone}
-                        icon={chip.icon}
-                      />
-                      <span className="display-face tabular text-figure-inline text-ink">
-                        {format.number(entry.count)}
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </Panel>
-        </aside>
-      </div>
+              {approvalFacts.length > 0 ? (
+                <Panel title={t("approval.title")}>
+                  <Facts items={approvalFacts} />
+                </Panel>
+              ) : null}
 
-      <Register
-        id="applications"
-        title={t("detail.applicationsList")}
-        count={rows.length}
-        countLabel={applicationsCopy("countLabel")}
-      >
-        {applicationsFailure ? (
-          <div className="p-5">
-            <LoadFailure failure={applicationsFailure} />
-          </div>
-        ) : rows.length === 0 ? (
-          <RegisterNote title={t("detail.noApplications")} />
-        ) : (
-          <Table>
-            <TableCaption className="sr-only">
-              {t("detail.applicationsList")}
-            </TableCaption>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead scope="col">{applicationsCopy("table.volunteer")}</TableHead>
-                <TableHead scope="col">{applicationsCopy("table.status")}</TableHead>
-                <TableHead scope="col">{applicationsCopy("table.submitted")}</TableHead>
-                <TableHead scope="col">
-                  <span className="sr-only">{common("actions")}</span>
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {rows.map((application) => {
-                const name = volunteerNameOf(application) || common("notSet");
-                const chip = applicationStatus(application.status);
-                const attendanceChip = application.attendance
-                  ? attendanceStatus(application.attendance.outcome)
-                  : null;
-                const waiting =
-                  application.status === "submitted" ||
-                  application.status === "under_review";
-                return (
-                  <TableRow key={application.id}>
-                    <TableCell>
-                      <span className="flex items-center gap-3">
-                        <Avatar
-                          name={name}
-                          src={application.volunteer?.avatarUrl}
-                          size="sm"
-                          person
-                        />
-                        <Link
-                          href={applicationHref(application.id)}
-                          className="font-semibold text-ink hover:text-primary-ink hover:underline"
+              <Panel title={t("detail.applications")}>
+                {byStatus.length === 0 ? (
+                  <p className="text-sm text-ink-muted">{t("detail.noApplications")}</p>
+                ) : (
+                  <ul className="flex flex-col divide-y divide-border">
+                    {byStatus.map((entry) => {
+                      const chip = applicationStatus(entry.value);
+                      return (
+                        <li
+                          key={entry.value}
+                          className="flex items-center justify-between gap-3 py-2"
                         >
-                          {name}
-                        </Link>
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <span className="flex flex-wrap gap-1.5">
-                        <StatusBadge
-                          label={applicationsCopy(`status.${application.status}`)}
-                          tone={chip.tone}
-                          icon={chip.icon}
-                        />
-                        {attendanceChip && application.attendance ? (
                           <StatusBadge
-                            label={attendanceCopy(
-                              `outcome.${application.attendance.outcome}`,
-                            )}
-                            tone={attendanceChip.tone}
-                            icon={attendanceChip.icon}
+                            label={applicationsCopy(`status.${entry.value}`)}
+                            tone={chip.tone}
+                            icon={chip.icon}
                           />
-                        ) : null}
-                      </span>
-                    </TableCell>
-                    <TableCell className="tabular whitespace-nowrap text-ink-muted">
-                      {application.submittedAt
-                        ? format.dateTime(new Date(application.submittedAt), "day")
-                        : "—"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {waiting && state !== "archived" ? (
-                        <InlineDecision
-                          action={reviewApplicationAction}
-                          hidden={{ id: application.id }}
-                          subject={name}
-                          labels={labels}
-                          options={applicationOptions({
-                            name,
-                            status: application.status,
-                          })}
-                          className="justify-end"
-                          expandClassName="mt-2 text-left"
-                        />
-                      ) : null}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        )}
-      </Register>
-
-      <Register
-        id="roll-call"
-        title={attendanceCopy("roster.title")}
-        count={accepted.length}
-        countLabel={attendanceCopy("roster.countLabel")}
-        description={attendanceCopy("roster.description")}
-      >
-        {applicationsFailure ? (
-          <div className="p-5">
-            <LoadFailure failure={applicationsFailure} />
+                          <span className="display-face tabular text-figure-inline text-ink">
+                            {format.number(entry.count)}
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </Panel>
+            </aside>
           </div>
-        ) : accepted.length === 0 ? (
-          <RegisterNote
-            title={attendanceCopy("roster.emptyTitle")}
-            description={attendanceCopy("roster.emptyDescription")}
-          />
-        ) : !attendanceOpen ? (
-          <RegisterNote
-            title={attendanceCopy("roster.closedTitle")}
-            description={
-              opensAt
-                ? attendanceCopy("roster.closedDescription", {
-                    when: format.dateTime(opensAt, "stamp"),
-                  })
-                : attendanceCopy("roster.closedUnknown")
-            }
-          />
+        </ResultsCopy>
+      ) : null}
+
+      {tab === "applications" ? (
+        applicationsFailure ? (
+          <LoadFailure failure={applicationsFailure} />
         ) : (
-          <div className="px-5 py-4">
-            <AttendanceRoster
+          <ResultsCopy>
+            <div
+              className={
+                accepted.length > 0 && instructions && isReady(instructions)
+                  ? "grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_23rem]"
+                  : "flex flex-col"
+              }
+            >
+              <ApplicationsDesk
+                key={rows.map((row) => `${row.id}:${row.status}`).join()}
+                vacancyId={vacancy.id}
+                capacity={vacancy.capacity ?? null}
+                archived={state === "archived"}
+                applicants={await deskApplicants(rows)}
+              />
+              {accepted.length > 0 && instructions && isReady(instructions) ? (
+                <div className="xl:sticky xl:top-6">
+                  <InstructionsPanel
+                    vacancyId={vacancy.id}
+                    vacancyTitle={vacancy.title}
+                    initial={instructions.data}
+                    sentLabel={
+                      instructions.data.sentAt
+                        ? format.dateTime(new Date(instructions.data.sentAt), "stamp")
+                        : null
+                    }
+                  />
+                </div>
+              ) : null}
+            </div>
+          </ResultsCopy>
+        )
+      ) : null}
+
+      {tab === "attendance" ? (
+        sheet && isReady(sheet) ? (
+          <ResultsCopy>
+            <AttendanceDesk
+              key={`${sheet.data.status}:${sheet.data.revision}:${sheet.data.correction}:${sheet.data.verifiedAt ?? ""}`}
               vacancyId={vacancy.id}
-              rows={rosterRows}
-              outcomes={RESOLVABLE_ATTENDANCE_OUTCOMES}
-              {...(vacancy.estimatedTotalHours === undefined
-                ? {}
-                : { defaultHours: String(vacancy.estimatedTotalHours) })}
-              labels={{
-                caption: attendanceCopy("roster.caption"),
-                volunteer: attendanceCopy("table.volunteer"),
-                state: attendanceCopy("table.outcome"),
-                select: attendanceCopy("roster.select"),
-                selectAll: attendanceCopy("roster.selectAll"),
-                selected: Array.from(
-                  { length: rosterRows.length + 1 },
-                  (_item, count) => attendanceCopy("roster.selected", { count }),
+              initial={sheet.data}
+              dates={{
+                opens: format.dateTime(new Date(sheet.data.opensAt), "stamp"),
+                submittable: format.dateTime(
+                  new Date(sheet.data.submittableAt),
+                  "stamp",
                 ),
-                correct: attendanceCopy("roster.correct"),
-                batchTitle: attendanceCopy("roster.batchTitle"),
-                batchHelp: attendanceCopy("roster.batchHelp"),
-                outcome: attendanceCopy("roster.outcome"),
-                outcomes: outcomeLabels,
-                hours: attendanceCopy("roster.hours"),
-                hoursHelp:
-                  vacancy.estimatedTotalHours === undefined
-                    ? attendanceCopy("resolve.hoursHelp")
-                    : attendanceCopy("roster.hoursHelp"),
-                submit: attendanceCopy("roster.submit"),
-                pending: attendanceCopy("roster.pending"),
-                success: attendanceCopy("roster.success"),
-                fallbackError: errors("server"),
-                errors: attendanceErrors,
-                row: {
-                  outcome: attendanceCopy("resolve.outcome"),
-                  outcomes: outcomeLabels,
-                  hours: attendanceCopy("resolve.hours"),
-                  hoursHelp: attendanceCopy("resolve.hoursHelp"),
-                  submit: attendanceCopy("resolve.confirm"),
-                  pending: attendanceCopy("resolve.pending"),
-                  success: attendanceCopy("resolve.success"),
-                  fallbackError: errors("server"),
-                  errors: attendanceErrors,
-                },
+                submitted: sheet.data.submittedAt
+                  ? format.dateTime(new Date(sheet.data.submittedAt), "stamp")
+                  : null,
+                reviewed: sheet.data.reviewedAt
+                  ? format.dateTime(new Date(sheet.data.reviewedAt), "stamp")
+                  : null,
+                verified: sheet.data.verifiedAt
+                  ? format.dateTime(new Date(sheet.data.verifiedAt), "stamp")
+                  : null,
+                events: Object.fromEntries(
+                  sheet.data.history.map((event) => [
+                    event.id,
+                    format.dateTime(new Date(event.createdAt), "stamp"),
+                  ]),
+                ),
               }}
             />
-          </div>
-        )}
-      </Register>
+          </ResultsCopy>
+        ) : sheet ? (
+          <LoadFailure failure={failureOf(sheet)!} />
+        ) : null
+      ) : null}
     </>
   );
 }

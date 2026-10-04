@@ -6,7 +6,6 @@ import type { ReactNode } from "react";
 import { Avatar } from "@/components/portal/avatar";
 import {
   QUEUE_ACTIONS,
-  QUEUE_EXPAND,
   QueueMain,
   QueueRow,
   QueueSection,
@@ -24,12 +23,11 @@ import { PageHeader } from "@/components/states/page-header";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { failureOf, isReady } from "@/lib/api/load";
-import { reviewApplicationAction } from "@/lib/applications/actions";
 import { loadApplications } from "@/lib/applications/data.server";
 import { volunteerNameOf } from "@/lib/applications/filters";
 import { getSession } from "@/lib/auth/session.server";
 import { sealDate } from "@/lib/datetime";
-import { applicationDecisions, decisionLabels } from "@/lib/queue/decisions.server";
+import { decisionLabels } from "@/lib/queue/decisions.server";
 import {
   applicationsToDecide,
   clearedToday,
@@ -107,9 +105,9 @@ export default async function TodayPage({ params }: PageProps<"/[locale]/dashboa
       })
     : [];
 
-  const [labels, applicationOptions] = await Promise.all([
+  const [labels, results] = await Promise.all([
     decisionLabels(),
-    applicationDecisions(),
+    getTranslations("results"),
   ]);
 
   const when = (value: string | undefined) =>
@@ -343,18 +341,24 @@ export default async function TodayPage({ params }: PageProps<"/[locale]/dashboa
                       ) : null}
                     </span>
                   </QueueSide>
-                  <InlineDecision
-                    action={reviewApplicationAction}
-                    hidden={{ id: entry.application.id }}
-                    subject={name}
-                    labels={labels}
-                    options={applicationOptions({
-                      name,
-                      status: entry.application.status,
-                    })}
-                    className={QUEUE_ACTIONS}
-                    expandClassName={QUEUE_EXPAND}
-                  />
+                  <div className={`flex items-center gap-2.5 ${QUEUE_ACTIONS}`}>
+                    {entry.application.stagedDecision ? (
+                      <span className="text-xs whitespace-nowrap text-accent-ink">
+                        {results("list.staged", {
+                          decision: results(
+                            `decision.${entry.application.stagedDecision}`,
+                          ),
+                        })}
+                      </span>
+                    ) : null}
+                    <Link
+                      href={`${vacancyHref(entry.application.opportunityId)}?tab=applications`}
+                      className={buttonClass({ size: "row", variant: "outline" })}
+                    >
+                      {results("list.review")}
+                      <span className="sr-only"> — {name}</span>
+                    </Link>
+                  </div>
                 </QueueRow>
               );
             })}
@@ -401,7 +405,7 @@ export default async function TodayPage({ params }: PageProps<"/[locale]/dashboa
                 </QueueSide>
                 <div className={`flex ${QUEUE_ACTIONS}`}>
                   <Link
-                    href={`${vacancyHref(call.vacancyId)}#roll-call`}
+                    href={`${vacancyHref(call.vacancyId)}?tab=attendance`}
                     className={buttonClass({ size: "row" })}
                   >
                     {t("rollCalls.open")}
