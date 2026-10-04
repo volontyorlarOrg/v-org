@@ -95,17 +95,36 @@ export const ATTENDANCE_OUTCOMES = [
   "attended",
   "excused",
   "cancelled",
+  "no_show",
   "awaiting_confirmation",
 ] as const;
 export type AttendanceOutcome = (typeof ATTENDANCE_OUTCOMES)[number];
 
+/** What an attendance sheet offers. "cancelled" only survives on older rows. */
 export const RESOLVABLE_ATTENDANCE_OUTCOMES = [
   "attended",
   "excused",
-  "cancelled",
+  "no_show",
 ] as const;
 export type ResolvableAttendanceOutcome =
   (typeof RESOLVABLE_ATTENDANCE_OUTCOMES)[number];
+
+export const SHEET_OUTCOMES = [...RESOLVABLE_ATTENDANCE_OUTCOMES, "cancelled"] as const;
+export type SheetOutcome = (typeof SHEET_OUTCOMES)[number];
+
+export const PLACEMENTS = ["winner", "contributor", "attendee"] as const;
+export type Placement = (typeof PLACEMENTS)[number];
+
+export const STAGED_DECISIONS = ["accept", "reject", "hold"] as const;
+export type StagedDecision = (typeof STAGED_DECISIONS)[number];
+
+export const SHEET_STATUSES = [
+  "draft",
+  "submitted",
+  "changes_requested",
+  "verified",
+] as const;
+export type SheetStatus = (typeof SHEET_STATUSES)[number];
 
 export const COORDINATOR_STATUSES = ["active", "blocked", "removed"] as const;
 export type CoordinatorStatus = (typeof COORDINATOR_STATUSES)[number];

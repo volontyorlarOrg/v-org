@@ -14,7 +14,11 @@ import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { failureOf, isReady } from "@/lib/api/load";
 import { loadApplications } from "@/lib/applications/data.server";
-import { groupAttendance, type AttendanceGroup } from "@/lib/attendance/queue";
+import {
+  groupAttendance,
+  groupStage,
+  type AttendanceGroup,
+} from "@/lib/attendance/queue";
 import { vacancyHref } from "@/lib/routing/routes";
 import { loadVacancies } from "@/lib/vacancies/data.server";
 
@@ -49,13 +53,28 @@ export default async function AttendancePage({
     isReady(applications) && isReady(vacancies)
       ? groupAttendance(applications.data, now, vacancies.data)
       : [];
-  const due = groups.filter((group) => group.open && group.unresolved.length > 0);
-  const upcoming = groups.filter((group) => !group.open);
+  const stageOf = new Map(groups.map((group) => [group.vacancyId, groupStage(group)]));
+  const due = groups
+    .filter((group) => ["returned", "due"].includes(stageOf.get(group.vacancyId) ?? ""))
+    .sort(
+      (a, b) =>
+        Number(stageOf.get(b.vacancyId) === "returned") -
+        Number(stageOf.get(a.vacancyId) === "returned"),
+    );
+  const verifying = groups.filter(
+    (group) => stageOf.get(group.vacancyId) === "verifying",
+  );
+  const upcoming = groups.filter(
+    (group) => stageOf.get(group.vacancyId) === "upcoming",
+  );
   const recorded = groups.filter(
-    (group) => group.open && group.unresolved.length === 0,
+    (group) => stageOf.get(group.vacancyId) === "verified",
   );
 
-  const rows = (list: AttendanceGroup[], kind: "due" | "upcoming" | "recorded") => (
+  const rows = (
+    list: AttendanceGroup[],
+    kind: "due" | "upcoming" | "verifying" | "recorded",
+  ) => (
     <ol className="divide-y divide-border">
       {list.map((group, index) => (
         <QueueRow
@@ -89,12 +108,22 @@ export default async function AttendancePage({
               <span>{t("queue.accepted", { count: group.unresolved.length })}</span>
             ) : (
               <>
-                {group.unresolved.length > 0 ? (
+                {stageOf.get(group.vacancyId) === "returned" ? (
+                  <span className="font-semibold text-accent-ink">
+                    {t("queue.returned")}
+                  </span>
+                ) : null}
+                {kind === "verifying" ? (
+                  <span className="font-medium text-primary-ink">
+                    {t("queue.verifying")}
+                  </span>
+                ) : null}
+                {kind === "due" && group.unresolved.length > 0 ? (
                   <span className="font-medium text-ink">
                     {t("queue.waiting", { count: group.unresolved.length })}
                   </span>
                 ) : null}
-                {group.resolved.length > 0 ? (
+                {kind === "due" && group.resolved.length > 0 ? (
                   <span>
                     {t("queue.resolvedCount", { count: group.resolved.length })}
                   </span>
@@ -104,7 +133,7 @@ export default async function AttendancePage({
           </QueueSide>
           <div className={`flex ${QUEUE_ACTIONS}`}>
             <Link
-              href={`${vacancyHref(group.vacancyId)}#roll-call`}
+              href={`${vacancyHref(group.vacancyId)}?tab=attendance`}
               className={buttonClass({
                 size: "row",
                 variant: kind === "due" ? "primary" : "outline",
@@ -144,6 +173,18 @@ export default async function AttendancePage({
               rows(due, "due")
             )}
           </Register>
+
+          {verifying.length > 0 ? (
+            <Register
+              id="verifying"
+              title={t("sections.verifying")}
+              count={verifying.length}
+              countLabel={t("sections.verifyingLabel")}
+              description={t("sections.verifyingDescription")}
+            >
+              {rows(verifying, "verifying")}
+            </Register>
+          ) : null}
 
           {upcoming.length > 0 ? (
             <Register
