@@ -10,9 +10,10 @@ This repository owns the UI at `org.volontyorlar.uz`. `v-backend` owns authentic
 2. Create a vacancy assigned to this organization. It starts as a draft.
 3. Submit it for administrator review. It becomes public only after approval in `v-admin`.
 4. Review applicants to vacancies created by this account.
-5. After an event ends, record attendance and confirmed hours for accepted volunteers.
+5. Stage accept and reject decisions and send them together, and send instructions to accepted volunteers through the Telegram bot.
+6. After an event ends, submit the attendance sheet: outcomes, confirmed hours or placements. Hours and XP apply once an administrator verifies it.
 
-The first release uses the current application and attendance behavior. It does not add results-sheet approval, XP tiers, or Telegram invitation flows shown in the approximate references.
+XP rules are set per vacancy and stay editable until it is published.
 
 ## Local development
 
@@ -24,4 +25,4 @@ Run `npm ci` and `npm run dev`. The server binds to `127.0.0.1:3004` and loads t
 
 All portal reads and writes go through server-side API calls. Tokens stay in an encrypted, HttpOnly cookie. The backend checks account status and scopes vacancies, applications, attendance, volunteers, counts, and activity to the account. Replacing a password or blocking an account revokes existing sessions.
 
-See [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md), and [docs/RELEASE.md](docs/RELEASE.md).
+See [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md), and [docs/RELEASE.md](docs/RELEASE.md). For how all six Volontyorlar repositories fit together, read [`../v-backend/docs/architecture/SYSTEM_GUIDE.md`](../v-backend/docs/architecture/SYSTEM_GUIDE.md).
