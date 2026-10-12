@@ -128,6 +128,38 @@ export const endpoints = {
   users: { method: "GET", path: "/org/users", contract: "published" },
   user: { method: "GET", path: "/org/users/{id}", contract: "published" },
 
+  participants: { method: "GET", path: "/org/participants", contract: "published" },
+  participant: {
+    method: "GET",
+    path: "/org/participants/{id}",
+    contract: "published",
+  },
+  proposePastEvent: {
+    method: "POST",
+    path: "/org/participants/{id}/past-events",
+    contract: "published",
+  },
+  proposePastEventChange: {
+    method: "PUT",
+    path: "/org/past-events/{eventId}",
+    contract: "published",
+  },
+  proposePastEventRemoval: {
+    method: "POST",
+    path: "/org/past-events/{eventId}/removal",
+    contract: "published",
+  },
+  pastEventRequests: {
+    method: "GET",
+    path: "/org/past-event-requests",
+    contract: "published",
+  },
+  cancelPastEventRequest: {
+    method: "POST",
+    path: "/org/past-event-requests/{id}/cancel",
+    contract: "published",
+  },
+
   organizations: { method: "GET", path: "/org/organizations", contract: "published" },
 } as const satisfies Record<string, Endpoint>;
 

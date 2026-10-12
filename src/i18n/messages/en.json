@@ -47,7 +47,8 @@
       "changesRequested": "returned for changes",
       "pendingReview": "applications to decide",
       "attendanceDue": "volunteers to record"
-    }
+    },
+    "participants": "Participants"
   },
   "auth": {
     "metaTitle": "Sign in",
@@ -1443,6 +1444,117 @@
       "review": "Review in vacancy",
       "decide": "Decide with the other applicants",
       "decideDescription": "Decisions for this vacancy are prepared together on its Applications tab and sent in one go after you review them."
+    }
+  },
+  "participants": {
+    "title": "Participants",
+    "record": "Participant",
+    "description": "Volunteers who took part in an event of your organization. Propose a past event with hours and XP for them, or a correction. Nothing changes for the volunteer until an administrator approves it.",
+    "listTitle": "Participants",
+    "found": "Search results",
+    "countLabel": "participants",
+    "filters": {
+      "search": "Search by name or username"
+    },
+    "empty": {
+      "title": "No participants yet",
+      "description": "A volunteer appears here once their attendance at one of your events is verified."
+    },
+    "noMatches": {
+      "title": "No participant matches that search",
+      "description": "Clear the search to see everyone again."
+    },
+    "table": {
+      "caption": "Volunteers who took part in your events",
+      "name": "Volunteer",
+      "events": "Events attended",
+      "hours": "Verified hours",
+      "pastEvents": "Past events",
+      "waiting": "Waiting"
+    },
+    "figures": {
+      "attended": "Events attended",
+      "hours": "Verified hours",
+      "pastEvents": "Past events",
+      "waiting": "Waiting for approval"
+    },
+    "facts": {
+      "hours": "{value} h",
+      "xp": "{value} XP"
+    },
+    "pastEvents": {
+      "title": "Past events with your organization",
+      "countLabel": "past events",
+      "description": "Events that happened outside a vacancy on the platform. They appear on the volunteer's profile and add hours and XP once an administrator approves them.",
+      "empty": "No past event is recorded for this volunteer yet.",
+      "waiting": "A change is waiting for approval",
+      "notCounted": "History only"
+    },
+    "attended": {
+      "title": "Attended on the platform",
+      "countLabel": "events",
+      "description": "Verified attendance at your organization's vacancies. Correct these from the vacancy's Attendance tab.",
+      "empty": "No verified attendance yet."
+    },
+    "requests": {
+      "title": "Your proposals",
+      "countLabel": "proposals",
+      "waitingLabel": "waiting for approval",
+      "description": "Each proposal waits for an administrator. You can withdraw one while it waits.",
+      "kind": {
+        "create": "New past event",
+        "update": "Correction",
+        "remove": "Removal"
+      },
+      "status": {
+        "pending": "Waiting for approval",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "cancelled": "Withdrawn"
+      },
+      "adjusted": "The administrator changed the hours or XP before approving.",
+      "yourNote": "Your note: {note}",
+      "reviewNote": "Administrator: {note}",
+      "sent": "Sent {when}"
+    },
+    "dialog": {
+      "propose": "Propose a past event",
+      "proposeDescription": "The event appears on the volunteer's profile and adds its hours and XP only after an administrator approves it.",
+      "proposeSuccess": "Sent for approval.",
+      "change": "Propose a correction",
+      "changeDescription": "The recorded event stays as it is until an administrator approves the correction.",
+      "changeSuccess": "Correction sent for approval.",
+      "remove": "Propose removal",
+      "removeDescription": "The event stays on the volunteer's profile until an administrator approves the removal.",
+      "removeSuccess": "Removal sent for approval.",
+      "withdraw": "Withdraw",
+      "withdrawDescription": "This proposal will no longer reach an administrator.",
+      "withdrawSuccess": "Proposal withdrawn.",
+      "send": "Send for approval",
+      "fields": {
+        "title": "Event name",
+        "date": "Date",
+        "hours": "Hours",
+        "xp": "XP",
+        "xpHelp": "An administrator can correct the hours and XP before approving.",
+        "note": "Note for the administrator",
+        "noteHelp": "Optional. What the volunteer did, or where this can be checked.",
+        "reason": "Reason",
+        "reasonHelp": "Tell the administrator why this has to change."
+      },
+      "errors": {
+        "hoursAmount": "Enter hours from 0 to 999, with at most two decimals.",
+        "xpAmount": "Enter a whole number of XP from 0 to 100,000.",
+        "dateInvalid": "Choose a date before today.",
+        "uncreditedXp": "This event is kept as history only, so it cannot carry XP.",
+        "eventNotFound": "That event is no longer recorded for your organization.",
+        "participantNotFound": "This volunteer has not taken part in an event of your organization.",
+        "alreadyWaiting": "A change to this event is already waiting for approval.",
+        "noChanges": "Nothing differs from the recorded event.",
+        "notWaiting": "This proposal has already been decided.",
+        "requestNotFound": "That proposal no longer exists.",
+        "submissionConflict": "This form was already sent. Close it and start again."
+      }
     }
   }
 }
