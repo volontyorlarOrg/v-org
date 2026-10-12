@@ -7,6 +7,7 @@ export const ROUTE_KEYS = [
   "newVacancy",
   "applications",
   "users",
+  "participants",
   "attendance",
   "activity",
 ] as const;
@@ -103,6 +104,15 @@ export const appRoutes: readonly AppRoute[] = [
     icon: "users",
   },
   {
+    key: "participants",
+    path: "/participants",
+    area: "portal",
+    guard: "session",
+    inNav: true,
+    group: "work",
+    icon: "users",
+  },
+  {
     key: "activity",
     path: "/activity",
     area: "account",
@@ -147,6 +157,10 @@ export function applicationHref(id: string): string {
 
 export function userHref(id: string): string {
   return `${navHref("users")}/${encodeURIComponent(id)}`;
+}
+
+export function participantHref(id: string): string {
+  return `${navHref("participants")}/${encodeURIComponent(id)}`;
 }
 
 export function localePath(locale: Locale, key: RouteKey): string {
