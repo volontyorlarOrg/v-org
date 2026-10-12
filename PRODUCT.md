@@ -19,6 +19,12 @@ The opportunity detail has Details, Applications and Attendance tabs.
 
 The dashboard, opportunity list, application list, attendance, activity, and volunteer directory reflect this same scope.
 
+## Participants and past events
+
+**Participants** lists the volunteers who took part in the organization: those with a verified attended result on one of its vacancies, or with a past event already recorded with it. It is scoped by organization rather than by who created the vacancy, because a vacancy an administrator ran under the organization's name is still the organization's event.
+
+For a participant the organization can propose a past event (name, date, hours, XP), a correction to one, or its removal. A proposal changes nothing: the volunteer's profile, hours and XP move only when an administrator approves it, and the administrator may set different hours or XP. The organization sees each proposal's status and the administrator's reason for a rejection, and can withdraw one while it waits. Only one change may wait per event. A volunteer who has not taken part cannot be given a past event, and the backend, not this portal, enforces that.
+
 ## Privacy and language
 
 Applicant data can include minors. Do not put personal data or tokens in URLs, logs, analytics, client storage, or public responses. Private pages are not indexable. Uzbek is the default language, with Russian and English translations.
