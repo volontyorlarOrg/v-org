@@ -47,7 +47,8 @@
       "changesRequested": "tuzatish uchun qaytarilgan",
       "pendingReview": "qaror kutayotgan ariza",
       "attendanceDue": "koʻngillining davomati belgilanmagan"
-    }
+    },
+    "participants": "Ishtirokchilar"
   },
   "auth": {
     "metaTitle": "Kirish",
@@ -1443,6 +1444,117 @@
       "review": "Vakansiyada koʻrib chiqish",
       "decide": "Boshqa arizachilar bilan birga hal qilish",
       "decideDescription": "Bu vakansiya boʻyicha qarorlar «Arizalar» boʻlimida birga tayyorlanadi va koʻrib chiqilgach, bir martada yuboriladi."
+    }
+  },
+  "participants": {
+    "title": "Ishtirokchilar",
+    "record": "Ishtirokchi",
+    "description": "Tashkilotingiz tadbirida qatnashgan volontyorlar. Ular uchun soat va XP bilan oʻtgan tadbirni yoki tuzatishni taklif qiling. Administrator tasdiqlamaguncha volontyor uchun hech narsa oʻzgarmaydi.",
+    "listTitle": "Ishtirokchilar",
+    "found": "Qidiruv natijalari",
+    "countLabel": "ishtirokchi",
+    "filters": {
+      "search": "Ism yoki foydalanuvchi nomi boʻyicha qidirish"
+    },
+    "empty": {
+      "title": "Hali ishtirokchi yoʻq",
+      "description": "Volontyorning tadbiringizdagi ishtiroki tasdiqlangach, u shu yerda paydo boʻladi."
+    },
+    "noMatches": {
+      "title": "Bu qidiruvga mos ishtirokchi yoʻq",
+      "description": "Hammani qayta koʻrish uchun qidiruvni tozalang."
+    },
+    "table": {
+      "caption": "Tadbirlaringizda qatnashgan volontyorlar",
+      "name": "Volontyor",
+      "events": "Qatnashgan tadbirlar",
+      "hours": "Tasdiqlangan soat",
+      "pastEvents": "Oʻtgan tadbirlar",
+      "waiting": "Kutilmoqda"
+    },
+    "figures": {
+      "attended": "Qatnashgan tadbirlar",
+      "hours": "Tasdiqlangan soat",
+      "pastEvents": "Oʻtgan tadbirlar",
+      "waiting": "Tasdiqlashni kutmoqda"
+    },
+    "facts": {
+      "hours": "{value} soat",
+      "xp": "{value} XP"
+    },
+    "pastEvents": {
+      "title": "Tashkilotingiz bilan oʻtgan tadbirlar",
+      "countLabel": "oʻtgan tadbir",
+      "description": "Platformadagi vakansiyadan tashqarida oʻtgan tadbirlar. Administrator tasdiqlagach, ular volontyor profilida koʻrinadi hamda soat va XP qoʻshadi.",
+      "empty": "Bu volontyor uchun hali oʻtgan tadbir yozilmagan.",
+      "waiting": "Oʻzgarish tasdiqlashni kutmoqda",
+      "notCounted": "Faqat tarix"
+    },
+    "attended": {
+      "title": "Platformada qatnashgan",
+      "countLabel": "tadbir",
+      "description": "Tashkilotingiz vakansiyalaridagi tasdiqlangan ishtirok. Ularni vakansiyaning Ishtirok boʻlimida tuzating.",
+      "empty": "Hali tasdiqlangan ishtirok yoʻq."
+    },
+    "requests": {
+      "title": "Takliflaringiz",
+      "countLabel": "taklif",
+      "waitingLabel": "tasdiqlashni kutmoqda",
+      "description": "Har bir taklif administratorni kutadi. Kutayotgan taklifni qaytarib olishingiz mumkin.",
+      "kind": {
+        "create": "Yangi oʻtgan tadbir",
+        "update": "Tuzatish",
+        "remove": "Olib tashlash"
+      },
+      "status": {
+        "pending": "Tasdiqlashni kutmoqda",
+        "approved": "Tasdiqlangan",
+        "rejected": "Rad etilgan",
+        "cancelled": "Qaytarib olingan"
+      },
+      "adjusted": "Administrator tasdiqlashdan oldin soat yoki XP ni oʻzgartirdi.",
+      "yourNote": "Sizning izohingiz: {note}",
+      "reviewNote": "Administrator: {note}",
+      "sent": "Yuborilgan: {when}"
+    },
+    "dialog": {
+      "propose": "Oʻtgan tadbirni taklif qilish",
+      "proposeDescription": "Tadbir volontyor profilida faqat administrator tasdiqlagandan keyin koʻrinadi va soat hamda XP qoʻshadi.",
+      "proposeSuccess": "Tasdiqlashga yuborildi.",
+      "change": "Tuzatishni taklif qilish",
+      "changeDescription": "Administrator tuzatishni tasdiqlamaguncha yozilgan tadbir oʻzgarishsiz qoladi.",
+      "changeSuccess": "Tuzatish tasdiqlashga yuborildi.",
+      "remove": "Olib tashlashni taklif qilish",
+      "removeDescription": "Administrator tasdiqlamaguncha tadbir volontyor profilida qoladi.",
+      "removeSuccess": "Olib tashlash tasdiqlashga yuborildi.",
+      "withdraw": "Qaytarib olish",
+      "withdrawDescription": "Bu taklif endi administratorga yetib bormaydi.",
+      "withdrawSuccess": "Taklif qaytarib olindi.",
+      "send": "Tasdiqlashga yuborish",
+      "fields": {
+        "title": "Tadbir nomi",
+        "date": "Sana",
+        "hours": "Soat",
+        "xp": "XP",
+        "xpHelp": "Administrator tasdiqlashdan oldin soat va XP ni tuzatishi mumkin.",
+        "note": "Administrator uchun izoh",
+        "noteHelp": "Ixtiyoriy. Volontyor nima qilgani yoki buni qayerdan tekshirish mumkinligi.",
+        "reason": "Sabab",
+        "reasonHelp": "Nega oʻzgartirish kerakligini administratorga yozing."
+      },
+      "errors": {
+        "hoursAmount": "0 dan 999 gacha soat kiriting, koʻpi bilan ikki kasr xonasi.",
+        "xpAmount": "0 dan 100 000 gacha butun XP kiriting.",
+        "dateInvalid": "Bugundan oldingi sanani tanlang.",
+        "uncreditedXp": "Bu tadbir faqat tarix sifatida saqlanadi, shuning uchun unga XP berilmaydi.",
+        "eventNotFound": "Bu tadbir endi tashkilotingiz uchun yozilmagan.",
+        "participantNotFound": "Bu volontyor tashkilotingiz tadbirida qatnashmagan.",
+        "alreadyWaiting": "Bu tadbirga oʻzgarish allaqachon tasdiqlashni kutmoqda.",
+        "noChanges": "Yozilgan tadbirdan hech narsa farq qilmaydi.",
+        "notWaiting": "Bu taklif boʻyicha qaror allaqachon qabul qilingan.",
+        "requestNotFound": "Bu taklif endi mavjud emas.",
+        "submissionConflict": "Bu forma allaqachon yuborilgan. Uni yopib, qaytadan boshlang."
+      }
     }
   }
 }
