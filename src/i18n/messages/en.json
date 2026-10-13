@@ -660,6 +660,7 @@
       "fullName": "Full name",
       "bio": "Bio",
       "region": "Region",
+      "hometownRegion": "Hometown region",
       "languages": "Languages",
       "school": "School",
       "phone": "Phone",
