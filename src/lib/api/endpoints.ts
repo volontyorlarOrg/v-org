@@ -11,6 +11,26 @@ export type Endpoint = {
 };
 
 export const endpoints = {
+  pastEventRosters: {
+    method: "GET",
+    path: "/org/past-event-rosters",
+    contract: "published",
+  },
+  pastEventRoster: {
+    method: "GET",
+    path: "/org/past-event-rosters/{id}",
+    contract: "published",
+  },
+  createPastEventRoster: {
+    method: "POST",
+    path: "/org/past-event-rosters",
+    contract: "published",
+  },
+  pastEventVolunteer: {
+    method: "GET",
+    path: "/org/past-event-rosters/volunteer",
+    contract: "published",
+  },
   logIn: { method: "POST", path: "/auth/org/login", contract: "published" },
   refresh: { method: "POST", path: "/auth/refresh", contract: "published" },
   logOut: { method: "POST", path: "/auth/logout", contract: "published" },

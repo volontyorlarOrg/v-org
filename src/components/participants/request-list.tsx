@@ -64,7 +64,12 @@ export function RequestList({
               <p className="mt-1 font-semibold [overflow-wrap:anywhere] text-ink">
                 {requestSubject(request)}
               </p>
-              {showVolunteer ? (
+              {showVolunteer && request.rosterId ? (
+                <p className="mt-0.5 text-sm [overflow-wrap:anywhere] text-ink-muted">
+                  {request.volunteer.displayName ?? labels.unnamed} @
+                  {request.volunteer.username}
+                </p>
+              ) : showVolunteer ? (
                 <Link
                   href={participantHref(request.volunteer.id)}
                   className="mt-0.5 block w-fit text-sm text-primary-ink underline-offset-4 hover:underline"

@@ -8,6 +8,7 @@ This repository is `v-org`, the private organization portal. Read `PRODUCT.md` f
 - The backend is the authorization boundary. Every org endpoint must check the active account and scope both creator ID and organization ID. The UI must never claim a successful publication before admin approval.
 - Never add organization password change, volunteer password reset, or self-registration without an explicit product decision and matching backend contract. Results verification, per-vacancy XP rewards and instructions with a Telegram group link were decided on 2026-10-03 (see `PRODUCT.md`); results never count before an administrator verifies them. Past event proposals for participants were decided on 2026-10-12: `/participants` is scoped by organization alone, and nothing reaches a volunteer before an administrator approves it.
 - Use the semantic tokens and existing components inherited from `v-staff` and `v-admin`. Keep Uzbek, Russian, and English keys in parity, accessible controls, mobile layouts, dark mode, and reduced motion.
+- `/past-events` creates an event roster before assigning participants. Exact public username lookup permits first-time historical participants; private directories stay scoped. Each volunteer is reviewed separately through the existing admin queue. See `../v-backend/docs/plans/ORG_HISTORICAL_EVENTS.md`.
 - Keep secrets out of Git. Local development binds to loopback. Changes to production accounts or database require separate explicit approval.
 
 <!-- BEGIN:nextjs-agent-rules -->
