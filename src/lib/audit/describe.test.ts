@@ -3,6 +3,15 @@ import { describe, expect, it } from "vitest";
 import { subjectOf } from "@/lib/audit/describe";
 
 describe("what an audit event touched", () => {
+  it("opens a submitted roster from its activity entry", () => {
+    expect(
+      subjectOf({
+        action: "past_event_roster.submitted",
+        entityType: "PastEventRoster",
+        entityId: "roster-1",
+      }),
+    ).toEqual({ kind: "pastEvent", href: "/past-events/roster-1" });
+  });
   it("links vacancies and applications to their pages", () => {
     expect(
       subjectOf({
