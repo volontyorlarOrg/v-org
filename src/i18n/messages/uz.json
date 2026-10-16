@@ -48,7 +48,9 @@
       "pendingReview": "qaror kutayotgan ariza",
       "attendanceDue": "koʻngillining davomati belgilanmagan"
     },
-    "participants": "Ishtirokchilar"
+    "participants": "Ishtirokchilar",
+    "pastEvents": "Oʻtgan tadbirlar",
+    "newPastEvent": "Oʻtgan tadbir yaratish"
   },
   "auth": {
     "metaTitle": "Kirish",
@@ -1022,7 +1024,8 @@
       "volunteer": "Volontyor",
       "organization": "Tashkilot",
       "attendance": "Davomat yozuvi",
-      "account": "Hisob"
+      "account": "Hisob",
+      "pastEvent": "Oʻtgan tadbir"
     },
     "details": {
       "closedByArchive": "Vakansiya arxivlanganda yopildi",
@@ -1057,7 +1060,12 @@
       "user_password_replaced": "Vaqtinchalik parol berildi",
       "user_username_changed": "Foydalanuvchi nomi oʻzgartirildi",
       "user_avatar_updated": "Rasm yangilandi",
-      "user_avatar_removed": "Rasm olib tashlandi"
+      "user_avatar_removed": "Rasm olib tashlandi",
+      "past_event_roster_submitted": "Oʻtgan tadbir yuborildi",
+      "past_event_request_submitted": "Oʻtgan tadbir taklifi yuborildi",
+      "past_event_request_approved": "Oʻtgan tadbir taklifi tasdiqlandi",
+      "past_event_request_rejected": "Oʻtgan tadbir taklifi rad etildi",
+      "past_event_request_cancelled": "Oʻtgan tadbir taklifi qaytarib olindi"
     },
     "you": "Siz"
   },
@@ -1489,7 +1497,8 @@
       "description": "Platformadagi vakansiyadan tashqarida oʻtgan tadbirlar. Administrator tasdiqlagach, ular volontyor profilida koʻrinadi hamda soat va XP qoʻshadi.",
       "empty": "Bu volontyor uchun hali oʻtgan tadbir yozilmagan.",
       "waiting": "Oʻzgarish tasdiqlashni kutmoqda",
-      "notCounted": "Faqat tarix"
+      "notCounted": "Faqat tarix",
+      "browse": "Oʻtgan tadbirlar"
     },
     "attended": {
       "title": "Platformada qatnashgan",
@@ -1556,6 +1565,53 @@
         "requestNotFound": "Bu taklif endi mavjud emas.",
         "submissionConflict": "Bu forma allaqachon yuborilgan. Uni yopib, qaytadan boshlang."
       }
+    }
+  },
+  "historicalEvents": {
+    "title": "Oʻtgan tadbirlar",
+    "description": "Boʻlib oʻtgan tadbirni yarating va unda qatnashgan volontyorlarni qoʻshing. Har bir volontyorning soatlari va XP miqdori administrator tasdigʻidan oʻtadi.",
+    "create": "Oʻtgan tadbir yaratish",
+    "record": "Oʻtgan tadbir",
+    "listTitle": "Yuborilgan tadbirlar",
+    "search": "Tadbirlarni qidirish",
+    "empty": "Hozircha oʻtgan tadbirlar yoʻq",
+    "emptyHelp": "Tadbirni bir marta yarating va qatnashchilarni, jumladan Volontyorlar platformasiga qoʻshilishdan oldin qatnashganlarni ham kiriting.",
+    "noMatches": "Qidiruvga mos tadbir topilmadi",
+    "people": "{count} qatnashchi",
+    "reviewTotals": "{pending} kutilmoqda · {approved} tasdiqlangan · {rejected} rad etilgan · {cancelled} qaytarib olingan",
+    "form": {
+      "details": "Tadbir maʼlumotlari",
+      "participants": "Qatnashchilar",
+      "review": "Tekshirish",
+      "title": "Tadbir nomi",
+      "date": "Tadbir sanasi",
+      "note": "Administrator uchun izoh (ixtiyoriy)",
+      "username": "Volontyorlar foydalanuvchi nomi",
+      "usernameHelp": "Qatnashchilarni Volontyorlar platformasidagi aniq foydalanuvchi nomi bilan qoʻshing. Tashkilotingiz tadbirlarida avval qatnashgan boʻlishi shart emas.",
+      "find": "Volontyor qoʻshish",
+      "finding": "Volontyor qidirilmoqda…",
+      "hours": "Soatlar",
+      "xp": "XP",
+      "remove": "Qatnashchini olib tashlash",
+      "empty": "Qatnashgan volontyorlarni qoʻshing",
+      "emptyHelp": "Foydalanuvchi nomini kiriting, soʻng uning soatlari va XP miqdorini belgilang. 100 tagacha volontyor qoʻshishingiz mumkin.",
+      "next": "Davom etish",
+      "back": "Orqaga",
+      "send": "Tasdiqlash uchun yuborish",
+      "sending": "Yuborilmoqda…",
+      "cancel": "Bekor qilish",
+      "approvalHelp": "Volontyorning faolligi va natijalarida faqat tasdiqlangan qatnashuv koʻrinadi.",
+      "limit": "Tadbir uchun 100 ta qatnashchi chegarasiga yetildi.",
+      "reviewHelp": "Har bir qatnashchining soatlari va XP miqdorini tekshiring. Administrator har birini alohida koʻrib chiqadi va miqdorlarni oʻzgartirishi yoki rad etishi mumkin."
+    },
+    "errors": {
+      "pastEventVolunteerNotFound": "Bu foydalanuvchi nomiga ega faol volontyor topilmadi. Uning Volontyorlar profilini tekshiring va qayta urinib koʻring.",
+      "pastEventRosterConflict": "Bu yuborish boshqa tadbir maʼlumotlari uchun ishlatilgan. Tadbirni oʻzgartiring va qayta urinib koʻring.",
+      "pastEventRosterDuplicate": "Bu volontyor tadbir qatnashchilari roʻyxatida allaqachon bor.",
+      "pastEventRosterParticipants": "1 tadan 100 tagacha qatnashchi qoʻshing.",
+      "pastEventDateInvalid": "Toshkent vaqti boʻyicha bugundan oldingi toʻgʻri sanani tanlang.",
+      "hoursAmount": "0 dan 999 gacha soat kiriting, kasr qismi ikki xonadan oshmasin.",
+      "xpAmount": "0 dan 100 000 gacha butun XP miqdorini kiriting."
     }
   }
 }

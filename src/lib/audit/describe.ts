@@ -1,5 +1,11 @@
 import type { AuditEvent } from "@/lib/api/schemas";
-import { applicationHref, userHref, vacancyHref } from "@/lib/routing/routes";
+import {
+  applicationHref,
+  navHref,
+  pastEventRosterHref,
+  userHref,
+  vacancyHref,
+} from "@/lib/routing/routes";
 
 export type AuditSubjectKind =
   | "vacancy"
@@ -8,7 +14,8 @@ export type AuditSubjectKind =
   | "volunteer"
   | "organization"
   | "attendance"
-  | "account";
+  | "account"
+  | "pastEvent";
 
 export type AuditSubject = { kind: AuditSubjectKind; href: string | null };
 
@@ -18,6 +25,11 @@ export function subjectOf(
 ): AuditSubject {
   const type = event.entityType.toLowerCase();
   const id = event.entityId;
+
+  if (type === "pasteventroster")
+    return { kind: "pastEvent", href: pastEventRosterHref(id) };
+  if (type === "pasteventrequest")
+    return { kind: "pastEvent", href: navHref("pastEvents") };
 
   if (type === "opportunity") return { kind: "vacancy", href: vacancyHref(id) };
   if (type === "application") return { kind: "application", href: applicationHref(id) };

@@ -8,6 +8,8 @@ export const ROUTE_KEYS = [
   "applications",
   "users",
   "participants",
+  "pastEvents",
+  "newPastEvent",
   "attendance",
   "activity",
 ] as const;
@@ -120,6 +122,23 @@ export const appRoutes: readonly AppRoute[] = [
     inNav: false,
     icon: "history",
   },
+  {
+    key: "pastEvents",
+    path: "/past-events",
+    area: "portal",
+    guard: "session",
+    inNav: true,
+    group: "work",
+    icon: "history",
+  },
+  {
+    key: "newPastEvent",
+    path: "/past-events/new",
+    area: "portal",
+    guard: "session",
+    inNav: false,
+    icon: "plus",
+  },
 ] as const;
 
 export const ENTRY_ROUTE: RouteKey = "login";
@@ -161,6 +180,10 @@ export function userHref(id: string): string {
 
 export function participantHref(id: string): string {
   return `${navHref("participants")}/${encodeURIComponent(id)}`;
+}
+
+export function pastEventRosterHref(id: string): string {
+  return `${navHref("pastEvents")}/${encodeURIComponent(id)}`;
 }
 
 export function localePath(locale: Locale, key: RouteKey): string {
