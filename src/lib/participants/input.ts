@@ -6,7 +6,8 @@ const decimalHours = z
   .string()
   .trim()
   .regex(/^(?:0|[1-9]\d{0,2})(?:\.\d{1,2})?$/, "hoursAmount")
-  .transform(Number);
+  .transform(Number)
+  .pipe(z.number().min(0, "hoursAmount").max(999, "hoursAmount"));
 
 const awardedXp = z
   .string()

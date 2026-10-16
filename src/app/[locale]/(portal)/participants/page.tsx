@@ -8,6 +8,7 @@ import { Register, RegisterNote, RegisterSearch } from "@/components/register/re
 import { LoadFailure } from "@/components/states/load-failure";
 import { PageHeader } from "@/components/states/page-header";
 import { Pagination } from "@/components/states/pagination";
+import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -78,7 +79,15 @@ export default async function ParticipantsPage({
 
   return (
     <>
-      <PageHeader title={t("title")} description={t("description")} />
+      <PageHeader
+        title={t("title")}
+        description={t("description")}
+        actions={
+          <Button asChild size="sm" variant="outline">
+            <Link href={navHref("pastEvents")}>{t("pastEvents.browse")}</Link>
+          </Button>
+        }
+      />
 
       {failure ? <LoadFailure failure={failure} /> : null}
 

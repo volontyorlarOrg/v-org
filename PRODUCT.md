@@ -4,7 +4,7 @@
 
 One administrator-issued account represents one organization. Its login handle is the organization's stable slug. It has the `partner` role and a permanent password. The organization can sign in and sign out, but cannot change or recover its password in this portal. An administrator issues or replaces the password and can block or unblock the account in `v-admin`.
 
-The account can see and act on vacancies it created under its own organization. The backend enforces both creator and organization ownership on every record operation. Organization identity is derived from the authenticated account, never trusted from a form field. Volunteers are visible only through applications to those vacancies. The portal cannot reset volunteer passwords.
+The account can see and act on vacancies it created under its own organization. The backend enforces both creator and organization ownership on every vacancy operation. Organization identity is derived from the authenticated account, never trusted from a form field. Private volunteer details are visible only through applications to those vacancies. Historical event assignment can resolve an exact public username and returns only public identity fields. The portal cannot reset volunteer passwords.
 
 ## Work sequence
 
@@ -23,7 +23,9 @@ The dashboard, opportunity list, application list, attendance, activity, and vol
 
 **Participants** lists the volunteers who took part in the organization: those with a verified attended result on one of its vacancies, or with a past event already recorded with it. It is scoped by organization rather than by who created the vacancy, because a vacancy an administrator ran under the organization's name is still the organization's event.
 
-For a participant the organization can propose a past event (name, date, hours, XP), a correction to one, or its removal. A proposal changes nothing: the volunteer's profile, hours and XP move only when an administrator approves it, and the administrator may set different hours or XP. The organization sees each proposal's status and the administrator's reason for a rejection, and can withdraw one while it waits. Only one change may wait per event. A volunteer who has not taken part cannot be given a past event, and the backend, not this portal, enforces that.
+For an existing participant the organization can propose a past event (name, date, hours, XP), a correction to one, or its removal. A proposal changes nothing: the volunteer's profile, hours and XP move only when an administrator approves it, and the administrator may set different hours or XP. The organization sees each proposal's status and the administrator's reason for a rejection, and can withdraw one while it waits. Only one change may wait per recorded event.
+
+**Past events** adds the event-first entry point: enter the name and past date, add up to 100 active volunteers by exact Volontyorlar username, set hours and XP per person, review and submit. Earlier participation on the platform is not required; this can be the organization's first historical event. Administrators review each volunteer separately through the existing past-event queue. The event page shows every proposal, any adjusted amounts, rejection reasons and withdrawal controls. Pending, rejected and withdrawn proposals never count. Draft values remain in page memory until submission. Organizations cannot edit a submitted roster; later changes to approved credit use the participant's existing correction or removal proposal.
 
 ## Privacy and language
 
