@@ -1458,7 +1458,7 @@
   "participants": {
     "title": "Ishtirokchilar",
     "record": "Ishtirokchi",
-    "description": "Tashkilotingiz tadbirida qatnashgan volontyorlar. Ular uchun soat va XP bilan oʻtgan tadbirni yoki tuzatishni taklif qiling. Administrator tasdiqlamaguncha volontyor uchun hech narsa oʻzgarmaydi.",
+    "description": "Tashkilotingiz tadbirida qatnashgan volontyorlar. Boʻlib oʻtgan tadbirni qayd etish uchun oʻtgan tadbir yarating. Bu yerda bitta volontyorning qayd etilgan oʻtgan tadbiri uchun tuzatish yoki olib tashlashni taklif qilishingiz mumkin; administrator tasdiqlamaguncha hech narsa oʻzgarmaydi.",
     "listTitle": "Ishtirokchilar",
     "found": "Qidiruv natijalari",
     "countLabel": "ishtirokchi",
@@ -1498,7 +1498,8 @@
       "empty": "Bu volontyor uchun hali oʻtgan tadbir yozilmagan.",
       "waiting": "Oʻzgarish tasdiqlashni kutmoqda",
       "notCounted": "Faqat tarix",
-      "browse": "Oʻtgan tadbirlar"
+      "browse": "Oʻtgan tadbirlar",
+      "create": "Oʻtgan tadbir yaratish"
     },
     "attended": {
       "title": "Platformada qatnashgan",
@@ -1528,9 +1529,6 @@
       "sent": "Yuborilgan: {when}"
     },
     "dialog": {
-      "propose": "Oʻtgan tadbirni taklif qilish",
-      "proposeDescription": "Tadbir volontyor profilida faqat administrator tasdiqlagandan keyin koʻrinadi va soat hamda XP qoʻshadi.",
-      "proposeSuccess": "Tasdiqlashga yuborildi.",
       "change": "Tuzatishni taklif qilish",
       "changeDescription": "Administrator tuzatishni tasdiqlamaguncha yozilgan tadbir oʻzgarishsiz qoladi.",
       "changeSuccess": "Tuzatish tasdiqlashga yuborildi.",
@@ -1547,8 +1545,6 @@
         "hours": "Soat",
         "xp": "XP",
         "xpHelp": "Administrator tasdiqlashdan oldin soat va XP ni tuzatishi mumkin.",
-        "note": "Administrator uchun izoh",
-        "noteHelp": "Ixtiyoriy. Volontyor nima qilgani yoki buni qayerdan tekshirish mumkinligi.",
         "reason": "Sabab",
         "reasonHelp": "Nega oʻzgartirish kerakligini administratorga yozing."
       },
@@ -1569,7 +1565,7 @@
   },
   "historicalEvents": {
     "title": "Oʻtgan tadbirlar",
-    "description": "Boʻlib oʻtgan tadbirni yarating va unda qatnashgan volontyorlarni qoʻshing. Har bir volontyorning soatlari va XP miqdori administrator tasdigʻidan oʻtadi.",
+    "description": "Boʻlib oʻtgan tadbirni qayd eting va unda qatnashgan volontyorlarni qoʻshing. Administrator butun tadbirni koʻrib chiqadi va ishtirokchilarni tasdiqlaydi — hammasini birdaniga yoki birma-bir.",
     "create": "Oʻtgan tadbir yaratish",
     "record": "Oʻtgan tadbir",
     "listTitle": "Yuborilgan tadbirlar",
@@ -1578,7 +1574,15 @@
     "emptyHelp": "Tadbirni bir marta yarating va qatnashchilarni, jumladan Volontyorlar platformasiga qoʻshilishdan oldin qatnashganlarni ham kiriting.",
     "noMatches": "Qidiruvga mos tadbir topilmadi",
     "people": "{count} qatnashchi",
-    "reviewTotals": "{pending} kutilmoqda · {approved} tasdiqlangan · {rejected} rad etilgan · {cancelled} qaytarib olingan",
+    "state": {
+      "waiting": "{count} ta tasdiqlashni kutmoqda",
+      "approved": "Tasdiqlangan",
+      "partlyApproved": "Qisman tasdiqlangan",
+      "rejected": "Rad etilgan",
+      "withdrawn": "Qaytarib olingan"
+    },
+    "published": "Administrator tasdiqlagach, tadbir har bir ishtirokchining tarixida va volontyor ilovasidagi Avvalgi imkoniyatlar boʻlimida koʻrinadi.",
+    "eventHelp": "Administrator bu tadbirni koʻrib chiqadi va ishtirokchilarni hammasini birdaniga yoki birma-bir tasdiqlaydi, baʼzan soat yoki XP ni tuzatib. Hali kutayotgan har qanday ishtirokchini qaytarib olishingiz mumkin.",
     "form": {
       "details": "Tadbir maʼlumotlari",
       "participants": "Qatnashchilar",
@@ -1602,7 +1606,7 @@
       "cancel": "Bekor qilish",
       "approvalHelp": "Volontyorning faolligi va natijalarida faqat tasdiqlangan qatnashuv koʻrinadi.",
       "limit": "Tadbir uchun 100 ta qatnashchi chegarasiga yetildi.",
-      "reviewHelp": "Har bir qatnashchining soatlari va XP miqdorini tekshiring. Administrator har birini alohida koʻrib chiqadi va miqdorlarni oʻzgartirishi yoki rad etishi mumkin."
+      "reviewHelp": "Har bir qatnashchining soatlari va XP miqdorini tekshiring. Administrator butun tadbirni koʻrib chiqadi: hammani birdaniga tasdiqlashi yoki kimningdir miqdorini oʻzgartirishi yoxud rad etishi mumkin."
     },
     "errors": {
       "pastEventVolunteerNotFound": "Bu foydalanuvchi nomiga ega faol volontyor topilmadi. Uning Volontyorlar profilini tekshiring va qayta urinib koʻring.",

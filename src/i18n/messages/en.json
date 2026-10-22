@@ -1458,7 +1458,7 @@
   "participants": {
     "title": "Participants",
     "record": "Participant",
-    "description": "Volunteers who took part in an event of your organization. Propose a past event with hours and XP for them, or a correction. Nothing changes for the volunteer until an administrator approves it.",
+    "description": "Volunteers who took part in an event of your organization. To record an event that already happened, create a past event. Here you can propose a correction or removal for one volunteer's recorded past event; nothing changes until an administrator approves it.",
     "listTitle": "Participants",
     "found": "Search results",
     "countLabel": "participants",
@@ -1498,7 +1498,8 @@
       "empty": "No past event is recorded for this volunteer yet.",
       "waiting": "A change is waiting for approval",
       "notCounted": "History only",
-      "browse": "Past events"
+      "browse": "Past events",
+      "create": "Create past event"
     },
     "attended": {
       "title": "Attended on the platform",
@@ -1528,9 +1529,6 @@
       "sent": "Sent {when}"
     },
     "dialog": {
-      "propose": "Propose a past event",
-      "proposeDescription": "The event appears on the volunteer's profile and adds its hours and XP only after an administrator approves it.",
-      "proposeSuccess": "Sent for approval.",
       "change": "Propose a correction",
       "changeDescription": "The recorded event stays as it is until an administrator approves the correction.",
       "changeSuccess": "Correction sent for approval.",
@@ -1547,8 +1545,6 @@
         "hours": "Hours",
         "xp": "XP",
         "xpHelp": "An administrator can correct the hours and XP before approving.",
-        "note": "Note for the administrator",
-        "noteHelp": "Optional. What the volunteer did, or where this can be checked.",
         "reason": "Reason",
         "reasonHelp": "Tell the administrator why this has to change."
       },
@@ -1569,7 +1565,7 @@
   },
   "historicalEvents": {
     "title": "Past events",
-    "description": "Record an event that already happened, then assign the volunteers who took part. Each volunteer’s hours and XP need administrator approval.",
+    "description": "Record an event that already happened and add the volunteers who took part. An administrator reviews the whole event and approves its participants — all at once or one by one.",
     "create": "Create past event",
     "record": "Past event",
     "listTitle": "Events submitted",
@@ -1578,7 +1574,15 @@
     "emptyHelp": "Create the event once and add its participants, including volunteers whose first event was before they joined Volontyorlar.",
     "noMatches": "No events match this search",
     "people": "{count, plural, one {# participant} other {# participants}}",
-    "reviewTotals": "{pending} waiting · {approved} approved · {rejected} rejected · {cancelled} withdrawn",
+    "state": {
+      "waiting": "{count} waiting for approval",
+      "approved": "Approved",
+      "partlyApproved": "Partly approved",
+      "rejected": "Rejected",
+      "withdrawn": "Withdrawn"
+    },
+    "published": "Once an administrator approves it, the event shows in each participant's history and under Past opportunities in the volunteer app.",
+    "eventHelp": "An administrator reviews this event and approves its participants all at once or one by one, sometimes with corrected hours or XP. You can withdraw anyone still waiting.",
     "form": {
       "details": "Event details",
       "participants": "Participants",
@@ -1602,7 +1606,7 @@
       "cancel": "Cancel",
       "approvalHelp": "Only approved participation appears in the volunteer’s activity and progress.",
       "limit": "The event has reached the limit of 100 participants.",
-      "reviewHelp": "Check every participant’s hours and XP. An administrator reviews each person separately and may adjust or reject the proposed credit."
+      "reviewHelp": "Check every participant's hours and XP. An administrator reviews the whole event and can approve everyone at once, or adjust or reject someone."
     },
     "errors": {
       "pastEventVolunteerNotFound": "No active volunteer has this username. Check their Volontyorlar profile and try again.",

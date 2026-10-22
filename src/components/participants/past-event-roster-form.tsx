@@ -378,7 +378,14 @@ export function PastEventRosterForm({
             description={labels.reviewHelp}
           >
             <div className="border-b border-border px-5 py-4">
-              <p className="tabular text-sm text-ink-muted">{details.eventDate}</p>
+              <p className="tabular text-sm text-ink-muted">
+                <time dateTime={details.eventDate}>
+                  {new Intl.DateTimeFormat(locale, {
+                    dateStyle: "long",
+                    timeZone: "UTC",
+                  }).format(new Date(`${details.eventDate}T00:00:00Z`))}
+                </time>
+              </p>
               {details.note ? (
                 <p className="mt-2 [overflow-wrap:anywhere] whitespace-pre-wrap text-ink">
                   {details.note}
