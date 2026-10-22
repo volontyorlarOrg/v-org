@@ -154,11 +154,6 @@ export const endpoints = {
     path: "/org/participants/{id}",
     contract: "published",
   },
-  proposePastEvent: {
-    method: "POST",
-    path: "/org/participants/{id}/past-events",
-    contract: "published",
-  },
   proposePastEventChange: {
     method: "PUT",
     path: "/org/past-events/{eventId}",

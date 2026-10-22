@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { WithdrawRequestDialog } from "@/components/participants/past-event-dialogs";
 import { RequestList } from "@/components/participants/request-list";
+import { StatusBadge } from "@/components/portal/status-badge";
 import { Register } from "@/components/register/register";
 import { LoadFailure } from "@/components/states/load-failure";
 import { PageHeader } from "@/components/states/page-header";
@@ -14,6 +15,11 @@ import {
 } from "@/lib/participants/labels.server";
 import { waitingFirst } from "@/lib/participants/requests";
 import { loadPastEventRoster } from "@/lib/past-event-rosters/data.server";
+import {
+  countsOf,
+  PAST_EVENT_STATE_TONES,
+  pastEventState,
+} from "@/lib/past-event-rosters/state";
 import { navHref } from "@/lib/routing/routes";
 
 export const dynamic = "force-dynamic";
@@ -50,17 +56,25 @@ export default async function PastEventPage({
     );
   if (!isReady(loaded)) notFound();
   const event = loaded.data;
+  const counts = countsOf(event.requests);
+  const state = pastEventState(counts);
   return (
     <>
       <PageHeader
         title={event.title}
         back={back}
-        description={t("description")}
+        description={t("published")}
         meta={
-          <span className="tabular">
-            {format.dateTime(new Date(`${event.eventDate}T00:00:00Z`), "date")} ·{" "}
-            {t("people", { count: event.requests.length })}
-          </span>
+          <>
+            <span className="tabular">
+              {format.dateTime(new Date(`${event.eventDate}T00:00:00Z`), "date")} ·{" "}
+              {t("people", { count: event.requests.length })}
+            </span>
+            <StatusBadge
+              label={t(`state.${state}`, { count: counts.pending })}
+              tone={PAST_EVENT_STATE_TONES[state]}
+            />
+          </>
         }
       />
       {event.note ? (
@@ -74,7 +88,7 @@ export default async function PastEventPage({
         id="historical-event-people"
         title={t("form.participants")}
         count={event.requests.length}
-        description={t("form.reviewHelp")}
+        description={t("eventHelp")}
       >
         <RequestList
           requests={waitingFirst(event.requests)}
