@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 
 import {
-  PastEventProposalDialog,
+  PastEventChangeDialog,
   PastEventRemovalDialog,
   WithdrawRequestDialog,
 } from "@/components/participants/past-event-dialogs";
@@ -13,10 +13,11 @@ import { FigureRow } from "@/components/register/facts";
 import { Register, RegisterNote } from "@/components/register/register";
 import { LoadFailure } from "@/components/states/load-failure";
 import { PageHeader } from "@/components/states/page-header";
+import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { failureOf, isReady } from "@/lib/api/load";
 import {
   cancelPastEventRequestAction,
-  proposePastEventAction,
   proposePastEventChangeAction,
   proposePastEventRemovalAction,
 } from "@/lib/participants/actions";
@@ -118,12 +119,9 @@ export default async function ParticipantPage({
         countLabel={t("pastEvents.countLabel")}
         description={t("pastEvents.description")}
         actions={
-          <PastEventProposalDialog
-            participantId={participant.id}
-            latestDate={latestDate}
-            action={proposePastEventAction}
-            labels={dialogLabels}
-          />
+          <Button asChild size="sm">
+            <Link href={navHref("newPastEvent")}>{t("pastEvents.create")}</Link>
+          </Button>
         }
       >
         {participant.pastEvents.length === 0 ? (
@@ -151,8 +149,7 @@ export default async function ParticipantPage({
                   <StatusBadge label={t("pastEvents.waiting")} tone="waiting" />
                 ) : (
                   <div className="flex flex-wrap gap-2">
-                    <PastEventProposalDialog
-                      participantId={participant.id}
+                    <PastEventChangeDialog
                       event={event}
                       latestDate={latestDate}
                       action={proposePastEventChangeAction}
@@ -160,6 +157,7 @@ export default async function ParticipantPage({
                     />
                     <PastEventRemovalDialog
                       eventId={event.id}
+                      eventTitle={event.title}
                       action={proposePastEventRemovalAction}
                       labels={dialogLabels}
                     />

@@ -74,9 +74,6 @@ export async function pastEventDialogLabels(): Promise<PastEventDialogLabels> {
   ]);
 
   return {
-    propose: t("propose"),
-    proposeDescription: t("proposeDescription"),
-    proposeSuccess: t("proposeSuccess"),
     change: t("change"),
     changeDescription: t("changeDescription"),
     changeSuccess: t("changeSuccess"),
@@ -92,8 +89,6 @@ export async function pastEventDialogLabels(): Promise<PastEventDialogLabels> {
     hours: t("fields.hours"),
     xp: t("fields.xp"),
     xpHelp: t("fields.xpHelp"),
-    note: t("fields.note"),
-    noteHelp: t("fields.noteHelp"),
     reason: t("fields.reason"),
     reasonHelp: t("fields.reasonHelp"),
     close: common("close"),

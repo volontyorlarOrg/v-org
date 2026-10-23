@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 
 import { FormDialog, type FormDialogLabels } from "@/components/forms/form-dialog";
 import { Button } from "@/components/ui/button";
@@ -12,9 +12,6 @@ import type { ActionResult } from "@/lib/api/action-result";
 type Action = (previous: ActionResult, formData: FormData) => Promise<ActionResult>;
 
 export type PastEventDialogLabels = {
-  propose: string;
-  proposeDescription: string;
-  proposeSuccess: string;
   change: string;
   changeDescription: string;
   changeSuccess: string;
@@ -30,8 +27,6 @@ export type PastEventDialogLabels = {
   hours: string;
   xp: string;
   xpHelp: string;
-  note: string;
-  noteHelp: string;
   reason: string;
   reasonHelp: string;
   close: string;
@@ -117,54 +112,43 @@ function NoteField({
   );
 }
 
-export function PastEventProposalDialog({
-  participantId,
+export function PastEventChangeDialog({
   event,
   latestDate,
   action,
   labels,
-  trigger,
 }: {
-  participantId: string;
-  event?: RecordedEvent;
+  event: RecordedEvent;
   latestDate: string;
   action: Action;
   labels: PastEventDialogLabels;
-  trigger?: ReactNode;
 }) {
   const { submissionId, renew } = useSubmissionId();
-  const change = Boolean(event);
-  const suffix = event?.id ?? "new";
-  const fieldId = (name: string) => `past-event-${suffix}-${name}`;
-  const creditable = event?.countsTowardProgress ?? true;
+  const fieldId = (name: string) => `past-event-${event.id}-${name}`;
 
   return (
     <FormDialog
       action={action}
       onOpenChange={renew}
       labels={dialogLabels(labels, {
-        title: change ? labels.change : labels.propose,
-        description: change ? labels.changeDescription : labels.proposeDescription,
+        title: labels.change,
+        description: labels.changeDescription,
         submit: labels.send,
-        success: change ? labels.changeSuccess : labels.proposeSuccess,
+        success: labels.changeSuccess,
       })}
       trigger={
-        trigger ?? (
-          <Button type="button" variant={change ? "outline" : "primary"} size="sm">
-            {change ? labels.change : labels.propose}
-          </Button>
-        )
+        <Button type="button" variant="outline" size="sm">
+          {labels.change}
+          <span className="sr-only"> — {event.title}</span>
+        </Button>
       }
-      fields={{
-        submissionId,
-        ...(event ? { eventId: event.id } : { id: participantId }),
-      }}
+      fields={{ submissionId, eventId: event.id }}
       fieldLabels={{
         title: labels.title,
         eventDate: labels.date,
         hours: labels.hours,
         xpAwarded: labels.xp,
-        note: change ? labels.reason : labels.note,
+        note: labels.reason,
       }}
       idFor={fieldId}
       size="lg"
@@ -180,7 +164,7 @@ export function PastEventProposalDialog({
                 name="title"
                 required
                 maxLength={160}
-                defaultValue={typed.title ?? event?.title ?? ""}
+                defaultValue={typed.title ?? event.title}
                 aria-invalid={Boolean(error("title")) || undefined}
               />
               <FieldError id={`${fieldId("title")}-error`}>{error("title")}</FieldError>
@@ -194,7 +178,7 @@ export function PastEventProposalDialog({
                   type="date"
                   required
                   max={latestDate}
-                  defaultValue={typed.eventDate ?? event?.eventDate ?? ""}
+                  defaultValue={typed.eventDate ?? event.eventDate}
                   aria-invalid={Boolean(error("eventDate")) || undefined}
                 />
                 <FieldError id={`${fieldId("eventDate")}-error`}>
@@ -212,7 +196,7 @@ export function PastEventProposalDialog({
                   max={999}
                   step={0.25}
                   required
-                  defaultValue={typed.hours ?? event?.hours ?? ""}
+                  defaultValue={typed.hours ?? event.hours}
                   aria-invalid={Boolean(error("hours")) || undefined}
                 />
                 <FieldError id={`${fieldId("hours")}-error`}>
@@ -230,8 +214,8 @@ export function PastEventProposalDialog({
                   max={100000}
                   step={1}
                   required
-                  readOnly={!creditable}
-                  defaultValue={typed.xpAwarded ?? event?.xpAwarded ?? 0}
+                  readOnly={!event.countsTowardProgress}
+                  defaultValue={typed.xpAwarded ?? event.xpAwarded}
                   aria-describedby={`${fieldId("xpAwarded")}-help`}
                   aria-invalid={Boolean(error("xpAwarded")) || undefined}
                 />
@@ -245,9 +229,9 @@ export function PastEventProposalDialog({
             </FieldDescription>
             <NoteField
               id={fieldId("note")}
-              label={change ? labels.reason : labels.note}
-              help={change ? labels.reasonHelp : labels.noteHelp}
-              required={change}
+              label={labels.reason}
+              help={labels.reasonHelp}
+              required
               value={typed.note ?? ""}
               error={error("note")}
             />
@@ -260,10 +244,12 @@ export function PastEventProposalDialog({
 
 export function PastEventRemovalDialog({
   eventId,
+  eventTitle,
   action,
   labels,
 }: {
   eventId: string;
+  eventTitle: string;
   action: Action;
   labels: PastEventDialogLabels;
 }) {
@@ -286,6 +272,7 @@ export function PastEventRemovalDialog({
       trigger={
         <Button type="button" variant="danger-outline" size="sm">
           {labels.remove}
+          <span className="sr-only"> — {eventTitle}</span>
         </Button>
       }
       tone="danger"

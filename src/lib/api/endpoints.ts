@@ -26,6 +26,11 @@ export const endpoints = {
     path: "/org/past-event-rosters",
     contract: "published",
   },
+  addPastEventParticipants: {
+    method: "POST",
+    path: "/org/past-event-rosters/{id}/participants",
+    contract: "published",
+  },
   pastEventVolunteer: {
     method: "GET",
     path: "/org/past-event-rosters/volunteer",
@@ -152,11 +157,6 @@ export const endpoints = {
   participant: {
     method: "GET",
     path: "/org/participants/{id}",
-    contract: "published",
-  },
-  proposePastEvent: {
-    method: "POST",
-    path: "/org/participants/{id}/past-events",
     contract: "published",
   },
   proposePastEventChange: {
