@@ -8,7 +8,6 @@ import { write } from "@/lib/api/gateway.server";
 import { fieldErrorsOf, stringField } from "@/lib/auth/credentials";
 import {
   pastEventChangeSchema,
-  pastEventProposalSchema,
   pastEventRemovalSchema,
 } from "@/lib/participants/input";
 
@@ -33,31 +32,6 @@ function settled(
   return result.status === "error"
     ? { ...result, values, submissionId: randomUUID() }
     : result;
-}
-
-export async function proposePastEventAction(
-  _previous: ActionResult,
-  formData: FormData,
-): Promise<ActionResult> {
-  const id = stringField(formData, "id");
-  const submissionId = stringField(formData, "submissionId");
-  if (!id) return failedResult("participantNotFound");
-  if (!submissionId) return failedResult("pastEventRequestConflict");
-  const values = proposalOf(formData);
-  const parsed = pastEventProposalSchema.safeParse(values);
-  if (!parsed.success)
-    return settled(
-      failedResult("validationFailed", fieldErrorsOf(parsed.error)),
-      values,
-    );
-  const { note, ...proposal } = parsed.data;
-  return settled(
-    await write("proposePastEvent", {
-      params: { id },
-      body: { ...proposal, submissionId, ...(note ? { note } : {}) },
-    }),
-    values,
-  );
 }
 
 export async function proposePastEventChangeAction(
