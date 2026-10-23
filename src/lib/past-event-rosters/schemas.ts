@@ -31,6 +31,10 @@ export const rosterInputSchema = pastEventProposalSchema
       ),
   });
 
+export const participantsInputSchema = z.object({
+  participants: rosterInputSchema.shape.participants,
+});
+
 const summaryFields = {
   id: z.uuid(),
   title: z.string(),

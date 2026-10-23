@@ -2663,6 +2663,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/org/past-event-rosters/{id}/participants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add volunteers to one of this organization’s past events; each waits for an administrator */
+        post: operations["OrgPastEventRostersController_addParticipants"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/past-events": {
         parameters: {
             query?: never;
@@ -4204,6 +4221,10 @@ export interface components {
              */
             eventDate: string;
             note?: string;
+            participants: components["schemas"]["PastEventRosterParticipantDto"][];
+        };
+        AddPastEventParticipantsDto: {
+            /** @description Volunteers to add to the event. Someone already waiting with the same hours and XP is skipped, so a retry is harmless. */
             participants: components["schemas"]["PastEventRosterParticipantDto"][];
         };
         PublicPastEventOrganizationDto: {
@@ -17656,6 +17677,94 @@ export interface operations {
             };
             /** @description Requested resource was not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    OrgPastEventRostersController_addParticipants: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddPastEventParticipantsDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PastEventRosterDto"];
+                };
+            };
+            /** @description Malformed request body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requested resource was not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request body exceeds the configured limit */
+            413: {
                 headers: {
                     [name: string]: unknown;
                 };
