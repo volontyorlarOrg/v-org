@@ -33,11 +33,13 @@ export function RequestList({
   requests,
   labels,
   showVolunteer = false,
+  inEvent = false,
   action,
 }: {
   requests: readonly PastEventRequest[];
   labels: RequestListLabels;
   showVolunteer?: boolean;
+  inEvent?: boolean;
   action?: (request: PastEventRequest) => ReactNode;
 }) {
   return (
@@ -45,7 +47,7 @@ export function RequestList({
       {requests.map((request) => {
         const date = requestDate(request);
         const facts = [
-          date ? labels.day(date) : null,
+          date && !inEvent ? labels.day(date) : null,
           request.hours === null ? null : labels.hours(labels.number(request.hours)),
           request.xpAwarded === null
             ? null
@@ -58,13 +60,24 @@ export function RequestList({
             className="flex flex-wrap items-start gap-x-5 gap-y-3 px-5 py-4"
           >
             <div className="min-w-0 flex-1 basis-64">
-              <p className="text-xs font-semibold tracking-[0.04em] text-ink-muted uppercase">
-                {labels.kind[request.kind]}
-              </p>
-              <p className="mt-1 font-semibold [overflow-wrap:anywhere] text-ink">
-                {requestSubject(request)}
-              </p>
-              {showVolunteer && request.rosterId ? (
+              {inEvent ? (
+                <p className="[overflow-wrap:anywhere]">
+                  <span className="font-semibold text-ink">
+                    {request.volunteer.displayName ?? labels.unnamed}
+                  </span>{" "}
+                  <span className="text-sm text-ink-muted">
+                    @{request.volunteer.username}
+                  </span>
+                </p>
+              ) : (
+                <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5">
+                  <span className="font-semibold [overflow-wrap:anywhere] text-ink">
+                    {requestSubject(request)}
+                  </span>
+                  <StatusBadge label={labels.kind[request.kind]} tone="neutral" />
+                </p>
+              )}
+              {inEvent ? null : showVolunteer && request.rosterId ? (
                 <p className="mt-0.5 text-sm [overflow-wrap:anywhere] text-ink-muted">
                   {request.volunteer.displayName ?? labels.unnamed} @
                   {request.volunteer.username}
@@ -82,7 +95,7 @@ export function RequestList({
                   {facts.join(" · ")}
                 </p>
               ) : null}
-              {request.note ? (
+              {request.note && !inEvent ? (
                 <p className="mt-2 text-sm leading-relaxed [overflow-wrap:anywhere] text-ink-muted">
                   {labels.yourNote(request.note)}
                 </p>
