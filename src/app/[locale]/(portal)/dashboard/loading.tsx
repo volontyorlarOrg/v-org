@@ -2,7 +2,7 @@ import { getTranslations } from "next-intl/server";
 
 import { QueueSkeleton } from "@/components/states/skeletons";
 
-export default async function TodayLoading() {
+export default async function DashboardLoading() {
   const t = await getTranslations("states.loading");
   return <QueueSkeleton label={t("queue")} />;
 }

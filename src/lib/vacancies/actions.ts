@@ -7,7 +7,7 @@ import { RedirectType, redirect } from "next/navigation";
 import { failedResult, type ActionResult } from "@/lib/api/action-result";
 import type { FieldErrors } from "@/lib/api/errors";
 import { write, writeMultipart, writeReturning } from "@/lib/api/gateway.server";
-import { vacancySchema } from "@/lib/api/schemas";
+import { imageUploadSchema, vacancySchema } from "@/lib/api/schemas";
 import { stringField } from "@/lib/auth/credentials";
 import { isLocale } from "@/i18n/routing";
 import { vacancyHref } from "@/lib/routing/routes";
@@ -67,7 +67,7 @@ async function uploadImage(
   if (image.file) {
     const body = new FormData();
     body.set("image", image.file);
-    return writeMultipart("uploadVacancyImage", { id }, body);
+    return writeMultipart("uploadVacancyImage", { id }, body, imageUploadSchema);
   }
   if (image.remove) return write("removeVacancyImage", { params: { id } });
   return { status: "ok" };

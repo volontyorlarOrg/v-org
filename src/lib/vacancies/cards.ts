@@ -52,7 +52,8 @@ export function cardStageOf(vacancy: VacancyListItem, now: Date): CardStage {
   if (!isAttendanceOpen(vacancy, now)) return "published";
   const sheet = vacancy.attendanceSheet;
   if (sheet?.status === "submitted") return "verifying";
-  if (sheet) return sheet.status === "verified" && !sheet.correction ? "results" : "ended";
+  if (sheet)
+    return sheet.status === "verified" && !sheet.correction ? "results" : "ended";
   // Vacancies recorded before results were verified carry no sheet.
   const progress = vacancy.progress ?? EMPTY;
   return progress.accepted > 0 && progress.attendanceResolved >= progress.accepted
