@@ -9,10 +9,11 @@ This repository owns the UI at `org.volontyorlar.uz`. `v-backend` owns authentic
 1. Sign in with the organization login name (its stable slug) and admin-issued password.
 2. Create a vacancy assigned to this organization. It starts as a draft.
 3. Submit it for administrator review. It becomes public only after approval in `v-admin`.
-4. Review applicants to vacancies created by this account.
-5. After an event ends, record attendance and confirmed hours for accepted volunteers.
+4. Stage decisions on the vacancy's applicants and send them together; send instructions to accepted volunteers.
+5. After an event ends, record attendance and submit the results. Hours and XP count only after an administrator verifies them.
+6. Record past events with their participants; an administrator approves them before any volunteer sees them.
 
-The first release uses the current application and attendance behavior. It does not add results-sheet approval, XP tiers, or Telegram invitation flows shown in the approximate references.
+The **Dashboard** opens on the organization's totals, then what waits on it (returned vacancies, returned results, drafts, applications grouped by vacancy, roll calls), what is with the administrator, and its recent activity. See [docs/DASHBOARD.md](docs/DASHBOARD.md) and, for how each record travels to the administrator portal and back, [docs/INFORMATION_FLOW.md](docs/INFORMATION_FLOW.md).
 
 ## Local development
 

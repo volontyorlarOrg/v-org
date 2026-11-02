@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
-import { AuditTable } from "@/components/audit/audit-table";
+import { AuditTimeline } from "@/components/audit/audit-timeline";
 import { Register, RegisterNote } from "@/components/register/register";
 import { LoadFailure } from "@/components/states/load-failure";
 import { PageHeader } from "@/components/states/page-header";
@@ -11,8 +11,9 @@ import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select"
 import { Link } from "@/i18n/navigation";
 import { failureOf, isReady } from "@/lib/api/load";
 import { loadActivity } from "@/lib/activity/data.server";
-import { actionNames, filterActivity } from "@/lib/activity/filters";
-import { auditActionKey } from "@/lib/domain/audit-actions";
+import { filterActivity } from "@/lib/activity/filters";
+import { loadAuditDirectory } from "@/lib/audit/directory.server";
+import { auditActionGroups, auditActionKey } from "@/lib/domain/audit-actions";
 import { navHref } from "@/lib/routing/routes";
 import {
   DEFAULT_PAGE_SIZE,
@@ -49,7 +50,7 @@ export default async function ActivityPage({
   const action = readParam(query, "action");
   const page = readPage(query);
 
-  const loaded = await loadActivity();
+  const [loaded, directory] = await Promise.all([loadActivity(), loadAuditDirectory()]);
   const failure = failureOf(loaded);
   const all = isReady(loaded) ? loaded.data : [];
   const filtered = filterActivity(all, { action });
@@ -88,10 +89,17 @@ export default async function ActivityPage({
                   className="min-h-10 rounded-full text-sm"
                 >
                   <NativeSelectOption value="">{common("all")}</NativeSelectOption>
-                  {actionNames(all).map((name) => (
-                    <NativeSelectOption key={name} value={name}>
-                      {label(name)}
-                    </NativeSelectOption>
+                  {auditActionGroups(all.map((event) => event.action)).map((group) => (
+                    <optgroup
+                      key={group.family}
+                      label={audit(`families.${group.family}`)}
+                    >
+                      {group.actions.map((name) => (
+                        <NativeSelectOption key={name} value={name}>
+                          {label(name)}
+                        </NativeSelectOption>
+                      ))}
+                    </optgroup>
                   ))}
                 </NativeSelect>
               </label>
@@ -118,9 +126,10 @@ export default async function ActivityPage({
             />
           ) : (
             <>
-              <AuditTable
+              <AuditTimeline
+                id="activity"
                 events={pageState.items}
-                caption={t("table.caption")}
+                directory={directory}
                 showActor={false}
               />
               <Pagination

@@ -36,7 +36,7 @@
   },
   "nav": {
     "label": "Portal sections",
-    "dashboard": "Today",
+    "dashboard": "Dashboard",
     "vacancies": "My opportunities",
     "applications": "Applications",
     "users": "Volunteers",
@@ -94,7 +94,10 @@
     },
     "failed": {
       "title": "This did not load",
-      "description": "Something went wrong on the way to the API. Reload the page to try again."
+      "description": "Something went wrong on the way to the API. Reload the page to try again.",
+      "reference": "Reference: {reference}.",
+      "retry": "Try again",
+      "retrying": "Trying again…"
     },
     "loading": {
       "list": "Loading the list…",
@@ -831,7 +834,7 @@
   },
   "activity": {
     "title": "My activity",
-    "description": "Everything you did in this portal, newest first.",
+    "description": "Everything you did in this portal, grouped by day, newest first.",
     "empty": {
       "title": "No activity yet",
       "description": "Publishing a vacancy, reviewing an application or confirming attendance is recorded here."
@@ -926,8 +929,7 @@
       "noteHelp": "Optional. The volunteer reads it with the decision."
     }
   },
-  "today": {
-    "title": "Today",
+  "desk": {
     "number": "Number",
     "waitingLabel": "waiting",
     "requirements": {
@@ -946,7 +948,11 @@
       "sent": "Sent {when}",
       "essay": "Essay attached",
       "looking": "Under review",
-      "unnamed": "Unnamed volunteer"
+      "unnamed": "Unnamed volunteer",
+      "waiting": "{count, plural, one {# application waits} other {# applications wait}}",
+      "oldest": "Oldest sent {when}",
+      "staged": "{count, plural, one {# decision staged, not sent} other {# decisions staged, not sent}}",
+      "review": "Review applications"
     },
     "rollCalls": {
       "title": "Roll calls due",
@@ -970,21 +976,12 @@
         "rejected": "Not selected",
         "closed": "Closed"
       },
-      "rollCall": "Roll call recorded: {attended} attended, {other} excused or cancelled"
+      "rollCall": "Roll call recorded: {attended} attended, {other} excused or cancelled",
+      "empty": "Decisions you make today land here with a seal."
     },
     "clear": {
       "title": "Nothing waits on you",
       "description": "Returned vacancies, drafts, applications and roll calls appear here as they arrive."
-    },
-    "operation": {
-      "title": "Your work",
-      "line": {
-        "live": "{count, plural, one {<n>#</n> live vacancy} other {<n>#</n> live vacancies}}",
-        "applications": "{count, plural, one {<n>#</n> application sent} other {<n>#</n> applications sent}}",
-        "accepted": "{count, plural, one {<n>#</n> volunteer accepted} other {<n>#</n> volunteers accepted}}",
-        "attended": "{count, plural, one {<n>#</n> event attended} other {<n>#</n> events attended}}",
-        "hours": "{count, plural, one {<n>#</n> hour confirmed} other {<n>#</n> hours confirmed}}"
-      }
     },
     "dateline": "{date} · {count, plural, =0 {nothing waits on you} one {# thing waits on you} other {# things wait on you}}",
     "listTitle": "On your desk",
@@ -1004,10 +1001,35 @@
       "ready": "Ready to send",
       "needs": "Needs {items}"
     },
-    "inReview": {
-      "line": "{count, plural, one {# vacancy is} other {# vacancies are}} with an administrator",
+    "returnedResults": {
+      "title": "Results returned for changes",
+      "countLabel": "results returned for changes",
+      "when": "Returned {when}",
+      "open": "Correct results"
+    },
+    "withAdmin": {
+      "title": "With the administrator",
+      "description": "Nothing here waits on you. It moves on when an administrator decides.",
+      "countLabel": "items with the administrator",
+      "vacancies": "{count, plural, one {# vacancy waits for approval} other {# vacancies wait for approval}}",
+      "results": "{count, plural, one {# set of results waits for verification} other {# sets of results wait for verification}}",
+      "pastEvents": "{count, plural, one {# past event waits for approval} other {# past events wait for approval}}",
       "open": "See them"
     }
+  },
+  "dashboardHome": {
+    "title": "Dashboard",
+    "description": "What waits on you first, then what is with the administrator, and how your work adds up.",
+    "overview": {
+      "title": "Your work",
+      "description": "All-time totals for your organization",
+      "publishedVacancies": "Live vacancies",
+      "applications": "Applications received",
+      "accepted": "Volunteers accepted",
+      "attended": "Attendances confirmed",
+      "confirmedHours": "Confirmed hours"
+    },
+    "loadingOperations": "Loading what waits on you…"
   },
   "audit": {
     "table": {
@@ -1061,13 +1083,48 @@
       "user_username_changed": "Username changed",
       "user_avatar_updated": "Photo updated",
       "user_avatar_removed": "Photo removed",
-      "past_event_roster_submitted": "Historical event submitted",
+      "past_event_roster_submitted": "Past event submitted",
       "past_event_request_submitted": "Past event proposal submitted",
       "past_event_request_approved": "Past event proposal approved",
       "past_event_request_rejected": "Past event proposal rejected",
-      "past_event_request_cancelled": "Past event proposal withdrawn"
+      "past_event_request_cancelled": "Past event proposal withdrawn",
+      "user_progress_adjusted": "XP and hours adjusted",
+      "bulk_award_created": "Bulk award given",
+      "bulk_award_revoked": "Bulk award taken back",
+      "user_past_event_created": "Past event added to a volunteer",
+      "user_past_event_updated": "Volunteer's past event edited",
+      "user_past_event_removed": "Volunteer's past event removed"
     },
-    "you": "You"
+    "you": "You",
+    "families": {
+      "opportunity": "Vacancies",
+      "application": "Applications",
+      "attendance": "Attendance",
+      "coordinator": "Coordinators",
+      "organization": "Organizations",
+      "user": "Accounts",
+      "pastEvent": "Past events",
+      "award": "XP and hours",
+      "other": "Other"
+    },
+    "day": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "count": "{count, plural, one {# action} other {# actions}}"
+    },
+    "roles": {
+      "administrator": "Administrator",
+      "coordinator": "Coordinator",
+      "organization": "Organization",
+      "volunteer": "Volunteer"
+    },
+    "feed": {
+      "title": "Recent activity",
+      "description": "Your latest recorded actions.",
+      "all": "Open my activity",
+      "empty": "Nothing has been recorded yet.",
+      "countLabel": "recent actions"
+    }
   },
   "results": {
     "tabs": {

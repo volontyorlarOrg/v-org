@@ -1,5 +1,7 @@
 import {
+  Award,
   Building2,
+  BookOpen,
   CalendarCheck,
   ChartColumn,
   ClipboardList,
@@ -10,7 +12,6 @@ import {
   LogIn,
   Plus,
   ScrollText,
-  Stamp,
   UserCog,
   UserPlus,
   Users,
@@ -18,14 +19,16 @@ import {
 } from "lucide-react";
 
 const ICONS: Record<string, LucideIcon> = {
+  award: Award,
   "building-2": Building2,
+  "book-open": BookOpen,
   "calendar-check": CalendarCheck,
   "chart-column": ChartColumn,
   "clipboard-list": ClipboardList,
   history: History,
   inbox: Inbox,
   "key-round": KeyRound,
-  "layout-dashboard": Stamp,
+  "layout-dashboard": LayoutDashboard,
   "log-in": LogIn,
   plus: Plus,
   "scroll-text": ScrollText,
@@ -43,6 +46,6 @@ export function NavIcon({
   className?: string;
   strokeWidth?: number;
 }) {
-  const Icon = ICONS[name] ?? LayoutDashboard;
+  const Icon = ICONS[name] ?? ScrollText;
   return <Icon aria-hidden="true" className={className} strokeWidth={strokeWidth} />;
 }
