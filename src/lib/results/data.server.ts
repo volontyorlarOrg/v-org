@@ -17,7 +17,9 @@ import {
 } from "@/lib/results/schemas";
 import { applicationHref } from "@/lib/routing/routes";
 
-export function loadAttendanceSheet(vacancyId: string): Promise<Loaded<AttendanceSheet>> {
+export function loadAttendanceSheet(
+  vacancyId: string,
+): Promise<Loaded<AttendanceSheet>> {
   return read("attendanceSheet", {
     schema: attendanceSheetSchema,
     params: { id: vacancyId },
@@ -25,7 +27,10 @@ export function loadAttendanceSheet(vacancyId: string): Promise<Loaded<Attendanc
 }
 
 export function loadInstructions(vacancyId: string): Promise<Loaded<Instructions>> {
-  return read("instructions", { schema: instructionsSchema, params: { id: vacancyId } });
+  return read("instructions", {
+    schema: instructionsSchema,
+    params: { id: vacancyId },
+  });
 }
 
 /** Applications shaped for the desk, with dates and profile already worded. */
@@ -55,7 +60,11 @@ export async function deskApplicants(
     const profile = snapshot
       ? PROFILE_FIELD_KEYS.flatMap((key) => {
           const value = snapshot[key];
-          if (value === undefined || value === "" || (Array.isArray(value) && !value.length)) {
+          if (
+            value === undefined ||
+            value === "" ||
+            (Array.isArray(value) && !value.length)
+          ) {
             return [];
           }
           const text =
