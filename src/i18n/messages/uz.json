@@ -36,7 +36,7 @@
   },
   "nav": {
     "label": "Portal boʻlimlari",
-    "dashboard": "Bugun",
+    "dashboard": "Boshqaruv paneli",
     "vacancies": "Mening imkoniyatlarim",
     "applications": "Arizalar",
     "users": "Volontyorlar",
@@ -94,7 +94,10 @@
     },
     "failed": {
       "title": "Yuklanmadi",
-      "description": "API yoʻlida nimadir notoʻgʻri ketdi. Sahifani yangilab, qayta urinib koʻring."
+      "description": "API yoʻlida nimadir notoʻgʻri ketdi. Sahifani yangilab, qayta urinib koʻring.",
+      "reference": "Murojaat raqami: {reference}.",
+      "retry": "Qayta urinish",
+      "retrying": "Qayta urinilmoqda…"
     },
     "loading": {
       "list": "Roʻyxat yuklanmoqda…",
@@ -831,7 +834,7 @@
   },
   "activity": {
     "title": "Mening amallarim",
-    "description": "Portalda qilgan barcha ishlaringiz, eng yangisidan boshlab.",
+    "description": "Portalda qilgan barcha ishlaringiz, kunlar boʻyicha, eng yangisidan boshlab.",
     "empty": {
       "title": "Hali amal yoʻq",
       "description": "Vakansiyani eʼlon qilish, arizani koʻrib chiqish yoki ishtirokni tasdiqlash shu yerda qayd etiladi."
@@ -926,8 +929,7 @@
       "noteHelp": "Ixtiyoriy. Volontyor buni qaror bilan birga oʻqiydi."
     }
   },
-  "today": {
-    "title": "Bugun",
+  "desk": {
     "number": "Raqam",
     "waitingLabel": "kutmoqda",
     "requirements": {
@@ -946,7 +948,11 @@
       "sent": "{when} yuborilgan",
       "essay": "Esse ilova qilingan",
       "looking": "Koʻrib chiqilmoqda",
-      "unnamed": "Ismi koʻrsatilmagan volontyor"
+      "unnamed": "Ismi koʻrsatilmagan volontyor",
+      "waiting": "{count, plural, other {# ta ariza kutmoqda}}",
+      "oldest": "Eng birinchisi {when} yuborilgan",
+      "staged": "{count, plural, other {# ta qaror tayyor, hali yuborilmagan}}",
+      "review": "Arizalarni koʻrib chiqish"
     },
     "rollCalls": {
       "title": "Davomat belgilanishi kerak",
@@ -970,21 +976,12 @@
         "rejected": "Tanlanmadi",
         "closed": "Yopildi"
       },
-      "rollCall": "Davomat qayd etildi: {attended} kishi keldi, {other} kishi sababli yoki bekor"
+      "rollCall": "Davomat qayd etildi: {attended} kishi keldi, {other} kishi sababli yoki bekor",
+      "empty": "Bugun qabul qilgan qarorlaringiz shu yerda muhr bilan paydo boʻladi."
     },
     "clear": {
       "title": "Sizni hech narsa kutmayapti",
       "description": "Qaytarilgan vakansiyalar, qoralamalar, arizalar va davomatlar kelishi bilan shu yerda paydo boʻladi."
-    },
-    "operation": {
-      "title": "Sizning ishingiz",
-      "line": {
-        "live": "{count, plural, other {<n>#</n> faol vakansiya}}",
-        "applications": "{count, plural, other {<n>#</n> ta ariza yuborilgan}}",
-        "accepted": "{count, plural, other {<n>#</n> koʻngilli qabul qilingan}}",
-        "attended": "{count, plural, other {<n>#</n> ta tadbirda qatnashilgan}}",
-        "hours": "{count, plural, other {<n>#</n> soat tasdiqlangan}}"
-      }
     },
     "dateline": "{date} · {count, plural, =0 {sizni hech narsa kutmayapti} other {sizni # ta ish kutmoqda}}",
     "listTitle": "Ish stolingizda",
@@ -1004,10 +1001,35 @@
       "ready": "Yuborishga tayyor",
       "needs": "Kerak: {items}"
     },
-    "inReview": {
-      "line": "{count, plural, other {# ta vakansiya administratorda koʻrib chiqilmoqda}}",
+    "returnedResults": {
+      "title": "Tuzatish uchun qaytarilgan natijalar",
+      "countLabel": "natija tuzatish uchun qaytarilgan",
+      "when": "{when} qaytarilgan",
+      "open": "Natijalarni tuzatish"
+    },
+    "withAdmin": {
+      "title": "Administratorda",
+      "description": "Bu yerda sizni hech narsa kutmayapti. Administrator qaror qilgach, ish davom etadi.",
+      "countLabel": "ish administratorda",
+      "vacancies": "{count, plural, other {# ta vakansiya tasdiqlanishni kutmoqda}}",
+      "results": "{count, plural, other {# ta natija tekshirilishni kutmoqda}}",
+      "pastEvents": "{count, plural, other {# ta oʻtgan tadbir tasdiqlanishni kutmoqda}}",
       "open": "Koʻrish"
     }
+  },
+  "dashboardHome": {
+    "title": "Boshqaruv paneli",
+    "description": "Avval sizni kutayotgan ishlar, soʻng administratordagi ishlar va ishingiz natijalari.",
+    "overview": {
+      "title": "Sizning ishingiz",
+      "description": "Tashkilotingizning butun davr boʻyicha koʻrsatkichlari",
+      "publishedVacancies": "Faol vakansiyalar",
+      "applications": "Qabul qilingan arizalar",
+      "accepted": "Qabul qilingan volontyorlar",
+      "attended": "Tasdiqlangan qatnashuvlar",
+      "confirmedHours": "Tasdiqlangan soatlar"
+    },
+    "loadingOperations": "Sizni kutayotgan ishlar yuklanmoqda…"
   },
   "audit": {
     "table": {
@@ -1065,9 +1087,44 @@
       "past_event_request_submitted": "Oʻtgan tadbir taklifi yuborildi",
       "past_event_request_approved": "Oʻtgan tadbir taklifi tasdiqlandi",
       "past_event_request_rejected": "Oʻtgan tadbir taklifi rad etildi",
-      "past_event_request_cancelled": "Oʻtgan tadbir taklifi qaytarib olindi"
+      "past_event_request_cancelled": "Oʻtgan tadbir taklifi qaytarib olindi",
+      "user_progress_adjusted": "XP va soatlar oʻzgartirildi",
+      "bulk_award_created": "Ommaviy mukofot berildi",
+      "bulk_award_revoked": "Ommaviy mukofot qaytarib olindi",
+      "user_past_event_created": "Volontyorga oʻtgan tadbir qoʻshildi",
+      "user_past_event_updated": "Volontyorning oʻtgan tadbiri tahrirlandi",
+      "user_past_event_removed": "Volontyorning oʻtgan tadbiri olib tashlandi"
     },
-    "you": "Siz"
+    "you": "Siz",
+    "families": {
+      "opportunity": "Vakansiyalar",
+      "application": "Arizalar",
+      "attendance": "Davomat",
+      "coordinator": "Koordinatorlar",
+      "organization": "Tashkilotlar",
+      "user": "Hisoblar",
+      "pastEvent": "Oʻtgan tadbirlar",
+      "award": "XP va soatlar",
+      "other": "Boshqa"
+    },
+    "day": {
+      "today": "Bugun",
+      "yesterday": "Kecha",
+      "count": "{count, plural, other {# ta amal}}"
+    },
+    "roles": {
+      "administrator": "Administrator",
+      "coordinator": "Koordinator",
+      "organization": "Tashkilot",
+      "volunteer": "Volontyor"
+    },
+    "feed": {
+      "title": "Soʻnggi amallar",
+      "description": "Eng soʻnggi qayd etilgan amallaringiz.",
+      "all": "Faoliyatimni ochish",
+      "empty": "Hozircha hech narsa qayd etilmagan.",
+      "countLabel": "soʻnggi amallar"
+    }
   },
   "results": {
     "tabs": {

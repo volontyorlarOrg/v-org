@@ -16,7 +16,3 @@ export function filterActivity(
         .includes(term);
     });
 }
-
-export function actionNames(events: AuditEvent[]): string[] {
-  return [...new Set(events.map((event) => event.action))].sort();
-}

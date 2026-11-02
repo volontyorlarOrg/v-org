@@ -235,12 +235,12 @@ tabular figures so the column lines up.
 
 A fixed navy rail of 15rem on the left from the large breakpoint; below it the
 rail becomes a drawer behind a menu button in a white header, and the content
-takes the width. The rail holds the stacked inverse lockup and two destinations:
-Today and Vacancies. Vacancies show the changes requested count. Each vacancy
-record has its own Applicants section, with links to the application records.
-Attendance is linked from Today and each vacancy record; the volunteer directory
-is linked from an application record. At its foot are My activity, language,
-theme, and Sign out.
+takes the width. The rail holds the stacked inverse lockup and four destinations:
+Dashboard, My opportunities, Participants and Past events. My opportunities shows
+the changes requested count. Each vacancy record has Details, Applications and
+Attendance tabs. Attendance is linked from Dashboard and each vacancy record; the
+volunteer directory is linked from an application record. At its foot are My
+activity, language, theme, and Sign out.
 
 The content column is capped at 80rem with 16px side padding on phones, 24px on
 small screens and 32px on the desk, 20px between blocks. A screen is a page
@@ -364,19 +364,32 @@ volunteer earned, muted for a closure. A seal pressed in the last few seconds
 lands with a short press (520ms; a fade under reduced motion). Seals stamp an
 approved vacancy's header and every entry in "Cleared today".
 
-### Totals Line
+### Your Work
 
-A ledger foot under the Today register: a small title and a run of serif figures
-with their words ("1 live vacancy · 6 applications sent · …"), confirmed hours
-in orange. This portal draws no charts; the stylesheet's chart ramp belongs to
-the administrator portal's Insights.
+The ledger sheet directly under Dashboard's page header, the same component as
+the administrator portal's platform overview: live vacancies, applications
+received, volunteers accepted, attendances confirmed and confirmed hours, each
+a serif figure over an Onest label, confirmed hours in orange. Two columns on
+phones, three from the small breakpoint, five from the extra-large one. This
+portal draws no charts; the stylesheet's chart ramp belongs to the
+administrator portal's Insights.
+
+### Audit Timeline
+
+My activity and the dashboard's recent activity are a timeline inside a register
+sheet: a tinted heading per Tashkent day (Today, Yesterday, then the weekday and
+date) with its count, then hairline rows of time (tabular), a round family icon
+on the soft sheet, the action in Onest semibold and the named record beneath it
+as a link. Every action is the organization's own, so no actor is shown.
 
 ## Do's and Don'ts
 
 ### Do:
 
-- **Do** put the decision in the row: Send for approval, Accept, Reject, Mark
-  under review and Take roll call are reachable without opening the record.
+- **Do** put the decision in the row: Send for approval and Take roll call are
+  reachable without opening the record. Applicants are decided together on a
+  vacancy's applications desk, so the dashboard shows one row per vacancy with
+  how many wait, how old the oldest is and how many decisions are staged.
 - **Do** open long forms — a new vacancy, an edit — as their own page, with a
   sticky footer holding Cancel and the submit.
 - **Do** keep modals for what needs protected focus: archiving a vacancy.
@@ -389,8 +402,8 @@ the administrator portal's Insights.
 ### Don't:
 
 - **Don't** put an eyebrow or kicker above a heading; the heading carries itself.
-- **Don't** arrange numbers as a row of KPI cards on Today; print them as the
-  totals line.
+- **Don't** arrange numbers as a row of KPI cards on Dashboard; they share the
+  one "Your work" ledger sheet.
 - **Don't** nest a box inside a sheet, or draw a coloured stripe on one side of
   it; a state is a chip, a decision is a slip.
 - **Don't** use orange for identity, caution or a vacancy's state.

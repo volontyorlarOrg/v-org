@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { actionNames, filterActivity } from "@/lib/activity/filters";
+import { filterActivity } from "@/lib/activity/filters";
 import type { AuditEvent } from "@/lib/api/schemas";
 
 function event(id: string, action: string, createdAt: string): AuditEvent {
@@ -46,14 +46,5 @@ describe("filterActivity", () => {
     const original = [...events];
     filterActivity(events, {});
     expect(events).toEqual(original);
-  });
-});
-
-describe("actionNames", () => {
-  it("lists each action once, sorted, so a filter can offer them", () => {
-    expect(actionNames(events)).toEqual([
-      "application.reviewed",
-      "opportunity.published",
-    ]);
   });
 });

@@ -28,7 +28,10 @@ export const DESK_FILTERS = [
 ] as const;
 export type DeskFilter = (typeof DESK_FILTERS)[number];
 
-export type DeskSort = { key: "applied" | "status" | "name"; direction: "asc" | "desc" };
+export type DeskSort = {
+  key: "applied" | "status" | "name";
+  direction: "asc" | "desc";
+};
 
 export type Staged = Readonly<Record<string, StagedDecision | null>>;
 
