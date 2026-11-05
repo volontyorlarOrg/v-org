@@ -52,13 +52,13 @@ export function FieldShell({
       className={cn(
         "group/field min-w-0",
         beside
-          ? "grid gap-2 lg:grid-cols-[12.5rem_minmax(0,1fr)] lg:gap-6"
-          : "flex flex-col gap-2",
+          ? "grid gap-1.5 lg:grid-cols-[11rem_minmax(0,1fr)] lg:gap-6"
+          : "flex flex-col gap-1.5",
         className,
       )}
     >
       <div
-        className={cn("flex items-center gap-2", beside && "self-start lg:min-h-12")}
+        className={cn("flex items-center gap-2", beside && "self-start lg:min-h-10")}
       >
         <Title
           {...(Title === "label" ? { htmlFor: id } : {})}

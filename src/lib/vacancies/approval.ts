@@ -1,10 +1,9 @@
 import {
   type OpportunityApprovalStatus,
   type VacancyFormat,
+  type VacancyKind,
   type VacancyState,
 } from "@/lib/domain/vocabulary";
-
-export const MAX_DECISION_NOTE = 2000;
 
 export type ApprovalSubject = {
   approvalStatus?: OpportunityApprovalStatus | undefined;
@@ -21,17 +20,23 @@ export function vacancyStateOf(vacancy: ApprovalSubject): VacancyState {
   return vacancy.archivedAt ? "archived" : approvalStatusOf(vacancy);
 }
 
-export function isAwaitingDecision(vacancy: ApprovalSubject): boolean {
-  return vacancyStateOf(vacancy) === "pending_review";
-}
-
-export function isPermanentlyRejected(vacancy: ApprovalSubject): boolean {
-  return vacancyStateOf(vacancy) === "rejected";
-}
-
 export function canEditVacancy(vacancy: ApprovalSubject): boolean {
   const state = vacancyStateOf(vacancy);
   return state === "draft" || state === "changes_requested" || state === "approved";
+}
+
+/**
+ * Saving a published vacancy returns it to draft, and a draft needs a future
+ * deadline before its start to go back for approval. Once the event has started
+ * that can never hold, so the edit would strand the vacancy and its attendance.
+ */
+export function canEditNow(
+  vacancy: ApprovalSubject & { startsAt: string },
+  now: Date,
+): boolean {
+  if (!canEditVacancy(vacancy)) return false;
+  if (vacancyStateOf(vacancy) !== "approved") return true;
+  return Date.parse(vacancy.startsAt) > now.getTime();
 }
 
 export function canSubmitForApproval(vacancy: ApprovalSubject): boolean {
@@ -39,21 +44,12 @@ export function canSubmitForApproval(vacancy: ApprovalSubject): boolean {
   return state === "draft" || state === "changes_requested";
 }
 
-export function canPublishVacancy(vacancy: ApprovalSubject): boolean {
-  const state = vacancyStateOf(vacancy);
-  return state === "draft" || state === "changes_requested";
-}
-
-export function canApproveVacancy(vacancy: ApprovalSubject): boolean {
-  return vacancyStateOf(vacancy) === "pending_review";
-}
-
-export function canRequestVacancyChanges(vacancy: ApprovalSubject): boolean {
-  return vacancyStateOf(vacancy) === "pending_review";
-}
-
-export function canRejectVacancy(vacancy: ApprovalSubject): boolean {
-  return vacancyStateOf(vacancy) === "pending_review";
+/** Applications and attendance mean nothing until a vacancy has been public. */
+export function hasOpenedToVolunteers(
+  vacancy: Pick<ApprovalSubject, "publishedAt">,
+  applications: number,
+): boolean {
+  return Boolean(vacancy.publishedAt) || applications > 0;
 }
 
 export const APPROVAL_REQUIREMENTS = [
@@ -62,6 +58,8 @@ export const APPROVAL_REQUIREMENTS = [
   "description",
   "format",
   "region",
+  "location",
+  "capacity",
   "startsAt",
   "applicationDeadline",
 ] as const;
@@ -69,14 +67,37 @@ export const APPROVAL_REQUIREMENTS = [
 export type ApprovalRequirement = (typeof APPROVAL_REQUIREMENTS)[number];
 
 export type ApprovalCandidate = {
+  kind: VacancyKind;
   title: string;
   description: string;
   format: VacancyFormat;
   region: string;
+  locationName?: string | undefined;
+  city?: string | undefined;
+  capacity?: number | undefined;
   startsAt: string;
   applicationDeadline: string;
   organization?: { verified: boolean } | undefined;
 };
+
+export function approvalCandidateOf(
+  vacancy: Omit<ApprovalCandidate, "organization">,
+  organization: { verified: boolean } | undefined,
+): ApprovalCandidate {
+  return {
+    kind: vacancy.kind,
+    title: vacancy.title,
+    description: vacancy.description,
+    format: vacancy.format,
+    region: vacancy.region,
+    locationName: vacancy.locationName,
+    city: vacancy.city,
+    capacity: vacancy.capacity,
+    startsAt: vacancy.startsAt,
+    applicationDeadline: vacancy.applicationDeadline,
+    organization,
+  };
+}
 
 function isFilled(value: string | undefined): boolean {
   return typeof value === "string" && value.trim().length > 0;
@@ -97,6 +118,12 @@ export function missingForApproval(
   if (!isFilled(vacancy.description)) missing.push("description");
   if (!vacancy.format) missing.push("format");
   if (!isFilled(vacancy.region)) missing.push("region");
+  if (!isFilled(vacancy.locationName) && !isFilled(vacancy.city)) {
+    missing.push("location");
+  }
+  if (vacancy.kind === "volunteering" && vacancy.capacity === undefined) {
+    missing.push("capacity");
+  }
   if (!isMoment(vacancy.startsAt)) missing.push("startsAt");
 
   if (!isMoment(vacancy.applicationDeadline)) {
@@ -111,10 +138,6 @@ export function missingForApproval(
   }
 
   return missing;
-}
-
-export function isReadyForApproval(vacancy: ApprovalCandidate, now?: Date): boolean {
-  return missingForApproval(vacancy, now).length === 0;
 }
 
 const CREDENTIAL_PATTERNS = [

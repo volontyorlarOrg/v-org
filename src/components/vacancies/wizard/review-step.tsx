@@ -17,9 +17,8 @@ import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
 import type { WizardOrganization } from "@/components/vacancies/wizard/details-step";
+import type { XpRules } from "@/lib/results/schemas";
 import {
-  ATTENDED_EVENT_XP,
-  CONFIRMED_HOUR_XP,
   estimatedHoursOf,
   sessionsOf,
   tashkentInstant,
@@ -38,7 +37,10 @@ function Fact({
 }) {
   return (
     <div className="flex min-w-0 gap-3">
-      <span aria-hidden="true" className="mt-0.5 shrink-0 text-accent [&_svg]:size-5">
+      <span
+        aria-hidden="true"
+        className="mt-0.5 shrink-0 text-ink-muted [&_svg]:size-[1.125rem]"
+      >
         {icon}
       </span>
       <div className="min-w-0 text-sm">
@@ -106,6 +108,8 @@ export function ReviewStep({
   regionName,
   onEdit,
   formatHours,
+  rules,
+  rewardsEditable,
 }: {
   draft: VacancyDraft;
   organization: WizardOrganization;
@@ -113,6 +117,8 @@ export function ReviewStep({
   regionName: string;
   onEdit: (step: WizardStep) => void;
   formatHours: (hours: number) => string;
+  rules: XpRules;
+  rewardsEditable: boolean;
 }) {
   const t = useTranslations("vacancies.wizard");
   const kinds = useTranslations("vacancies.kinds");
@@ -125,16 +131,19 @@ export function ReviewStep({
   const volunteering = draft.kind === "volunteering";
 
   const reward = volunteering
-    ? t("rewardHour", { xp: CONFIRMED_HOUR_XP })
-    : t("rewardCompetition", { xp: ATTENDED_EVENT_XP });
-  const rewardDetail = volunteering
-    ? [
-        t("rewardAttend", { xp: ATTENDED_EVENT_XP }),
-        hours === null ? null : t("commitment", { hours }),
-      ]
-        .filter(Boolean)
-        .join(" · ")
-    : null;
+    ? t("rewardHour", { xp: rules.xpPerHour })
+    : t("rewardCompetition", {
+        winner: rules.xpWinner,
+        contributor: rules.xpContributor,
+        attendee: rules.xpAttendee,
+      });
+  const rewardDetail = [
+    volunteering && hours !== null ? t("commitment", { hours }) : null,
+    rules.xpNoShowPenalty > 0 ? t("rewardNoShow", { xp: rules.xpNoShowPenalty }) : null,
+    rewardsEditable ? t("rewardLater") : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   const rows: { term: string; value: ReactNode }[] = [
     { term: t("facts.title"), value: draft.title.trim() },
@@ -220,7 +229,7 @@ export function ReviewStep({
           </Button>
         </div>
 
-        <article className="mt-4 overflow-hidden rounded-lg border border-border">
+        <article className="mt-4 overflow-hidden rounded-md border border-border">
           {cover ? (
             <Image
               unoptimized
@@ -231,22 +240,22 @@ export function ReviewStep({
               className="aspect-[2/1] w-full object-cover"
             />
           ) : (
-            <div className="grid aspect-[3/1] w-full place-items-center bg-[linear-gradient(135deg,var(--color-primary-muted),var(--color-surface-soft))] text-primary-ink">
-              <span className="flex items-center gap-2 text-sm font-semibold">
-                <ImageOff aria-hidden="true" className="size-5" />
+            <div className="grid aspect-[4/1] w-full place-items-center bg-surface-sunk text-ink-muted">
+              <span className="flex items-center gap-2 text-sm font-medium">
+                <ImageOff aria-hidden="true" className="size-4" />
                 {t("noCover")}
               </span>
             </div>
           )}
-          <div className="flex flex-col gap-3 p-4 sm:p-5">
-            <h4 className="text-2xl leading-tight font-semibold text-balance text-ink">
+          <div className="flex flex-col gap-3 p-4">
+            <h4 className="text-xl leading-snug font-semibold text-balance text-ink">
               {draft.title.trim()}
             </h4>
             <p className="flex items-center gap-2 text-sm text-ink-muted">
               <Building2 aria-hidden="true" className="size-4" />
               {organization.name}
             </p>
-            <span className="inline-flex w-fit items-center gap-1.5 rounded-full border border-primary/40 bg-surface-soft px-3 py-1 text-xs font-semibold text-primary-ink">
+            <span className="inline-flex h-5 w-fit items-center gap-1 rounded-sm bg-surface-soft px-1.5 text-xs font-medium text-primary-ink">
               {volunteering ? (
                 <UsersRound aria-hidden="true" className="size-3.5" />
               ) : (
@@ -309,9 +318,7 @@ export function ReviewStep({
                 className="grid grid-cols-[minmax(0,9rem)_minmax(0,1fr)] gap-3 py-2.5 text-sm"
               >
                 <dt className="text-ink-muted">{row.term}</dt>
-                <dd className="min-w-0 font-medium break-words text-ink">
-                  {row.value}
-                </dd>
+                <dd className="min-w-0 break-words text-ink">{row.value}</dd>
               </div>
             ))}
           </dl>
@@ -338,7 +345,7 @@ export function ReviewStep({
           </header>
           <div className="px-4 py-3">
             {prompt ? (
-              <div className="rounded-lg border border-border bg-surface-sunk/60 px-4 py-3">
+              <div className="rounded-md border border-border bg-surface-sunk/60 px-4 py-3">
                 <p className="text-sm font-semibold text-ink">{prompt}</p>
                 <p className="mt-1 text-sm text-ink-muted">
                   {t("questionPreviewHelp")}

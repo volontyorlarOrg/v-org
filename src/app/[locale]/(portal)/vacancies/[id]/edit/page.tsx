@@ -10,8 +10,8 @@ import { WizardMessages } from "@/components/vacancies/wizard/wizard-messages";
 import { failureOf, isReady } from "@/lib/api/load";
 import { REGIONS } from "@/lib/domain/vocabulary";
 import { readOption, type SearchParams } from "@/lib/routing/search-params";
-import { navHref, vacancyHref } from "@/lib/routing/routes";
-import { canEditVacancy, vacancyStateOf } from "@/lib/vacancies/approval";
+import { vacancyHref } from "@/lib/routing/routes";
+import { canEditNow, vacancyStateOf } from "@/lib/vacancies/approval";
 import { loadOrganizations, loadVacancy } from "@/lib/vacancies/data.server";
 import { WIZARD_STEPS, draftFromVacancy } from "@/lib/vacancies/draft";
 
@@ -42,7 +42,7 @@ export default async function EditVacancyPage({
     loadVacancy(id),
     loadOrganizations(),
   ]);
-  const back = { href: navHref("vacancies"), label: t("backToList") };
+  const back = { href: vacancyHref(id), label: vacancies("form.backToVacancy") };
   const failure = failureOf(loaded) ?? failureOf(organizations);
 
   if (failure) {
@@ -63,7 +63,7 @@ export default async function EditVacancyPage({
       ? organizations.data.find((item) => item.id === vacancy.organizationId)
       : undefined) ?? vacancy.organization;
 
-  if (!canEditVacancy(vacancy) || !organization) {
+  if (!canEditNow(vacancy, new Date()) || !organization) {
     return (
       <>
         <PageHeader
@@ -74,14 +74,20 @@ export default async function EditVacancyPage({
           title={t("editTitle")}
           description={vacancy.title}
         />
-        <StatePanel role="status" title={vacancies("form.locked")} />
+        <StatePanel
+          role="status"
+          title={vacancies("form.locked")}
+          description={
+            state === "approved" ? vacancies("form.lockedStarted") : undefined
+          }
+        />
       </>
     );
   }
 
   return (
     <>
-      <PageHeader back={back} title={t("editTitle")} />
+      <PageHeader back={back} title={t("editTitle")} description={vacancy.title} />
       <WizardMessages>
         <VacancyWizard
           locale={locale}
@@ -95,6 +101,13 @@ export default async function EditVacancyPage({
           }}
           storedImageUrl={vacancy.imageUrl ?? null}
           regions={REGIONS}
+          rules={{
+            xpPerHour: vacancy.xpPerHour,
+            xpWinner: vacancy.xpWinner,
+            xpContributor: vacancy.xpContributor,
+            xpAttendee: vacancy.xpAttendee,
+            xpNoShowPenalty: vacancy.xpNoShowPenalty,
+          }}
           kindLocked={Boolean(vacancy.publishedAt)}
           published={state === "approved"}
           feedback={state === "changes_requested" ? vacancy.approvalNote : undefined}

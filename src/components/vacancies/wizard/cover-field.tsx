@@ -94,7 +94,7 @@ export function CoverField({
         )}
       >
         {shown ? (
-          <div className="relative overflow-hidden rounded-lg border border-border bg-surface-sunk">
+          <div className="relative overflow-hidden rounded-md border border-border bg-surface-sunk">
             <Image
               unoptimized
               src={shown}
@@ -107,7 +107,7 @@ export function CoverField({
               type="button"
               onClick={clear}
               aria-label={t("coverRemove")}
-              className="absolute top-2 right-2 grid size-9 place-items-center rounded-full bg-black/55 text-white backdrop-blur-sm transition-colors hover:bg-black/75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              className="absolute top-2 right-2 grid size-8 place-items-center rounded-md border border-border-strong bg-surface text-ink transition-colors duration-150 hover:bg-surface-sunk"
             >
               <X aria-hidden="true" className="size-4" />
             </button>
@@ -123,9 +123,9 @@ export function CoverField({
           onDragLeave={() => setDragging(false)}
           onDrop={drop}
           className={cn(
-            "flex min-h-36 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed px-4 py-5 text-center transition-colors",
-            "border-border-control bg-surface-soft/40 hover:border-primary-ink hover:bg-surface-soft has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary",
-            dragging && "border-primary-ink bg-surface-soft",
+            "flex min-h-36 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-md border border-dashed px-4 py-5 text-center transition-colors",
+            "has-focus-visible:outline-primary-ink-ink border-border-strong bg-surface-sunk/50 hover:border-border-control hover:bg-surface-sunk has-focus-visible:outline-2 has-focus-visible:outline-offset-2",
+            dragging && "border-border-control bg-surface-sunk",
             message && "border-danger",
           )}
         >
@@ -137,8 +137,8 @@ export function CoverField({
           ) : (
             <ImagePlus
               aria-hidden="true"
-              className="size-6 text-primary-ink"
-              strokeWidth={1.75}
+              className="size-5 text-ink-muted"
+              strokeWidth={1.9}
             />
           )}
           <span className="text-sm font-semibold text-ink">

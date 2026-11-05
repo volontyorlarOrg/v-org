@@ -57,7 +57,7 @@ export function ApplicantDrawer({
         >
           {applicant ? (
             <>
-              <header className="flex items-center justify-between gap-3 border-b border-border px-5 py-3.5">
+              <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
                 <DialogPrimitive.Title className="text-section text-ink">
                   {t("title")}
                 </DialogPrimitive.Title>
@@ -67,7 +67,7 @@ export function ApplicantDrawer({
                     total: position.total,
                   })}
                 </span>
-                <DialogPrimitive.Close className="rounded-full p-1.5 text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink">
+                <DialogPrimitive.Close className="rounded-md p-1.5 text-ink-muted transition-colors hover:bg-surface-sunk hover:text-ink">
                   <X aria-hidden="true" className="size-4" />
                   <span className="sr-only">{t("close")}</span>
                 </DialogPrimitive.Close>
@@ -82,7 +82,7 @@ export function ApplicantDrawer({
                     person
                   />
                   <div className="min-w-0">
-                    <p className="display-face truncate text-2xl leading-tight text-ink">
+                    <p className="truncate text-2xl leading-tight figure text-ink">
                       {applicant.name}
                     </p>
                     {applicant.username ? (
@@ -195,7 +195,7 @@ export function ApplicantDrawer({
                 </section>
               </div>
 
-              <footer className="flex flex-col gap-2 border-t border-border bg-surface-sunk/60 px-5 py-4">
+              <footer className="flex flex-col gap-2 border-t border-border bg-surface-sunk/60 px-4 py-3">
                 <div className="grid grid-cols-2 gap-2">
                   <Button
                     type="button"

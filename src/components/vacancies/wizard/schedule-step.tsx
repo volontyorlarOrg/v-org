@@ -139,8 +139,8 @@ export function ScheduleStep({
               <label
                 key={value}
                 className={cn(
-                  "flex min-h-16 cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 transition-colors",
-                  "border-border-control hover:border-primary-ink has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary",
+                  "flex min-h-14 cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 transition-colors duration-150",
+                  "has-focus-visible:outline-primary-ink-ink border-border-strong hover:border-border-control has-focus-visible:outline-2 has-focus-visible:outline-offset-2",
                   "has-checked:border-primary has-checked:bg-surface-soft",
                 )}
               >
@@ -154,7 +154,7 @@ export function ScheduleStep({
                 />
                 <Icon
                   aria-hidden="true"
-                  className="size-5 shrink-0 text-primary-ink"
+                  className="size-[1.125rem] shrink-0 text-primary-ink"
                   strokeWidth={1.75}
                 />
                 <span className="min-w-0">
@@ -341,7 +341,7 @@ export function ScheduleStep({
           </div>
 
           {draft.sameTimes ? null : (
-            <fieldset className="mt-2 rounded-lg border border-border bg-surface-sunk/50 px-4 py-3">
+            <fieldset className="mt-2 rounded-md border border-border bg-surface-sunk/50 px-3 py-2.5">
               <legend className="px-1 text-sm font-semibold text-ink">
                 {t("perDay")}
               </legend>
@@ -366,7 +366,6 @@ export function ScheduleStep({
                         onChange={(event) =>
                           setDay(session.date, "startTime", event.target.value)
                         }
-                        className="min-h-10"
                       />
                       <Input
                         type="time"
@@ -377,7 +376,6 @@ export function ScheduleStep({
                         onChange={(event) =>
                           setDay(session.date, "endTime", event.target.value)
                         }
-                        className="min-h-10"
                       />
                       {problem ? (
                         <p
@@ -466,9 +464,9 @@ export function ScheduleStep({
             <output
               id="wizard-hours"
               aria-live="polite"
-              className="flex min-h-12 items-center gap-3 rounded-lg border border-border bg-surface-sunk/60 px-4 text-base text-ink"
+              className="flex min-h-10 items-center gap-3 rounded-md border border-border bg-surface-sunk/60 px-3 text-base text-ink sm:text-sm"
             >
-              <Clock3 aria-hidden="true" className="size-4.5 text-ink-muted" />
+              <Clock3 aria-hidden="true" className="size-4 text-ink-muted" />
               {hours === null ? (
                 <span className="text-ink-muted">{t("hoursPending")}</span>
               ) : multiDay && !draft.allDaysRequired ? (
@@ -487,10 +485,10 @@ export function ScheduleStep({
           help={t("questionHelp")}
           error={error("essayPrompt")}
         >
-          <span className="relative flex min-h-12 items-center rounded-lg border border-input bg-field transition-colors focus-within:border-primary-ink hover:border-primary-ink has-aria-invalid:border-danger">
+          <span className="relative flex min-h-10 items-center rounded-md border border-input bg-field transition-colors duration-150 focus-within:border-primary-ink hover:border-ink-muted has-aria-invalid:border-danger">
             <FileQuestion
               aria-hidden="true"
-              className="ml-4 size-4.5 shrink-0 text-ink-muted"
+              className="ml-3 size-4 shrink-0 text-ink-muted"
             />
             <span
               aria-hidden="true"
@@ -511,7 +509,7 @@ export function ScheduleStep({
                 true,
                 Boolean(error("essayPrompt")),
               )}
-              className="min-h-12 w-full min-w-0 bg-transparent px-2 pr-4 text-base text-ink outline-none placeholder:text-muted-foreground"
+              className="min-h-10 w-full min-w-0 bg-transparent px-2 pr-3 text-base text-ink outline-none placeholder:text-muted-foreground sm:text-sm"
             />
           </span>
         </FieldShell>
@@ -522,7 +520,7 @@ export function ScheduleStep({
           {ACCEPTANCE_MODES.map((mode) => (
             <label
               key={mode}
-              className="flex cursor-pointer items-start gap-3 rounded-lg border border-border-control px-4 py-3 transition-colors hover:border-primary-ink has-checked:border-primary has-checked:bg-surface-soft has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary"
+              className="has-focus-visible:outline-primary-ink-ink flex cursor-pointer items-start gap-3 rounded-md border border-border-strong px-3 py-2.5 transition-colors duration-150 hover:border-border-control has-checked:border-primary has-checked:bg-surface-soft has-focus-visible:outline-2 has-focus-visible:outline-offset-2"
             >
               <input
                 type="radio"

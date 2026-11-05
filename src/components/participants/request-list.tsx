@@ -57,7 +57,7 @@ export function RequestList({
         return (
           <li
             key={request.id}
-            className="flex flex-wrap items-start gap-x-5 gap-y-3 px-5 py-4"
+            className="flex flex-wrap items-start gap-x-5 gap-y-3 px-4 py-3"
           >
             <div className="min-w-0 flex-1 basis-64">
               {inEvent ? (

@@ -83,7 +83,7 @@ export default async function PastEventPage({
       />
       {event.note ? (
         <Register id="historical-event-note" title={t("noteTitle")}>
-          <p className="px-5 py-4 [overflow-wrap:anywhere] whitespace-pre-wrap text-ink">
+          <p className="px-4 py-3 [overflow-wrap:anywhere] whitespace-pre-wrap text-ink">
             {event.note}
           </p>
         </Register>

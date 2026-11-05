@@ -152,7 +152,7 @@ export function ParticipantPicker({
 
   return (
     <>
-      <div className="flex flex-col gap-5 border-b border-border p-5">
+      <div className="flex flex-col gap-4 border-b border-border p-4">
         <Field invalid={Boolean(problem)}>
           <FieldLabel htmlFor={id("username")}>{labels.username}</FieldLabel>
           <div className="flex flex-col gap-2 sm:flex-row">
@@ -265,7 +265,7 @@ export function ParticipantPicker({
       ) : (
         <ul className="divide-y divide-border">
           {participants.map((person) => (
-            <li key={person.id} className="flex flex-wrap items-end gap-4 px-5 py-4">
+            <li key={person.id} className="flex flex-wrap items-end gap-4 px-4 py-3">
               <div className="flex min-w-0 flex-1 basis-52 items-center gap-3 self-center">
                 <Avatar
                   name={person.displayName ?? undefined}
