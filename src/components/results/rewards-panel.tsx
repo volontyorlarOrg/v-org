@@ -87,7 +87,7 @@ export function RewardsPanel({
   }
 
   return (
-    <section aria-labelledby={`${formId}-title`} className="sheet px-5 py-4">
+    <section aria-labelledby={`${formId}-title`} className="sheet px-4 py-3">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h2 id={`${formId}-title`} className="text-section text-ink">
@@ -129,7 +129,7 @@ export function RewardsPanel({
               <dt className="min-w-0 flex-1 text-sm text-ink-muted">
                 {t(`fields.${field}`)}
               </dt>
-              <dd className="display-face tabular shrink-0 text-lg whitespace-nowrap text-ink">
+              <dd className="shrink-0 text-lg figure whitespace-nowrap text-ink">
                 {field === "xpNoShowPenalty"
                   ? t("penaltyValue", { value })
                   : field === "xpPerHour"

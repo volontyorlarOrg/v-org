@@ -54,8 +54,8 @@ export function DecisionSelect({
           )
         }
         className={cn(
-          "w-full appearance-none rounded-full border bg-field pr-9 font-semibold transition-colors hover:border-primary-ink disabled:cursor-not-allowed disabled:opacity-60",
-          size === "row" ? "min-h-9 text-sm" : "min-h-12 rounded-lg text-base",
+          "w-full appearance-none rounded-md border bg-field pr-9 font-semibold transition-colors hover:border-primary-ink disabled:cursor-not-allowed disabled:opacity-60",
+          size === "row" ? "min-h-9 text-sm" : "min-h-10 text-sm",
           Icon ? "pl-9" : "pl-3.5",
           look?.tone ?? "border-border-control text-ink-muted",
         )}

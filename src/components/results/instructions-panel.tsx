@@ -157,7 +157,7 @@ export function InstructionsPanel({
 
   return (
     <section aria-labelledby={`${messageId}-title`} className="flex flex-col sheet">
-      <header className="border-b border-border px-5 py-4">
+      <header className="border-b border-border px-4 py-3">
         <h2
           id={`${messageId}-title`}
           className="flex items-center gap-2 text-section text-ink"
@@ -170,7 +170,7 @@ export function InstructionsPanel({
         </p>
       </header>
 
-      <div className="flex flex-col gap-4 px-5 py-4">
+      <div className="flex flex-col gap-4 px-4 py-3">
         <p className="flex items-center gap-2 text-sm text-ink">
           <Users aria-hidden="true" className="size-4 text-ink-muted" />
           {t("recipients", { count: view.recipients })}
@@ -250,7 +250,7 @@ export function InstructionsPanel({
       </div>
 
       {view.sentAt ? (
-        <div className="border-t border-border px-5 py-4">
+        <div className="border-t border-border px-4 py-3">
           <div className="flex items-center justify-between gap-3">
             <h3 className="text-sm font-semibold text-ink">{t("delivery.title")}</h3>
             {view.delivery.failed > 0 ? (

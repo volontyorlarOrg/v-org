@@ -28,3 +28,10 @@ export function waitingFirst(
     return waiting !== 0 ? waiting : right.createdAt.localeCompare(left.createdAt);
   });
 }
+
+/** A roster's rows live on their event's page; these are proposals of their own. */
+export function standaloneRequests(
+  requests: readonly PastEventRequest[],
+): PastEventRequest[] {
+  return requests.filter((request) => request.rosterId === null);
+}

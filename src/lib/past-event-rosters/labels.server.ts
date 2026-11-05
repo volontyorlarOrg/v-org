@@ -28,6 +28,7 @@ const PICKER_KEYS = [
 
 const FORM_KEYS = [
   "steps",
+  "stepDone",
   "details",
   "participants",
   "review",

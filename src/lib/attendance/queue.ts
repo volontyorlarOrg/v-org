@@ -78,6 +78,8 @@ export function groupStage(group: AttendanceGroup): GroupStage {
   return "due";
 }
 
-export function unresolvedCount(groups: readonly AttendanceGroup[]): number {
-  return groups.reduce((total, group) => total + group.unresolved.length, 0);
+/** Rows with no outcome anywhere yet; a saved draft already has one. */
+export function toRecordCount(group: AttendanceGroup): number {
+  return group.unresolved.filter((application) => !application.attendance?.draftOutcome)
+    .length;
 }

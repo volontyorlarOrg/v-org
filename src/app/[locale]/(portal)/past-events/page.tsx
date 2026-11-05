@@ -1,3 +1,4 @@
+import { Plus } from "lucide-react";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 import { StatusBadge } from "@/components/portal/status-badge";
@@ -51,7 +52,10 @@ export default async function PastEventsPage({
         description={t("description")}
         actions={
           <Button asChild size="sm">
-            <Link href={navHref("newPastEvent")}>{t("create")}</Link>
+            <Link href={navHref("newPastEvent")}>
+              <Plus aria-hidden="true" />
+              {t("create")}
+            </Link>
           </Button>
         }
       />
@@ -83,16 +87,16 @@ export default async function PastEventsPage({
                   return (
                     <li
                       key={event.id}
-                      className="flex flex-wrap items-center justify-between gap-3 px-5 py-4"
+                      className="flex flex-wrap items-center justify-between gap-3 px-4 py-3"
                     >
                       <div className="min-w-0 flex-1 basis-64">
                         <Link
                           href={pastEventRosterHref(event.id)}
-                          className="font-semibold [overflow-wrap:anywhere] text-primary-ink underline-offset-4 hover:underline"
+                          className="text-sm font-semibold [overflow-wrap:anywhere] text-ink hover:text-primary-ink hover:underline"
                         >
                           {event.title}
                         </Link>
-                        <p className="tabular mt-1 text-sm text-ink-muted">
+                        <p className="tabular mt-0.5 text-[0.8125rem] text-ink-muted">
                           {format.dateTime(
                             new Date(`${event.eventDate}T00:00:00Z`),
                             "date",

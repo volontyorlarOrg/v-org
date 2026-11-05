@@ -50,16 +50,16 @@ export function DetailsStep({
       <FieldShell id="wizard-organization" label={t("organization")} beside>
         <div
           id="wizard-organization"
-          className="flex min-h-12 items-center gap-3 rounded-lg border border-border bg-surface-sunk/60 px-3 text-base text-ink"
+          className="flex min-h-10 items-center gap-3 rounded-md border border-border bg-surface-sunk/60 px-3 text-base text-ink sm:text-sm"
         >
           <Avatar name={organization.name} src={organization.logoUrl} size="sm" />
           <span className="min-w-0 truncate">{organization.name}</span>
         </div>
         {organization.verified ? null : (
-          <p className="flex items-start gap-2 rounded-lg border border-danger/40 bg-danger-muted px-3 py-2.5 text-sm text-ink">
+          <p className="flex items-start gap-2 rounded-md border border-primary-muted bg-surface-soft px-3 py-2.5 text-sm text-ink">
             <ShieldAlert
               aria-hidden="true"
-              className="mt-0.5 size-4 shrink-0 text-danger-ink"
+              className="mt-0.5 size-4 shrink-0 text-primary-ink"
             />
             <span className="min-w-0">{t("organizationUnverified")}</span>
           </p>
@@ -101,9 +101,9 @@ export function DetailsStep({
               <label
                 key={kind}
                 className={cn(
-                  "flex min-h-12 min-w-[11rem] flex-1 cursor-pointer items-center justify-center gap-2.5 rounded-lg border px-4 text-sm font-semibold transition-colors sm:flex-none",
-                  "border-border-control text-ink hover:border-primary-ink has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-primary",
-                  "has-checked:border-action has-checked:bg-action has-checked:text-knockout",
+                  "flex min-h-10 min-w-[11rem] flex-1 cursor-pointer items-center gap-2.5 rounded-md border px-4 text-sm font-semibold transition-colors sm:flex-none",
+                  "has-focus-visible:outline-primary-ink-ink border-border-control text-ink hover:border-ink-muted has-focus-visible:outline-2 has-focus-visible:outline-offset-2",
+                  "has-checked:border-primary has-checked:bg-surface-soft has-checked:text-ink",
                   kindLocked && "cursor-not-allowed opacity-60 has-checked:opacity-100",
                 )}
               >
@@ -116,7 +116,11 @@ export function DetailsStep({
                   onChange={() => set("kind", kind)}
                   className="sr-only"
                 />
-                <Icon aria-hidden="true" className="size-5" strokeWidth={1.75} />
+                <Icon
+                  aria-hidden="true"
+                  className="size-[1.125rem] text-primary-ink"
+                  strokeWidth={1.9}
+                />
                 {kinds(kind)}
               </label>
             );

@@ -37,20 +37,24 @@
   "nav": {
     "label": "Portal sections",
     "dashboard": "Dashboard",
-    "vacancies": "My opportunities",
+    "vacancies": "Vacancies",
     "applications": "Applications",
-    "users": "Volunteers",
+    "users": "Applicants",
     "attendance": "Attendance",
     "activity": "My activity",
     "waiting": {
-      "pendingApproval": "waiting for approval",
       "changesRequested": "returned for changes",
       "pendingReview": "applications to decide",
-      "attendanceDue": "volunteers to record"
+      "attendanceDue": "volunteers waiting on your roll call"
     },
     "participants": "Participants",
     "pastEvents": "Past events",
-    "newPastEvent": "Create past event"
+    "newPastEvent": "Create past event",
+    "groups": {
+      "overview": "Overview",
+      "volunteering": "Volunteering",
+      "people": "People"
+    }
   },
   "auth": {
     "metaTitle": "Sign in",
@@ -102,7 +106,8 @@
     "loading": {
       "list": "Loading the list…",
       "panel": "Loading…",
-      "queue": "Loading what waits on you…"
+      "queue": "Loading what waits on you…",
+      "dashboard": "Loading dashboard…"
     },
     "passwordChangeRequired": {
       "title": "Contact your administrator",
@@ -193,20 +198,20 @@
     "opportunityArchived": "This vacancy is archived, so nobody new can be accepted.",
     "opportunityAtCapacity": "Every place is taken. Free a place before accepting someone else.",
     "opportunityCannotBePublished": "This vacancy cannot be published in its current state.",
-    "competitionHoursNotAllowed": "Competition opportunities cannot include volunteer hours.",
+    "competitionHoursNotAllowed": "A competition cannot include volunteer hours.",
     "opportunityKindLocked": "The type cannot change after publication or application.",
     "day": "Enter a valid date.",
     "time": "Enter a valid time.",
     "finishBeforeStart": "The finish must come after the start.",
-    "scheduleTooLong": "An opportunity can last up to 31 days.",
+    "scheduleTooLong": "A vacancy can last up to 31 days.",
     "invalidOpportunitySchedule": "Those days and times do not fit together. Check the schedule.",
     "coverImageTooLarge": "Choose an image under 15 MB."
   },
   "vacancies": {
-    "title": "My opportunities",
-    "description": "Create and manage your volunteer and participation opportunities.",
+    "title": "Vacancies",
+    "description": "Every vacancy your organization created, and the next step on each.",
     "new": "New vacancy",
-    "manage": "Manage opportunity",
+    "manage": "Manage vacancy",
     "empty": {
       "title": "No vacancies yet",
       "description": "Create a vacancy, publish it once its organization is verified, and applications arrive here."
@@ -238,7 +243,7 @@
       "waiting": "{count} to decide"
     },
     "detail": {
-      "sections": "Opportunity sections",
+      "sections": "Vacancy sections",
       "results": "Attendance results",
       "description": "Description",
       "requirements": "Requirements",
@@ -282,7 +287,7 @@
       "essayRequiredNo": "Not required",
       "essayRequiredYes": "Required",
       "essayRequiredHelp": "Volunteers must write an essay before they can submit this application.",
-      "kind": "Opportunity type",
+      "kind": "Vacancy type",
       "kindHelp": "Choose how the person will take part. Competitions earn event XP, but no volunteer hours."
     },
     "form": {
@@ -315,7 +320,8 @@
         "when": "Applications close before the start. Attendance opens when it ends.",
         "volunteers": "Places, hours and how applications are accepted."
       },
-      "editDescription": "Saving changes to a published vacancy hides it until you send it for approval again."
+      "editDescription": "Saving changes to a published vacancy hides it until you send it for approval again.",
+      "lockedStarted": "The event has started. Saving a change would take the vacancy off the volunteer app, and it could not be approved again. Ask an administrator if a detail is wrong."
     },
     "image": {
       "title": "Vacancy photo",
@@ -376,33 +382,26 @@
     "listTitle": "Your vacancies",
     "kinds": {
       "volunteering": "Volunteering",
-      "competition": "Participation"
+      "competition": "Competition"
     },
     "list": {
-      "search": "Search opportunities",
-      "searchSubmit": "Search",
-      "status": "Status",
-      "allStatuses": "All statuses",
-      "savedOnly": "Saved only",
-      "apply": "Apply filters",
-      "create": "Create opportunity",
-      "createHint": "Post a new volunteering or participation opportunity.",
-      "showing": "Showing {from}–{to} of {total, plural, one {# opportunity} other {# opportunities}}",
-      "emptyTitle": "No opportunities yet",
+      "search": "Search by title or place",
+      "emptyTitle": "No vacancies yet",
       "emptyDescription": "Create your first one. It stays a draft until you submit it, and an administrator approves it before volunteers see it.",
       "noMatchesTitle": "Nothing matches these filters",
-      "noMatchesDescription": "Change the search or the status, or clear the filters.",
+      "noMatchesDescription": "Change the search or the tab, or clear the filters.",
       "clear": "Clear filters",
       "stage": {
         "draft": "Draft",
-        "pending_review": "In review",
+        "pending_review": "Waiting for approval",
         "changes_requested": "Changes requested",
         "published": "Published",
         "ended": "Ended",
         "verifying": "Results in review",
         "results": "Results verified",
         "rejected": "Rejected",
-        "archived": "Archived"
+        "archived": "Archived",
+        "results_returned": "Results returned"
       },
       "action": {
         "continue": "Continue editing",
@@ -412,16 +411,8 @@
         "attendance": "Record attendance",
         "results": "View results",
         "decision": "View decision",
-        "open": "Open"
-      },
-      "count": {
-        "toReview": "{count, plural, one {# application to review} other {# applications to review}}",
-        "applications": "{count, plural, one {# application} other {# applications}}",
-        "noApplications": "No applications yet",
-        "attendanceDue": "Attendance not recorded",
-        "attended": "{count, plural, one {# volunteer attended} other {# volunteers attended}}",
-        "resultsReturned": "Results returned for changes",
-        "awaitingVerification": "Waiting for an administrator"
+        "open": "Open",
+        "correct": "Correct results"
       },
       "save": "Save “{title}”",
       "unsave": "Remove “{title}” from saved",
@@ -431,14 +422,12 @@
       "menuEdit": "Edit",
       "menuApplications": "Applications",
       "menuAttendance": "Attendance",
-      "online": "Online",
-      "pages": "Pages",
-      "page": "Page {page}"
+      "saved": "Saved"
     },
     "wizard": {
-      "createTitle": "Create opportunity",
-      "editTitle": "Edit opportunity",
-      "backToList": "My opportunities",
+      "createTitle": "New vacancy",
+      "editTitle": "Edit vacancy",
+      "backToList": "Vacancies",
       "steps": {
         "label": "Steps",
         "details": "Details",
@@ -447,16 +436,16 @@
         "done": "done",
         "current": "current step"
       },
-      "organization": "Organisation",
-      "organizationUnverified": "Your organisation is not verified yet. You can prepare and save drafts, but an administrator must verify the organisation before an opportunity can be approved.",
-      "title": "Opportunity title",
+      "organization": "Organization",
+      "organizationUnverified": "Your organization is not verified yet. You can prepare and save drafts, but an administrator must verify the organization before a vacancy can be approved.",
+      "title": "Vacancy title",
       "titlePlaceholder": "e.g. Exhibition volunteer team",
       "type": "Type",
       "typeHelp": {
         "volunteering": "People help out and earn verified volunteer hours.",
         "competition": "People take part and earn event XP, without volunteer hours."
       },
-      "typeLocked": "The type cannot change once the opportunity has been published.",
+      "typeLocked": "The type cannot change once the vacancy has been published.",
       "cover": "Cover image",
       "optional": "(optional)",
       "coverChoose": "Upload image",
@@ -469,7 +458,7 @@
       "descriptionPlaceholder": "What will people do? Who can join? What do you provide?",
       "descriptionHelp": "Explain what people will do, who can join, and what you provide.",
       "scheduleTitle": "Schedule and location",
-      "scheduleDescription": "When and where will your opportunity take place?",
+      "scheduleDescription": "When and where will your vacancy take place?",
       "format": "Format",
       "formats": {
         "onsite": {
@@ -534,15 +523,15 @@
         }
       },
       "reviewTitle": "Review and submit",
-      "reviewDescription": "This is how your opportunity will appear to applicants.",
+      "reviewDescription": "This is how your vacancy will appear to applicants.",
       "keyDetails": "Key details",
       "edit": "Edit",
       "editDetails": "Edit details",
       "editSchedule": "Edit schedule",
       "editQuestion": "Edit application question",
       "facts": {
-        "title": "Opportunity title",
-        "organization": "Organisation",
+        "title": "Vacancy title",
+        "organization": "Organization",
         "type": "Type",
         "format": "Format",
         "dates": "Dates",
@@ -562,8 +551,7 @@
       "noLimit": "No limit",
       "placesValue": "{count, plural, one {# place} other {# places}}",
       "rewardHour": "{xp} XP per verified volunteer hour",
-      "rewardAttend": "+{xp} XP for attending",
-      "rewardCompetition": "{xp} XP for taking part",
+      "rewardCompetition": "Winner {winner} XP · contributor {contributor} XP · attendee {attendee} XP",
       "commitment": "Estimated commitment: {hours, plural, one {# hour} other {# hours}}",
       "hoursFact": "{hours, plural, one {# hour} other {# hours}}",
       "applyBy": "Apply by {when}",
@@ -577,14 +565,18 @@
       "previous": "Back",
       "submit": "Submit for approval",
       "submitting": "Submitting…",
-      "submitNote": "Submitting sends this opportunity to admin review. It will not be published immediately.",
-      "publishedNote": "This opportunity is published. Saving changes hides it from volunteers until an administrator approves it again.",
+      "submitNote": "Submitting sends this vacancy to an administrator. It will not be published immediately.",
+      "publishedNote": "This vacancy is live. Saving changes takes it off the volunteer app until an administrator approves it again.",
       "feedbackTitle": "The administrator asked for changes",
       "fixFirst": "Check the highlighted fields.",
       "draftNeedsSchedule": "To save a draft, also add where and when it happens.",
       "photoFailed": "The details were saved, but the cover image was not. Choose the image again and save.",
-      "sent": "Submitted for approval. An administrator reviews it before volunteers can see it."
-    }
+      "sent": "Submitted for approval. An administrator reviews it before volunteers can see it.",
+      "saveUnpublished": "Save and unpublish",
+      "rewardNoShow": "−{xp} XP for an unexcused no-show",
+      "rewardLater": "You can change these on the vacancy page until it is published"
+    },
+    "approvedOn": "Approved {date}"
   },
   "applications": {
     "title": "Applications",
@@ -688,10 +680,11 @@
       "withdrawn": "Withdrawn",
       "closed": "Closed",
       "all": "All"
-    }
+    },
+    "acceptedOn": "Accepted {date}"
   },
   "users": {
-    "title": "Volunteers",
+    "title": "Applicants",
     "description": "Volunteers who applied to the vacancies you created.",
     "empty": {
       "title": "No volunteers yet",
@@ -747,8 +740,8 @@
     "noEmail": "No email",
     "record": "Volunteer",
     "countLabel": "volunteers",
-    "found": "Matching volunteers",
-    "listTitle": "Every volunteer"
+    "found": "Matching applicants",
+    "listTitle": "Every applicant"
   },
   "attendance": {
     "title": "Attendance",
@@ -781,17 +774,20 @@
     },
     "resolved": "Resolved {when}",
     "queue": {
-      "waiting": "{count, plural, one {# volunteer to confirm} other {# volunteers to confirm}}",
+      "waiting": "{count, plural, one {# volunteer to record} other {# volunteers to record}}",
       "opensAt": "Opens {when}, once the event has ended.",
       "opensUnknown": "Opens once the event has ended.",
-      "resolvedCount": "{count, plural, one {# volunteer already confirmed} other {# volunteers already confirmed}}",
+      "resolvedCount": "{count, plural, one {# already recorded} other {# already recorded}}",
       "take": "Take roll call",
       "view": "Open",
       "ended": "Ended {when}",
       "accepted": "{count, plural, one {# volunteer accepted} other {# volunteers accepted}}",
-      "number": "Number",
       "returned": "Returned for changes",
-      "verifying": "With an administrator"
+      "verifying": "With an administrator",
+      "age": "Ended {age} ago",
+      "ready": "All recorded, not yet submitted",
+      "correct": "Correct results",
+      "finish": "Review and submit"
     },
     "roster": {
       "title": "Attendance",
@@ -894,17 +890,6 @@
       "automatic": "Automatically"
     }
   },
-  "seal": {
-    "issuer": "Volontyorlar",
-    "approved": "Approved",
-    "accepted": "Accepted",
-    "returned": "Returned",
-    "rejected": "Rejected",
-    "closed": "Closed",
-    "recorded": "Recorded",
-    "clear": "All clear",
-    "label": "{word} on {date}"
-  },
   "decisions": {
     "group": "Decision",
     "cancel": "Cancel",
@@ -930,7 +915,6 @@
     }
   },
   "desk": {
-    "number": "Number",
     "waitingLabel": "waiting",
     "requirements": {
       "organization": "a verified organization",
@@ -939,7 +923,9 @@
       "format": "a format",
       "region": "a region",
       "startsAt": "a start",
-      "applicationDeadline": "a future deadline before the start"
+      "applicationDeadline": "a future deadline before the start",
+      "location": "where it happens",
+      "capacity": "how many places"
     },
     "decide": {
       "title": "Applications to decide",
@@ -960,31 +946,30 @@
       "ended": "Ended {when}",
       "waiting": "{count, plural, one {# volunteer to record} other {# volunteers to record}}",
       "resolved": "{count, plural, one {# already recorded} other {# already recorded}}",
-      "open": "Take roll call"
+      "open": "Take roll call",
+      "ready": "All recorded, not yet submitted",
+      "finish": "Review and submit"
     },
     "cleared": {
-      "title": "Cleared today",
+      "title": "Decided today",
       "countLabel": "decisions today",
-      "vacancy": {
-        "approved": "Approved and published",
-        "changes_requested": "Returned for changes",
-        "rejected": "Rejected"
-      },
-      "application": "{decision} · {vacancy}",
-      "decision": {
+      "empty": "Today's decisions, yours and the administrator's, are listed here.",
+      "word": {
+        "approved": "Approved",
+        "returned": "Returned",
+        "rejected": "Rejected",
         "accepted": "Accepted",
-        "rejected": "Not selected",
-        "closed": "Closed"
-      },
-      "rollCall": "Roll call recorded: {attended} attended, {other} excused or cancelled",
-      "empty": "Decisions you make today land here with a seal."
+        "notSelected": "Not selected",
+        "closed": "Closed",
+        "verified": "Results verified"
+      }
     },
     "clear": {
       "title": "Nothing waits on you",
-      "description": "Returned vacancies, drafts, applications and roll calls appear here as they arrive."
+      "description": "Returned vacancies, drafts, applications and roll calls appear here as they arrive.",
+      "action": "Create a vacancy"
     },
-    "dateline": "{date} · {count, plural, =0 {nothing waits on you} one {# thing waits on you} other {# things wait on you}}",
-    "listTitle": "On your desk",
+    "listTitle": "Waiting on you",
     "returned": {
       "title": "Returned for changes",
       "countLabel": "vacancies returned for changes",
@@ -1009,26 +994,27 @@
     },
     "withAdmin": {
       "title": "With the administrator",
-      "description": "Nothing here waits on you. It moves on when an administrator decides.",
+      "description": "Sent and waiting for a decision. Longest wait first.",
       "countLabel": "items with the administrator",
-      "vacancies": "{count, plural, one {# vacancy waits for approval} other {# vacancies wait for approval}}",
-      "results": "{count, plural, one {# set of results waits for verification} other {# sets of results wait for verification}}",
-      "pastEvents": "{count, plural, one {# past event waits for approval} other {# past events wait for approval}}",
-      "open": "See them"
+      "empty": "Nothing is with the administrator.",
+      "more": "{count, plural, one {and # more} other {and # more}}",
+      "kind": {
+        "vacancy": "Vacancy waiting for approval",
+        "results": "Results waiting for verification",
+        "pastEvent": "Past event waiting for approval"
+      }
+    },
+    "age": "Waiting {age}",
+    "ageUnknown": "Waiting time not recorded",
+    "datelineOldest": "{date} · oldest waiting {age}",
+    "unverified": {
+      "title": "Your organization is not verified yet",
+      "description": "You can prepare and save drafts. Sending them for approval opens once an administrator verifies the organization."
     }
   },
   "dashboardHome": {
     "title": "Dashboard",
-    "description": "What waits on you first, then what is with the administrator, and how your work adds up.",
-    "overview": {
-      "title": "Your work",
-      "description": "All-time totals for your organization",
-      "publishedVacancies": "Live vacancies",
-      "applications": "Applications received",
-      "accepted": "Volunteers accepted",
-      "attended": "Attendances confirmed",
-      "confirmedHours": "Confirmed hours"
-    },
+    "description": "Where your vacancies stand and whose move it is.",
     "loadingOperations": "Loading what waits on you…"
   },
   "audit": {
@@ -1065,10 +1051,6 @@
       "application_closed": "Application closed",
       "application_withdrawn": "Application withdrawn",
       "attendance_resolved": "Attendance recorded",
-      "coordinator_created": "Coordinator created",
-      "coordinator_blocked": "Coordinator blocked",
-      "coordinator_active": "Coordinator unblocked",
-      "coordinator_removed": "Coordinator removed",
       "opportunity_created": "Vacancy created",
       "opportunity_updated": "Vacancy edited",
       "opportunity_submitted_for_approval": "Vacancy sent for approval",
@@ -1077,23 +1059,19 @@
       "opportunity_changes_requested": "Vacancy returned for changes",
       "opportunity_rejected": "Vacancy rejected",
       "opportunity_archived": "Vacancy archived",
-      "organization_created": "Organization added",
-      "organization_updated": "Organization updated",
-      "user_password_replaced": "Temporary password assigned",
-      "user_username_changed": "Username changed",
-      "user_avatar_updated": "Photo updated",
-      "user_avatar_removed": "Photo removed",
       "past_event_roster_submitted": "Past event submitted",
       "past_event_request_submitted": "Past event proposal submitted",
       "past_event_request_approved": "Past event proposal approved",
       "past_event_request_rejected": "Past event proposal rejected",
       "past_event_request_cancelled": "Past event proposal withdrawn",
-      "user_progress_adjusted": "XP and hours adjusted",
-      "bulk_award_created": "Bulk award given",
-      "bulk_award_revoked": "Bulk award taken back",
-      "user_past_event_created": "Past event added to a volunteer",
-      "user_past_event_updated": "Volunteer's past event edited",
-      "user_past_event_removed": "Volunteer's past event removed"
+      "application_reopened": "Application reopened",
+      "attendance_submitted": "Results submitted for verification",
+      "attendance_verified": "Results verified",
+      "attendance_changes_requested": "Results returned for changes",
+      "opportunity_image_updated": "Vacancy photo changed",
+      "opportunity_image_removed": "Vacancy photo removed",
+      "opportunity_instructions_sent": "Instructions sent to accepted volunteers",
+      "past_event_roster_participants_added": "Participants added to a past event"
     },
     "you": "You",
     "families": {
@@ -1515,7 +1493,7 @@
   "participants": {
     "title": "Participants",
     "record": "Participant",
-    "description": "Volunteers who took part in an event of your organization. To record an event that already happened, create a past event. Here you can propose a correction or removal for one volunteer's recorded past event; nothing changes until an administrator approves it.",
+    "description": "Volunteers who took part in your events. Propose a correction or removal for a recorded past event; nothing changes until an administrator approves it.",
     "listTitle": "Participants",
     "found": "Search results",
     "countLabel": "participants",
@@ -1639,7 +1617,7 @@
       "rejected": "Rejected",
       "withdrawn": "Withdrawn"
     },
-    "published": "Once an administrator approves it, the event shows in each participant's history and under Past opportunities in the volunteer app.",
+    "published": "Once an administrator approves it, the event shows in each participant's history and under Past events in the volunteer app.",
     "eventHelp": "An administrator reviews this event and approves its participants all at once or one by one, sometimes with corrected hours or XP. You can withdraw anyone still waiting.",
     "form": {
       "details": "Event details",
@@ -1675,7 +1653,8 @@
       "zeroHours": "Participants with 0 hours: {count}. Check that before you submit.",
       "add": "Add participants",
       "addHelp": "Forgot someone? Add them here. Each new participant waits for an administrator, so the event shows as waiting again.",
-      "added": "Sent for approval."
+      "added": "Sent for approval.",
+      "stepDone": "done"
     },
     "errors": {
       "pastEventVolunteerNotFound": "No active volunteer has this username. Check their Volontyorlar profile and try again.",
@@ -1687,5 +1666,36 @@
       "xpAmount": "Enter a whole XP amount from 0 to 100,000.",
       "pastEventRosterNotFound": "That event no longer exists."
     }
+  },
+  "journey": {
+    "title": "Volunteer journey",
+    "summary": "Your organization, from a published vacancy to confirmed hours",
+    "scope": {
+      "now": "now",
+      "allTime": "all time"
+    },
+    "stations": {
+      "published": "Published vacancies",
+      "applications": "Applications received",
+      "accepted": "Accepted volunteers",
+      "attended": "Attendances",
+      "hours": "Confirmed hours"
+    },
+    "owner": {
+      "you": "you",
+      "administrator": "administrator"
+    },
+    "waiting": {
+      "returned": "{count, plural, one {# returned for changes} other {# returned for changes}}",
+      "drafts": "{count, plural, one {# draft to send} other {# drafts to send}}",
+      "approval": "{count, plural, one {# waits for approval} other {# wait for approval}}",
+      "decide": "{count, plural, one {# application to decide} other {# applications to decide}}",
+      "corrections": "{count, plural, one {# result to correct} other {# results to correct}}",
+      "rollCalls": "{count, plural, one {# roll call due} other {# roll calls due}}",
+      "results": "{count, plural, one {# result to verify} other {# results to verify}}",
+      "pastEvents": "{count, plural, one {# past event to approve} other {# past events to approve}}"
+    },
+    "clear": "Nothing waiting",
+    "hours": "{value} h"
   }
 }

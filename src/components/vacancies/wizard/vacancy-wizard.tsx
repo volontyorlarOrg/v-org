@@ -29,7 +29,9 @@ import {
   submitVacancyDraftAction,
   type DraftResult,
 } from "@/lib/vacancies/actions";
+import type { XpRules } from "@/lib/results/schemas";
 import {
+  DEFAULT_XP_RULES,
   WIZARD_STEPS,
   draftProblems,
   hasProblems,
@@ -85,6 +87,7 @@ export function VacancyWizard({
   organization,
   storedImageUrl = null,
   regions,
+  rules = DEFAULT_XP_RULES,
   kindLocked = false,
   published = false,
   feedback,
@@ -97,6 +100,7 @@ export function VacancyWizard({
   organization: WizardOrganization;
   storedImageUrl?: string | null;
   regions: readonly Region[];
+  rules?: XpRules;
   kindLocked?: boolean;
   published?: boolean;
   feedback?: string | undefined;
@@ -320,7 +324,7 @@ export function VacancyWizard({
         : t("reviewTitle");
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
       <WizardStepper
         current={step}
         reachable={reachable}
@@ -364,7 +368,7 @@ export function VacancyWizard({
         }}
         className="flex min-w-0 flex-col sheet"
       >
-        <div className="flex flex-col gap-6 px-4 py-5 sm:px-6 sm:py-6">
+        <div className="flex flex-col gap-6 px-4 py-4 sm:px-5 sm:py-5">
           <div className={cn(step === "review" && "sr-only")}>
             <h2
               id="wizard-step-title"
@@ -384,14 +388,14 @@ export function VacancyWizard({
           {notice && !(noticeForFields && !hasProblems(problems)) ? (
             <p
               role="alert"
-              className="flex items-start gap-2 rounded-lg border border-danger/40 bg-danger-muted px-4 py-3 text-sm font-medium text-danger-ink"
+              className="flex items-start gap-2 rounded-md border border-danger/40 bg-danger-muted px-4 py-3 text-sm font-medium text-danger-ink"
             >
               <TriangleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
               <span className="min-w-0">{notice}</span>
             </p>
           ) : null}
 
-          <div key={step} className="wizard-step-enter">
+          <div key={step} className="step-enter">
             {step === "details" ? (
               <DetailsStep
                 draft={draft}
@@ -425,12 +429,14 @@ export function VacancyWizard({
                 regionName={draft.region ? vocabulary(`regions.${draft.region}`) : ""}
                 onEdit={go}
                 formatHours={formatHours}
+                rules={rules}
+                rewardsEditable={!kindLocked}
               />
             )}
           </div>
         </div>
 
-        <footer className="sticky bottom-0 z-10 flex flex-col gap-2 rounded-b-[inherit] border-t border-border bg-surface/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-surface/85 sm:px-6">
+        <footer className="sticky bottom-0 z-10 flex flex-col gap-2 rounded-b-[inherit] border-t border-border bg-surface px-4 py-3 sm:px-5">
           <div className="flex flex-wrap items-center gap-2">
             {index > 0 ? (
               <Button
@@ -452,7 +458,11 @@ export function VacancyWizard({
                 onClick={save}
                 disabled={busy}
               >
-                {pending === "save" ? t("saving") : t("saveDraft")}
+                {pending === "save"
+                  ? t("saving")
+                  : published
+                    ? t("saveUnpublished")
+                    : t("saveDraft")}
               </Button>
               {step === "review" ? (
                 <Button type="submit" size="sm" disabled={busy}>

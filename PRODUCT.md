@@ -10,14 +10,16 @@ The account can see and act on vacancies it created under its own organization. 
 
 Create draft → edit details, image and XP rewards → submit for administrator approval → publish after approval → decide on applicants → send instructions → record attendance → submit results for administrator verification. Changes requested by the administrator return the draft for correction; rejection keeps it read-only. The account can archive its own vacancies.
 
-The opportunity detail has Details, Applications and Attendance tabs.
+The vacancy record has Details, Applications and Attendance tabs; the last two appear once a vacancy has been public, or if it has applications.
+
+Saving a published vacancy returns it to draft, off the volunteer app, until an administrator approves it again, and the wizard says so before the save. Because a draft needs a future deadline before its start to go back for approval, a published vacancy cannot be edited once its event has started. Sending for approval needs the venue and, for volunteering, the number of places, wherever it is sent from.
 
 - **Decisions** are staged per applicant (accept, reject, hold) and reach applicants only through "Review and send", which rechecks withdrawn applications and capacity first. Hold keeps an application pending.
 - **Instructions** (a message and an optional Telegram group link) go to every accepted applicant through the bot and in-app, with per-person delivery status and an explicit retry that never duplicates a delivered message.
 - **Attendance** is a draft until the organization submits it. Hours and XP count only after an administrator verifies it; the administrator can return it with flagged rows. Corrections to verified results go through the same verification and re-score only the rows that changed.
 - **XP rewards** belong to each vacancy: XP per verified hour for volunteering, winner / contributor / attendee XP for competitions, and an unexcused no-show penalty. They can change until the vacancy is published.
 
-The dashboard, opportunity list, application list, attendance, activity, and volunteer directory reflect this same scope.
+The dashboard, vacancy list, application list, attendance, activity, and volunteer directory reflect this same scope.
 
 ## Participants and past events
 

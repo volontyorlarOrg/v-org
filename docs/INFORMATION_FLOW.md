@@ -3,7 +3,7 @@
 `v-org` and `v-admin` never talk to each other. Each reads and writes
 `v-backend`, which holds every record, enforces every rule and writes the audit
 log. What one portal does becomes visible in the other on its next read.
-Section names in bold are the dashboards' sections: **On your desk** and
+Section names in bold are the dashboards' sections: **Waiting on you** and
 **With the administrator** here, **Waiting on you** and **Waiting on
 organizers** in `v-admin`. This
 page follows each record across that boundary.
