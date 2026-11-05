@@ -1,11 +1,11 @@
+import { Plus } from "lucide-react";
 import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
 import { DashboardDesk } from "@/components/dashboard/desk";
-import { DashboardOverview } from "@/components/dashboard/overview";
 import { PageHeader } from "@/components/states/page-header";
-import { QueueSkeleton } from "@/components/states/skeletons";
+import { DeskSkeleton } from "@/components/states/skeletons";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { navHref } from "@/lib/routing/routes";
@@ -40,22 +40,13 @@ export default async function DashboardPage({
         description={t("description")}
         actions={
           <Link href={navHref("newVacancy")} className={buttonClass({ size: "sm" })}>
+            <Plus aria-hidden="true" />
             {vacancies("new")}
           </Link>
         }
       />
-      <DashboardOverview
-        statistics={statistics}
-        figures={[
-          "publishedVacancies",
-          "applications",
-          "accepted",
-          "attended",
-          "confirmedHours",
-        ]}
-      />
-      <Suspense fallback={<QueueSkeleton label={t("loadingOperations")} />}>
-        <DashboardDesk />
+      <Suspense fallback={<DeskSkeleton label={t("loadingOperations")} />}>
+        <DashboardDesk statistics={statistics} />
       </Suspense>
     </>
   );

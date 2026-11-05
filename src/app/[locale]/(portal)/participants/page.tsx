@@ -1,3 +1,4 @@
+import { Plus } from "lucide-react";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
@@ -29,10 +30,11 @@ import {
   pastEventDialogLabels,
   requestListLabels,
 } from "@/lib/participants/labels.server";
-import { waitingFirst } from "@/lib/participants/requests";
+import { standaloneRequests, waitingFirst } from "@/lib/participants/requests";
 import { navHref, participantHref } from "@/lib/routing/routes";
 import {
   DEFAULT_PAGE_SIZE,
+  MAX_PAGE_SIZE,
   hrefWith,
   readPage,
   readParam,
@@ -67,15 +69,16 @@ export default async function ParticipantsPage({
       getTranslations("common"),
       getFormatter(),
       loadParticipants({ q, page, pageSize: DEFAULT_PAGE_SIZE }),
-      loadPastEventRequests({ pageSize: RECENT_REQUESTS }),
+      loadPastEventRequests({ pageSize: MAX_PAGE_SIZE }),
       requestListLabels(),
       pastEventDialogLabels(),
     ]);
 
   const failure = failureOf(loaded);
   const listPath = navHref("participants");
-  const recent = isReady(requests) ? waitingFirst(requests.data.items) : [];
-  const waiting = isReady(requests) ? requests.data.pending : 0;
+  const proposals = isReady(requests) ? standaloneRequests(requests.data.items) : [];
+  const recent = waitingFirst(proposals).slice(0, RECENT_REQUESTS);
+  const waiting = proposals.filter((request) => request.status === "pending").length;
 
   return (
     <>
@@ -84,42 +87,15 @@ export default async function ParticipantsPage({
         description={t("description")}
         actions={
           <Button asChild size="sm" variant="outline">
-            <Link href={navHref("pastEvents")}>{t("pastEvents.browse")}</Link>
+            <Link href={navHref("newPastEvent")}>
+              <Plus aria-hidden="true" />
+              {t("pastEvents.create")}
+            </Link>
           </Button>
         }
       />
 
       {failure ? <LoadFailure failure={failure} /> : null}
-
-      {recent.length > 0 ? (
-        <Register
-          id="requests"
-          title={t("requests.title")}
-          {...(waiting > 0
-            ? {
-                count: waiting,
-                countLabel: t("requests.waitingLabel"),
-                countTone: "waiting" as const,
-              }
-            : {})}
-          description={t("requests.description")}
-        >
-          <RequestList
-            requests={recent}
-            labels={listLabels}
-            showVolunteer
-            action={(request) =>
-              request.status === "pending" ? (
-                <WithdrawRequestDialog
-                  requestId={request.id}
-                  action={cancelPastEventRequestAction}
-                  labels={dialogLabels}
-                />
-              ) : null
-            }
-          />
-        </Register>
-      ) : null}
 
       {isReady(loaded) ? (
         <Register
@@ -205,6 +181,36 @@ export default async function ParticipantsPage({
               />
             </>
           )}
+        </Register>
+      ) : null}
+
+      {recent.length > 0 ? (
+        <Register
+          id="requests"
+          title={t("requests.title")}
+          {...(waiting > 0
+            ? {
+                count: waiting,
+                countLabel: t("requests.waitingLabel"),
+                countTone: "waiting" as const,
+              }
+            : {})}
+          description={t("requests.description")}
+        >
+          <RequestList
+            requests={recent}
+            labels={listLabels}
+            showVolunteer
+            action={(request) =>
+              request.status === "pending" ? (
+                <WithdrawRequestDialog
+                  requestId={request.id}
+                  action={cancelPastEventRequestAction}
+                  labels={dialogLabels}
+                />
+              ) : null
+            }
+          />
         </Register>
       ) : null}
     </>

@@ -17,8 +17,15 @@ export const DESCRIPTION_LIMIT = 1000;
 export const LOCATION_LIMIT = 200;
 export const QUESTION_LIMIT = 300;
 export const MAX_SCHEDULE_DAYS = 31;
-export const ATTENDED_EVENT_XP = 50;
-export const CONFIRMED_HOUR_XP = 10;
+
+/** What the backend gives a vacancy that has not chosen its own rewards. */
+export const DEFAULT_XP_RULES = {
+  xpPerHour: 10,
+  xpWinner: 50,
+  xpContributor: 30,
+  xpAttendee: 10,
+  xpNoShowPenalty: 10,
+} as const;
 
 const TASHKENT_OFFSET = "+05:00";
 const TASHKENT_OFFSET_MS = 5 * 60 * 60 * 1000;

@@ -64,11 +64,10 @@ export default async function ApplicationsPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const [t, attendance, common, nav, format] = await Promise.all([
+  const [t, attendance, common, format] = await Promise.all([
     getTranslations("applications"),
     getTranslations("attendance"),
     getTranslations("common"),
-    getTranslations("nav"),
     getFormatter(),
   ]);
 
@@ -97,18 +96,7 @@ export default async function ApplicationsPage({
 
   return (
     <>
-      <PageHeader
-        title={t("title")}
-        description={t("description")}
-        actions={
-          <Link
-            href={navHref("users")}
-            className={buttonClass({ size: "sm", variant: "outline" })}
-          >
-            {nav("users")}
-          </Link>
-        }
-      />
+      <PageHeader title={t("title")} description={t("description")} />
 
       {failure ? <LoadFailure failure={failure} /> : null}
 
@@ -225,7 +213,7 @@ export default async function ApplicationsPage({
                           {waiting && application.opportunity ? (
                             <span className="inline-flex items-center justify-end gap-2.5">
                               {application.stagedDecision ? (
-                                <span className="text-xs whitespace-nowrap text-accent-ink">
+                                <span className="text-xs whitespace-nowrap text-primary-ink">
                                   {results("list.staged", {
                                     decision: results(
                                       `decision.${application.stagedDecision}`,

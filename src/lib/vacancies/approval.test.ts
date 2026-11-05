@@ -3,13 +3,11 @@ import { describe, expect, it } from "vitest";
 import {
   approvalStatusOf,
   attendanceOpensAt,
-  canApproveVacancy,
+  canEditNow,
   canEditVacancy,
-  canPublishVacancy,
-  canRejectVacancy,
-  canRequestVacancyChanges,
   canSubmitForApproval,
   hasMeetingCredentials,
+  hasOpenedToVolunteers,
   isAttendanceOpen,
   missingForApproval,
   vacancyStateOf,
@@ -17,10 +15,13 @@ import {
 } from "@/lib/vacancies/approval";
 
 const ready: ApprovalCandidate = {
+  kind: "volunteering",
   title: "Winter book drive",
   description: "A longer description of the work.",
   format: "onsite",
   region: "tashkent-city",
+  locationName: "Chilonzor library",
+  capacity: 20,
   startsAt: "2026-10-01T09:00:00.000Z",
   applicationDeadline: "2026-09-20T18:00:00.000Z",
   organization: { verified: true },
@@ -55,7 +56,7 @@ describe("vacancyStateOf", () => {
   });
 });
 
-describe("what a coordinator may do", () => {
+describe("what an organization may do", () => {
   it("submits a draft and a vacancy that came back for changes", () => {
     expect(canSubmitForApproval({ approvalStatus: "draft" })).toBe(true);
     expect(canSubmitForApproval({ approvalStatus: "changes_requested" })).toBe(true);
@@ -68,7 +69,7 @@ describe("what a coordinator may do", () => {
     expect(canEditVacancy({ approvalStatus: "pending_review" })).toBe(false);
   });
 
-  it("lets a coordinator revise a published vacancy for another approval", () => {
+  it("lets an organization revise a published vacancy for another approval", () => {
     expect(canEditVacancy({ approvalStatus: "approved" })).toBe(true);
   });
 
@@ -91,27 +92,59 @@ describe("what a coordinator may do", () => {
   });
 });
 
-describe("what an administrator may do", () => {
-  it("publishes a draft or corrected vacancy directly", () => {
-    expect(canPublishVacancy({ approvalStatus: "draft" })).toBe(true);
-    expect(canPublishVacancy({ approvalStatus: "changes_requested" })).toBe(true);
-    expect(canPublishVacancy({ approvalStatus: "pending_review" })).toBe(false);
-    expect(canPublishVacancy({ approvalStatus: "approved" })).toBe(false);
-    expect(canPublishVacancy({ approvalStatus: "rejected" })).toBe(false);
+describe("editing once a vacancy is live", () => {
+  const NOW = new Date("2026-10-10T09:00:00.000Z");
+
+  it("allows it before the event starts, because the vacancy can still return", () => {
+    expect(
+      canEditNow(
+        { approvalStatus: "approved", startsAt: "2026-10-20T09:00:00.000Z" },
+        NOW,
+      ),
+    ).toBe(true);
   });
 
-  it("decides only a vacancy waiting for review", () => {
-    expect(canRequestVacancyChanges({ approvalStatus: "pending_review" })).toBe(true);
-    expect(canRejectVacancy({ approvalStatus: "pending_review" })).toBe(true);
-    expect(canRequestVacancyChanges({ approvalStatus: "draft" })).toBe(false);
-    expect(canRejectVacancy({ approvalStatus: "approved" })).toBe(false);
+  it("refuses it once the event has started, because it could never be approved again", () => {
+    expect(
+      canEditNow(
+        { approvalStatus: "approved", startsAt: "2026-10-09T09:00:00.000Z" },
+        NOW,
+      ),
+    ).toBe(false);
   });
 
-  it("approves only after the draft has entered review", () => {
-    expect(canApproveVacancy({ approvalStatus: "draft" })).toBe(false);
-    expect(canApproveVacancy({ approvalStatus: "pending_review" })).toBe(true);
-    expect(canApproveVacancy({ approvalStatus: "approved" })).toBe(false);
-    expect(canApproveVacancy({ approvalStatus: "rejected" })).toBe(false);
+  it("keeps a draft editable whatever its dates say, so they can be corrected", () => {
+    expect(
+      canEditNow(
+        { approvalStatus: "draft", startsAt: "2026-10-09T09:00:00.000Z" },
+        NOW,
+      ),
+    ).toBe(true);
+  });
+
+  it("follows the ordinary rules otherwise", () => {
+    expect(
+      canEditNow(
+        { approvalStatus: "pending_review", startsAt: "2026-10-20T09:00:00.000Z" },
+        NOW,
+      ),
+    ).toBe(false);
+  });
+});
+
+describe("whether applications and attendance apply yet", () => {
+  it("waits for a never-published vacancy, where the tabs would be dead ends", () => {
+    expect(hasOpenedToVolunteers({}, 0)).toBe(false);
+  });
+
+  it("opens once the vacancy has been published, even if it has returned to draft", () => {
+    expect(hasOpenedToVolunteers({ publishedAt: "2026-09-01T00:00:00.000Z" }, 0)).toBe(
+      true,
+    );
+  });
+
+  it("opens if applications exist, so none is ever hidden", () => {
+    expect(hasOpenedToVolunteers({}, 1)).toBe(true);
   });
 });
 
@@ -126,17 +159,21 @@ describe("missingForApproval", () => {
     ).toContain("organization");
   });
 
-  it("allows optional logistics to be filled in after the essentials", () => {
+  it("asks for a venue and places, as the wizard does before it sends", () => {
     expect(
-      missingForApproval({
-        title: ready.title,
-        description: ready.description,
-        format: ready.format,
-        region: ready.region,
-        startsAt: ready.startsAt,
-        applicationDeadline: ready.applicationDeadline,
-        organization: ready.organization,
-      }),
+      missingForApproval({ ...ready, locationName: undefined, capacity: undefined }),
+    ).toEqual(["location", "capacity"]);
+  });
+
+  it("accepts a city in place of a venue on an older vacancy", () => {
+    expect(
+      missingForApproval({ ...ready, locationName: undefined, city: "Tashkent" }),
+    ).toEqual([]);
+  });
+
+  it("asks a competition for a venue but not for a number of places", () => {
+    expect(
+      missingForApproval({ ...ready, kind: "competition", capacity: undefined }),
     ).toEqual([]);
   });
 
