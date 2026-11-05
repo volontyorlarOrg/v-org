@@ -1,4 +1,4 @@
-import { CalendarDays, MapPin, PencilLine, Stamp, Tag } from "lucide-react";
+import { CalendarDays, Hourglass, MapPin, PencilLine, Tag } from "lucide-react";
 import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -7,7 +7,7 @@ import { Panel } from "@/components/portal/panel";
 import {
   StatusBadge,
   applicationStatus,
-  vacancyStatus,
+  stageStatus,
 } from "@/components/portal/status-badge";
 import { Facts, type Fact } from "@/components/register/facts";
 import { InlineDecision } from "@/components/register/inline-decision";
@@ -22,7 +22,6 @@ import {
   isVacancyTab,
   type VacancyTab,
 } from "@/components/results/vacancy-tabs";
-import { Seal } from "@/components/register/seal";
 import { LoadFailure } from "@/components/states/load-failure";
 import { PageHeader } from "@/components/states/page-header";
 import { StatePanel } from "@/components/states/state-panel";
@@ -33,7 +32,7 @@ import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import { failureOf, isReady } from "@/lib/api/load";
 import { loadApplications } from "@/lib/applications/data.server";
-import { sealDate } from "@/lib/datetime";
+import { isAttendanceResolved } from "@/lib/applications/filters";
 import { SENT_APPLICATION_STATUSES, canArchive } from "@/lib/domain/vocabulary";
 import { decisionLabels } from "@/lib/queue/decisions.server";
 import {
@@ -45,8 +44,11 @@ import { navHref, vacancyEditHref, vacancyHref } from "@/lib/routing/routes";
 import { readParam } from "@/lib/routing/search-params";
 import {
   APPROVAL_REQUIREMENTS,
+  approvalCandidateOf,
+  canEditNow,
   canEditVacancy,
   canSubmitForApproval,
+  hasOpenedToVolunteers,
   missingForApproval,
   vacancyStateOf,
 } from "@/lib/vacancies/approval";
@@ -56,6 +58,7 @@ import {
 } from "@/lib/vacancies/actions";
 import { loadOrganizations, loadVacancy } from "@/lib/vacancies/data.server";
 import { errorCatalog } from "@/lib/vacancies/labels.server";
+import { stageOf } from "@/lib/vacancies/stage";
 
 export const dynamic = "force-dynamic";
 
@@ -87,7 +90,6 @@ export default async function VacancyPage({
     vocabulary,
     errors,
     common,
-    seal,
     format,
     loaded,
     organizations,
@@ -99,7 +101,6 @@ export default async function VacancyPage({
     getTranslations("vocabulary"),
     getTranslations("errors"),
     getTranslations("common"),
-    getTranslations("seal"),
     getFormatter(),
     loadVacancy(id),
     loadOrganizations(),
@@ -123,46 +124,53 @@ export default async function VacancyPage({
   const vacancy = loaded.data;
   const now = new Date();
   const state = vacancyStateOf(vacancy);
-  const status = vacancyStatus(state);
 
   const organization =
     (isReady(organizations)
       ? organizations.data.find((item) => item.id === vacancy.organizationId)
       : undefined) ?? vacancy.organization;
 
-  const missing = missingForApproval(
-    {
-      title: vacancy.title,
-      description: vacancy.description,
-      format: vacancy.format,
-      region: vacancy.region,
-      startsAt: vacancy.startsAt,
-      applicationDeadline: vacancy.applicationDeadline,
-      ...(organization ? { organization: { verified: organization.verified } } : {}),
-    },
-    now,
-  );
+  const missing = missingForApproval(approvalCandidateOf(vacancy, organization), now);
   const ready = missing.length === 0;
 
   const rows = isReady(applications) ? applications.data : [];
   const applicationsFailure = failureOf(applications);
   const accepted = rows.filter((application) => application.status === "accepted");
+  const stage = stageOf(
+    {
+      ...vacancy,
+      saved: false,
+      progress: {
+        applications: rows.length,
+        awaitingReview: 0,
+        accepted: accepted.length,
+        attended: 0,
+        attendanceResolved: accepted.filter(isAttendanceResolved).length,
+      },
+    },
+    now,
+  );
+  const status = stageStatus(stage);
   const undecided = rows.filter(
     (application) =>
       application.status === "submitted" || application.status === "under_review",
   );
 
   // A vacancy opens on what needs doing: details until it is published,
-  // applications while it runs, attendance once the event has started.
+  // applications while it runs, attendance once the event has started. The other
+  // tabs would be dead ends until a vacancy has been in front of volunteers.
+  const opened = hasOpenedToVolunteers(vacancy, rows.length);
   const published = state === "approved" || state === "archived";
   const started = new Date(vacancy.startsAt) <= now;
-  const tab: VacancyTab = isVacancyTab(requestedTab)
-    ? requestedTab
-    : !published
-      ? "details"
-      : started && accepted.length > 0
-        ? "attendance"
-        : "applications";
+  const tab: VacancyTab = !opened
+    ? "details"
+    : isVacancyTab(requestedTab)
+      ? requestedTab
+      : !published
+        ? "details"
+        : started && accepted.length > 0
+          ? "attendance"
+          : "applications";
   const tabHref = (value: VacancyTab) => `${vacancyHref(vacancy.id)}?tab=${value}`;
 
   const [labels, instructions, sheet] = await Promise.all([
@@ -322,10 +330,17 @@ export default async function VacancyPage({
         meta={
           <>
             <StatusBadge
-              label={t(`state.${state}`)}
+              label={t(`list.stage.${stage}`)}
               tone={status.tone}
               icon={status.icon}
             />
+            {approved && vacancy.approvalReviewedAt ? (
+              <span>
+                {t("approvedOn", {
+                  date: format.dateTime(new Date(vacancy.approvalReviewedAt), "date"),
+                })}
+              </span>
+            ) : null}
             {organization ? <span>{organization.name}</span> : null}
             <span className="inline-flex items-center gap-1.5">
               <CalendarDays aria-hidden="true" className="size-4" />
@@ -351,19 +366,7 @@ export default async function VacancyPage({
         }
         actions={
           <>
-            {approved ? (
-              <Seal
-                word={seal("approved")}
-                date={sealDate(vacancy.approvalReviewedAt as string)}
-                issuer={seal("issuer")}
-                label={seal("label", {
-                  word: seal("approved"),
-                  date: sealDate(vacancy.approvalReviewedAt as string),
-                })}
-                size={76}
-              />
-            ) : null}
-            {canEditVacancy(vacancy) ? (
+            {canEditNow(vacancy, now) ? (
               <Link
                 href={vacancyEditHref(vacancy.id)}
                 className={buttonClass({ variant: "outline", size: "sm" })}
@@ -411,43 +414,6 @@ export default async function VacancyPage({
         }
       />
 
-      {vacancy.imageUrl ? (
-        <VacancyImage imageUrl={vacancy.imageUrl} title={t("image.title")} />
-      ) : null}
-
-      <VacancyTabs
-        label={t("detail.sections")}
-        active={tab}
-        items={[
-          { tab: "details", label: t("detail.details"), href: tabHref("details") },
-          {
-            tab: "applications",
-            label: t("detail.applicationsList"),
-            href: tabHref("applications"),
-            badge:
-              undecided.length > 0 ? (
-                <Count
-                  value={undecided.length}
-                  label={results("tabs.pending")}
-                  tone="waiting"
-                />
-              ) : undefined,
-          },
-          {
-            tab: "attendance",
-            label: t("detail.results"),
-            href: tabHref("attendance"),
-            badge: vacancy.attendanceSheet ? (
-              <span className="text-xs font-medium text-ink-muted">
-                {results(
-                  `tabs.sheet.${vacancy.attendanceSheet.correction && vacancy.attendanceSheet.status === "draft" ? "correction" : vacancy.attendanceSheet.status}`,
-                )}
-              </span>
-            ) : undefined,
-          },
-        ]}
-      />
-
       {justSent && state === "pending_review" ? (
         <StatePanel role="status" tone="notice" title={t("wizard.sent")} />
       ) : null}
@@ -455,14 +421,14 @@ export default async function VacancyPage({
       {state === "pending_review" ? (
         <section
           aria-labelledby="decision-title"
-          className="rounded-xl border border-border bg-surface-soft px-5 py-4 shadow-(--sheet-shadow)"
+          className="rounded-xl border border-border bg-surface-soft px-4 py-3.5"
         >
           <div className="flex min-w-0 gap-3">
             <span
               aria-hidden="true"
-              className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-knockout"
+              className="grid size-9 shrink-0 place-items-center rounded-md bg-surface text-primary-ink"
             >
-              <Stamp className="size-4" strokeWidth={2} />
+              <Hourglass className="size-4" strokeWidth={2} />
             </span>
             <div className="min-w-0">
               <h2 id="decision-title" className="text-section text-ink">
@@ -479,7 +445,7 @@ export default async function VacancyPage({
       {canSubmitForApproval(vacancy) ? (
         <section
           aria-labelledby="publish-title"
-          className="flex flex-col gap-4 sheet px-5 py-4 lg:flex-row lg:items-start lg:justify-between"
+          className="flex flex-col gap-4 sheet px-4 py-3.5 lg:flex-row lg:items-start lg:justify-between"
         >
           <div className="min-w-0" id={readinessId}>
             <h2 id="publish-title" className="text-section text-ink">
@@ -536,6 +502,45 @@ export default async function VacancyPage({
 
       {state === "archived" ? (
         <StatePanel role="status" title={t("archivedNotice")} />
+      ) : null}
+
+      {vacancy.imageUrl ? (
+        <VacancyImage imageUrl={vacancy.imageUrl} title={t("image.title")} />
+      ) : null}
+
+      {opened ? (
+        <VacancyTabs
+          label={t("detail.sections")}
+          active={tab}
+          items={[
+            { tab: "details", label: t("detail.details"), href: tabHref("details") },
+            {
+              tab: "applications",
+              label: t("detail.applicationsList"),
+              href: tabHref("applications"),
+              badge:
+                undecided.length > 0 ? (
+                  <Count
+                    value={undecided.length}
+                    label={results("tabs.pending")}
+                    tone="waiting"
+                  />
+                ) : undefined,
+            },
+            {
+              tab: "attendance",
+              label: t("detail.results"),
+              href: tabHref("attendance"),
+              badge: vacancy.attendanceSheet ? (
+                <span className="text-xs font-medium text-ink-muted">
+                  {results(
+                    `tabs.sheet.${vacancy.attendanceSheet.correction && vacancy.attendanceSheet.status === "draft" ? "correction" : vacancy.attendanceSheet.status}`,
+                  )}
+                </span>
+              ) : undefined,
+            },
+          ]}
+        />
       ) : null}
 
       {tab === "details" ? (
@@ -627,7 +632,7 @@ export default async function VacancyPage({
                             tone={chip.tone}
                             icon={chip.icon}
                           />
-                          <span className="display-face tabular text-figure-inline text-ink">
+                          <span className="text-figure-inline figure text-ink">
                             {format.number(entry.count)}
                           </span>
                         </li>

@@ -2,6 +2,7 @@ import { getFormatter, getTranslations, setRequestLocale } from "next-intl/serve
 import type { Metadata } from "next";
 
 import {
+  AgeLead,
   QUEUE_ACTIONS,
   QueueMain,
   QueueRow,
@@ -17,8 +18,10 @@ import { loadApplications } from "@/lib/applications/data.server";
 import {
   groupAttendance,
   groupStage,
+  toRecordCount,
   type AttendanceGroup,
 } from "@/lib/attendance/queue";
+import { waited } from "@/lib/datetime";
 import { vacancyHref } from "@/lib/routing/routes";
 import { loadVacancies } from "@/lib/vacancies/data.server";
 
@@ -71,16 +74,40 @@ export default async function AttendancePage({
     (group) => stageOf.get(group.vacancyId) === "verified",
   );
 
+  const returned = (group: AttendanceGroup) =>
+    stageOf.get(group.vacancyId) === "returned";
+  const recordedCount = (group: AttendanceGroup) =>
+    group.resolved.length + group.unresolved.length - toRecordCount(group);
+  const dueScale = Math.max(
+    1,
+    ...due.map((group) => waited(group.opensAt, now)?.days ?? 0),
+  );
+  const lead = (group: AttendanceGroup) => {
+    const age = waited(group.opensAt, now);
+    if (!age) return undefined;
+    const value = format.number(age.value, {
+      style: "unit",
+      unit: age.unit,
+      unitDisplay: "narrow",
+    });
+    return (
+      <AgeLead
+        value={value}
+        label={t("queue.age", { age: value })}
+        share={age.days / dueScale}
+      />
+    );
+  };
+
   const rows = (
     list: AttendanceGroup[],
     kind: "due" | "upcoming" | "verifying" | "recorded",
   ) => (
     <ol className="divide-y divide-border">
-      {list.map((group, index) => (
+      {list.map((group) => (
         <QueueRow
           key={group.vacancyId}
-          number={index + 1}
-          numberLabel={t("queue.number")}
+          {...(kind === "due" ? { lead: lead(group) } : {})}
         >
           <QueueMain
             title={
@@ -108,24 +135,29 @@ export default async function AttendancePage({
               <span>{t("queue.accepted", { count: group.unresolved.length })}</span>
             ) : (
               <>
-                {stageOf.get(group.vacancyId) === "returned" ? (
-                  <span className="font-semibold text-accent-ink">
+                {returned(group) ? (
+                  <span className="font-medium text-primary-ink">
                     {t("queue.returned")}
                   </span>
                 ) : null}
                 {kind === "verifying" ? (
-                  <span className="font-medium text-primary-ink">
+                  <span className="font-medium text-warning-ink">
                     {t("queue.verifying")}
                   </span>
                 ) : null}
-                {kind === "due" && group.unresolved.length > 0 ? (
+                {kind === "due" && toRecordCount(group) > 0 ? (
                   <span className="font-medium text-ink">
-                    {t("queue.waiting", { count: group.unresolved.length })}
+                    {t("queue.waiting", { count: toRecordCount(group) })}
                   </span>
                 ) : null}
-                {kind === "due" && group.resolved.length > 0 ? (
+                {kind === "due" && !returned(group) && toRecordCount(group) === 0 ? (
+                  <span className="font-medium text-success-ink">
+                    {t("queue.ready")}
+                  </span>
+                ) : null}
+                {kind === "due" && recordedCount(group) > 0 ? (
                   <span>
-                    {t("queue.resolvedCount", { count: group.resolved.length })}
+                    {t("queue.resolvedCount", { count: recordedCount(group) })}
                   </span>
                 ) : null}
               </>
@@ -139,7 +171,13 @@ export default async function AttendancePage({
                 variant: kind === "due" ? "primary" : "outline",
               })}
             >
-              {kind === "due" ? t("queue.take") : t("queue.view")}
+              {kind !== "due"
+                ? t("queue.view")
+                : returned(group)
+                  ? t("queue.correct")
+                  : toRecordCount(group) > 0
+                    ? t("queue.take")
+                    : t("queue.finish")}
               <span className="sr-only"> — {group.title}</span>
             </Link>
           </div>

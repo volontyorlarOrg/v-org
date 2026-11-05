@@ -1,8 +1,8 @@
 # Volontyorlar Organization Portal
 
-The private portal for organizations that publish volunteering opportunities on Volontyorlar. An administrator creates the organization and its account together, with a permanent login name and password. The organization cannot change that password; an administrator can replace it or block the account.
+The private portal for organizations that publish volunteering vacancies on Volontyorlar. An administrator creates the organization and its account together, with a permanent login name and password. The organization cannot change that password; an administrator can replace it or block the account.
 
-This repository owns the UI at `org.volontyorlar.uz`. `v-backend` owns authentication, permissions, approval, and records; `v-admin` owns account issuance and vacancy approval. The screenshots supplied for this project are approximate screen direction. This portal uses the component system and visual language of `v-staff` and `v-admin`.
+This repository owns the UI at `org.volontyorlar.uz`. `v-backend` owns authentication, permissions, approval, and records; `v-admin` owns account issuance and vacancy approval. This portal uses the component system and visual language of `v-admin` ("The Line"); see [DESIGN.md](DESIGN.md).
 
 ## Workflow
 
@@ -13,13 +13,13 @@ This repository owns the UI at `org.volontyorlar.uz`. `v-backend` owns authentic
 5. After an event ends, record attendance and submit the results. Hours and XP count only after an administrator verifies them.
 6. Record past events with their participants; an administrator approves them before any volunteer sees them.
 
-The **Dashboard** opens on the organization's totals, then what waits on it (returned vacancies, returned results, drafts, applications grouped by vacancy, roll calls), what is with the administrator, and its recent activity. See [docs/DASHBOARD.md](docs/DASHBOARD.md) and, for how each record travels to the administrator portal and back, [docs/INFORMATION_FLOW.md](docs/INFORMATION_FLOW.md).
+The **Dashboard** opens on the volunteer journey, then what waits on the organization, oldest first, beside what is with the administrator and what was decided today. See [docs/DASHBOARD.md](docs/DASHBOARD.md) and, for how each record travels to the administrator portal and back, [docs/INFORMATION_FLOW.md](docs/INFORMATION_FLOW.md).
 
 ## Local development
 
 Run `npm ci` and `npm run dev`. The server binds to `127.0.0.1:3004` and loads the ignored `../env/local/org.local.env`. It needs `VOLONTYORLAR_API_URL` and a 32-character or longer `VOLONTYORLAR_ORG_SESSION_SECRET`. Use a real local `v-backend` instance; runtime fixtures are not used.
 
-`npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` check the portal. `npm run api:types` regenerates the checked-in contract types from the sibling backend's OpenAPI output after that backend is updated.
+`npm run lint`, `npm run typecheck`, `npm run test`, and `npm run build` check the portal. `npm run test:e2e` drives the whole workflow in a browser against `e2e/stub-backend.mjs` (set `E2E_PORT` and `E2E_STUB_PORT` to run beside another checkout); that stub exists only for these tests. `npm run api:types` regenerates the checked-in contract types from the sibling backend's OpenAPI output after that backend is updated.
 
 ## Security boundary
 

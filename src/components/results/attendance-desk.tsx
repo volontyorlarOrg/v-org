@@ -76,7 +76,7 @@ function XpFigure({ value, muted }: { value: number | null; muted?: boolean }) {
         value === null || value === 0 || muted
           ? "text-ink-muted"
           : value > 0
-            ? "text-primary-ink"
+            ? "text-accent-ink"
             : "text-danger-ink",
       )}
     >
@@ -290,10 +290,10 @@ export function AttendanceDesk({
   return (
     <section aria-labelledby="sheet-title" className="flex min-w-0 flex-col gap-4">
       {view.status === "changes_requested" ? (
-        <div className="flex flex-col gap-3 rounded-xl border border-accent/40 bg-surface px-5 py-4 sm:flex-row sm:items-start">
+        <div className="flex flex-col gap-3 rounded-xl border border-primary-muted bg-surface-soft px-4 py-3 sm:flex-row sm:items-start">
           <span
             aria-hidden="true"
-            className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-knockout"
+            className="grid size-9 shrink-0 place-items-center rounded-md bg-surface text-primary-ink"
           >
             <Undo2 className="size-4.5" />
           </span>
@@ -322,7 +322,7 @@ export function AttendanceDesk({
       ) : null}
 
       {view.status === "submitted" ? (
-        <div className="flex flex-col gap-3 rounded-xl border border-primary-muted bg-surface-soft px-5 py-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3 rounded-xl border border-primary-muted bg-surface-soft px-4 py-3 sm:flex-row sm:items-center">
           <Hourglass aria-hidden="true" className="size-5 shrink-0 text-primary-ink" />
           <div className="min-w-0 flex-1">
             <p className="font-semibold text-ink">{t("awaiting.title")}</p>
@@ -334,7 +334,7 @@ export function AttendanceDesk({
       ) : null}
 
       {view.status === "verified" && !editing ? (
-        <div className="flex flex-col gap-3 rounded-xl border border-primary-ink/25 bg-surface px-5 py-4 lg:flex-row lg:items-center">
+        <div className="flex flex-col gap-3 rounded-xl border border-primary-ink/25 bg-surface px-4 py-3 lg:flex-row lg:items-center">
           <BadgeCheck aria-hidden="true" className="size-6 shrink-0 text-primary-ink" />
           <div className="min-w-0 flex-1">
             <p className="tabular font-semibold text-ink">
@@ -371,7 +371,7 @@ export function AttendanceDesk({
       ) : null}
 
       {correction && editing ? (
-        <div className="flex flex-col gap-3 rounded-xl border border-primary-muted bg-surface-soft px-5 py-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3 rounded-xl border border-primary-muted bg-surface-soft px-4 py-3 sm:flex-row sm:items-center">
           <Info aria-hidden="true" className="size-5 shrink-0 text-primary-ink" />
           <p className="min-w-0 flex-1 text-sm text-primary-ink">
             {verification ? t("correction.org") : t("correction.admin")}
@@ -395,7 +395,7 @@ export function AttendanceDesk({
       ) : null}
 
       <div className="min-w-0 sheet">
-        <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-border px-5 py-4">
+        <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-border px-4 py-3">
           <h2 id="sheet-title" className="text-section text-ink">
             {kind === "competition"
               ? t("titleCompetition", { count: view.rows.length })
@@ -843,7 +843,7 @@ export function AttendanceDesk({
         </div>
 
         {view.history.length > 0 ? (
-          <div className="border-t border-border px-5 py-3">
+          <div className="border-t border-border px-4 py-2.5">
             <button
               type="button"
               aria-expanded={showHistory}
@@ -882,7 +882,7 @@ export function AttendanceDesk({
 
       {editing ? (
         <div className="sticky bottom-3 z-20">
-          <div className="flex flex-col gap-3 rounded-xl border border-primary-ink/25 bg-surface-raised px-5 py-3 shadow-raised sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 rounded-xl border border-primary-ink/25 bg-surface-raised px-4 py-2.5 shadow-raised sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-ink-muted">
               <span className="tabular font-semibold text-ink">
                 {[

@@ -170,7 +170,7 @@ export function ApplicationsDesk({
   return (
     <section aria-labelledby="desk-title" className="flex min-w-0 flex-col">
       <div className="min-w-0 sheet">
-        <header className="flex flex-col gap-3 border-b border-border px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+        <header className="flex flex-col gap-3 border-b border-border px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
             <h2 id="desk-title" className="text-section text-ink">
               {t("title", { count: counts.total })}
@@ -444,10 +444,10 @@ export function ApplicationsDesk({
                               className="max-w-44"
                             />
                             {decision === "accept" || decision === "reject" ? (
-                              <span className="inline-flex items-center gap-1.5 text-xs whitespace-nowrap text-accent-ink">
+                              <span className="inline-flex items-center gap-1.5 text-xs whitespace-nowrap text-warning-ink">
                                 <span
                                   aria-hidden="true"
-                                  className="size-1.5 rounded-full bg-accent"
+                                  className="size-1.5 rounded-full bg-warning"
                                 />
                                 {t("notSent")}
                               </span>
@@ -476,7 +476,7 @@ export function ApplicationsDesk({
         {visible.length > PAGE_SIZE ? (
           <nav
             aria-label={t("pagination.label")}
-            className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-5 py-3"
+            className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-2.5"
           >
             <span className="tabular text-sm text-ink-muted">
               {t("pagination.showing", {
@@ -508,7 +508,7 @@ export function ApplicationsDesk({
                     aria-current={number === current ? "page" : undefined}
                     onClick={() => setPage(number)}
                     className={cn(
-                      "tabular grid size-9 place-items-center rounded-full text-sm font-semibold",
+                      "tabular grid size-9 place-items-center rounded-md text-sm font-semibold",
                       number === current
                         ? "bg-action text-knockout"
                         : "text-ink-muted hover:bg-surface-sunk hover:text-ink",
@@ -537,7 +537,7 @@ export function ApplicationsDesk({
         <div className="sticky bottom-3 z-20 mt-3">
           <div
             className={cn(
-              "flex flex-col gap-3 rounded-xl border px-5 py-3 sm:flex-row sm:items-center sm:justify-between",
+              "flex flex-col gap-3 rounded-xl border px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between",
               counts.ready > 0
                 ? "border-primary-ink/25 bg-surface-raised shadow-raised"
                 : "border-border bg-surface",

@@ -19,6 +19,7 @@ vi.mock("sonner", () => ({ toast: { success: vi.fn() } }));
 
 const labels: RosterFormLabels = {
   steps: "Steps",
+  stepDone: "done",
   details: "Event details",
   participants: "Participants",
   review: "Review",

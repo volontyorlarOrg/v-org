@@ -37,13 +37,13 @@ export function SaveToggle({
       aria-pressed={shown}
       aria-label={shown ? labels.unsave : labels.save}
       className={cn(
-        "grid size-9 place-items-center rounded-lg bg-black/45 text-white backdrop-blur-sm transition-colors hover:bg-black/65 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
-        shown && "text-accent",
+        "grid size-8 shrink-0 place-items-center rounded-md border border-border-strong bg-surface transition-colors duration-150 hover:border-border-control hover:bg-surface-sunk",
+        shown ? "text-primary-ink" : "text-ink-muted",
       )}
     >
       <Bookmark
         aria-hidden="true"
-        className="size-4.5"
+        className="size-4"
         fill={shown ? "currentColor" : "none"}
       />
     </button>

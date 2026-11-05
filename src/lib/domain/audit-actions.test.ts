@@ -23,22 +23,21 @@ describe("the audit action vocabulary", () => {
       "opportunity.approved",
       "opportunity.changes_requested",
       "opportunity.submitted_for_approval",
-      "coordinator.active",
-      "organization.updated",
+      "opportunity.instructions_sent",
+      "attendance.submitted",
     ]) {
       expect(isKnownAuditAction(action), action).toBe(true);
     }
     expect(isKnownAuditAction("application.reviewed")).toBe(false);
   });
 
-  it("covers every family of action the portals can cause", () => {
+  it("covers every family of action an organization account can cause", () => {
     for (const prefix of [
       "opportunity.",
       "application.",
       "attendance.",
-      "coordinator.",
-      "organization.",
-      "user.",
+      "past_event_roster.",
+      "past_event_request.",
     ]) {
       expect(
         AUDIT_ACTIONS.some((action) => action.startsWith(prefix)),
@@ -54,7 +53,7 @@ describe("the audit action vocabulary", () => {
 
 describe("auditActionOptions", () => {
   it("offers the whole vocabulary even when the page shows few actions", () => {
-    expect(auditActionOptions(["coordinator.created"]).length).toBe(
+    expect(auditActionOptions(["opportunity.created"]).length).toBe(
       AUDIT_ACTIONS.length,
     );
   });

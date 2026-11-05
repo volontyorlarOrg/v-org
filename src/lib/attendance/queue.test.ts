@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { vacancySchema, type Application } from "@/lib/api/schemas";
-import { groupAttendance, unresolvedCount } from "@/lib/attendance/queue";
+import { groupAttendance, toRecordCount } from "@/lib/attendance/queue";
 
 const NOW = new Date("2026-10-05T12:00:00.000Z");
 
@@ -145,12 +145,23 @@ describe("groupAttendance", () => {
   });
 });
 
-describe("unresolvedCount", () => {
-  it("counts every volunteer still waiting across the queue", () => {
-    const groups = groupAttendance(
-      [application("a", "v1"), application("b", "v2"), resolved("c", "v2")],
+describe("toRecordCount", () => {
+  it("counts only volunteers with no outcome yet, so a saved draft counts as recorded", () => {
+    const [group] = groupAttendance(
+      [
+        application("a", "v1"),
+        application("b", "v1", {
+          attendance: {
+            id: "att-b",
+            outcome: "awaiting_confirmation",
+            draftOutcome: "attended",
+            xpAwarded: 0,
+          },
+        } as Partial<Application>),
+        resolved("c", "v1"),
+      ],
       NOW,
     );
-    expect(unresolvedCount(groups)).toBe(2);
+    expect(group && toRecordCount(group)).toBe(1);
   });
 });

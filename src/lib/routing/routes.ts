@@ -20,10 +20,9 @@ export type RouteArea = "auth" | "portal" | "account";
 
 export type RouteGuard = "guest" | "session";
 
-export const NAV_GROUPS = ["work"] as const;
+export const NAV_GROUPS = ["overview", "volunteering", "people"] as const;
 
 export const NAV_COUNTS = [
-  "pendingApproval",
   "changesRequested",
   "pendingReview",
   "attendanceDue",
@@ -59,7 +58,7 @@ export const appRoutes: readonly AppRoute[] = [
     area: "portal",
     guard: "session",
     inNav: true,
-    group: "work",
+    group: "overview",
     icon: "layout-dashboard",
   },
   {
@@ -68,7 +67,7 @@ export const appRoutes: readonly AppRoute[] = [
     area: "portal",
     guard: "session",
     inNav: true,
-    group: "work",
+    group: "volunteering",
     count: "changesRequested",
     icon: "clipboard-list",
   },
@@ -85,7 +84,9 @@ export const appRoutes: readonly AppRoute[] = [
     path: "/applications",
     area: "portal",
     guard: "session",
-    inNav: false,
+    inNav: true,
+    group: "volunteering",
+    count: "pendingReview",
     icon: "inbox",
   },
   {
@@ -93,16 +94,27 @@ export const appRoutes: readonly AppRoute[] = [
     path: "/attendance",
     area: "portal",
     guard: "session",
-    inNav: false,
+    inNav: true,
+    group: "volunteering",
     count: "attendanceDue",
-    icon: "calendar-check",
+    icon: "clipboard-check",
+  },
+  {
+    key: "pastEvents",
+    path: "/past-events",
+    area: "portal",
+    guard: "session",
+    inNav: true,
+    group: "volunteering",
+    icon: "calendar-clock",
   },
   {
     key: "users",
     path: "/users",
     area: "portal",
     guard: "session",
-    inNav: false,
+    inNav: true,
+    group: "people",
     icon: "users",
   },
   {
@@ -111,8 +123,8 @@ export const appRoutes: readonly AppRoute[] = [
     area: "portal",
     guard: "session",
     inNav: true,
-    group: "work",
-    icon: "users",
+    group: "people",
+    icon: "user-check",
   },
   {
     key: "activity",
@@ -120,15 +132,6 @@ export const appRoutes: readonly AppRoute[] = [
     area: "account",
     guard: "session",
     inNav: false,
-    icon: "history",
-  },
-  {
-    key: "pastEvents",
-    path: "/past-events",
-    area: "portal",
-    guard: "session",
-    inNav: true,
-    group: "work",
     icon: "history",
   },
   {

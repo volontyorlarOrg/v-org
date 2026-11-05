@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link } from "@/i18n/navigation";
 
-export type CardMenuItem = {
+export type RowMenuItem = {
   key: "open" | "edit" | "applications" | "attendance";
   href: string;
   label: string;
@@ -23,16 +23,16 @@ const ICON = {
   attendance: CalendarCheck,
 } as const;
 
-export function CardMenu({ label, items }: { label: string; items: CardMenuItem[] }) {
+export function RowMenu({ label, items }: { label: string; items: RowMenuItem[] }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={label}
-        className="grid size-9 place-items-center rounded-lg bg-black/45 text-white backdrop-blur-sm transition-colors hover:bg-black/65 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        className="grid size-8 shrink-0 place-items-center rounded-md border border-border-strong bg-surface text-ink-muted transition-colors duration-150 hover:border-border-control hover:bg-surface-sunk hover:text-ink"
       >
-        <MoreVertical aria-hidden="true" className="size-4.5" />
+        <MoreVertical aria-hidden="true" className="size-4" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="min-w-48">
+      <DropdownMenuContent align="end" className="min-w-48">
         {items.map((item) => {
           const Icon = ICON[item.key];
           return (
