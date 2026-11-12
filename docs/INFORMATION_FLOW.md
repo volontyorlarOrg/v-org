@@ -84,3 +84,6 @@ the organization's own actions from `GET /org/activity` (My activity and the
 dashboard's recent activity); `v-admin` reads everyone's from
 `GET /admin/audit` and names the organization's account after the
 organization.
+
+The standalone applications list is not available. Review applications on each
+vacancy; individual application records remain available from related records.
