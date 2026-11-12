@@ -65,7 +65,6 @@ test.describe("the shell", () => {
     for (const name of [
       "Dashboard",
       "Vacancies",
-      "Applications",
       "Attendance",
       "Past events",
       "Applicants",
@@ -73,6 +72,11 @@ test.describe("the shell", () => {
     ]) {
       await expect(nav.getByRole("link", { name, exact: false }).first()).toBeVisible();
     }
+    await expect(nav.getByRole("link", { name: "Applications", exact: true })).toHaveCount(0);
+    const removed = await page.goto("/en/applications");
+    expect(removed?.status()).toBe(404);
+    await page.goto("/en/dashboard");
+    await openRail(page, isMobile);
     await expect(nav.getByText("Volunteering", { exact: true })).toBeVisible();
     await expect(nav.getByText("People", { exact: true })).toBeVisible();
   });
