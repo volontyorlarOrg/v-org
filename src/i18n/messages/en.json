@@ -1697,5 +1697,9 @@
     },
     "clear": "Nothing waiting",
     "hours": "{value} h"
+  },
+  "policy": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Use"
   }
 }
