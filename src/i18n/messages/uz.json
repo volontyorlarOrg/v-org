@@ -1697,5 +1697,9 @@
     },
     "clear": "Hech narsa kutmayapti",
     "hours": "{value} soat"
+  },
+  "policy": {
+    "privacy": "Maxfiylik siyosati",
+    "terms": "Foydalanish shartlari"
   }
 }
