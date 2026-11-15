@@ -126,7 +126,7 @@ export default async function AttendancePage({
                     })
                   : t("queue.opensUnknown")
                 : group.opensAt
-                  ? t("queue.ended", { when: format.relativeTime(group.opensAt, now) })
+                  ? t("queue.opened", { when: format.relativeTime(group.opensAt, now) })
                   : undefined
             }
           />
