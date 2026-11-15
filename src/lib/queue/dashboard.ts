@@ -163,6 +163,28 @@ export function rollCallsDue(
     calls.set(application.opportunityId, call);
   }
 
+  for (const vacancy of vacancies) {
+    const manual = vacancy.manualAttendance;
+    if (!manual?.total || !hasEventEnded(vacancy, now)) continue;
+    if (
+      vacancy.attendanceSheet?.status === "submitted" ||
+      vacancy.attendanceSheet?.status === "verified"
+    )
+      continue;
+    const call = calls.get(vacancy.id) ?? {
+      vacancyId: vacancy.id,
+      title: vacancy.title,
+      endedAt: eventEndsAt(vacancy),
+      awaiting: 0,
+      drafted: 0,
+      resolved: 0,
+    };
+    call.awaiting += manual.awaiting;
+    call.drafted += manual.drafted;
+    call.resolved += manual.resolved;
+    calls.set(vacancy.id, call);
+  }
+
   return [...calls.values()]
     .filter((call) => call.awaiting > 0 || call.drafted > 0)
     .sort((a, b) => (a.endedAt?.getTime() ?? 0) - (b.endedAt?.getTime() ?? 0));

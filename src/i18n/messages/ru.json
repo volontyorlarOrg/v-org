@@ -205,7 +205,8 @@
     "finishBeforeStart": "Окончание должно быть позже начала.",
     "scheduleTooLong": "Вакансия может длиться не больше 31 дня.",
     "invalidOpportunitySchedule": "Эти дни и время не сходятся. Проверьте расписание.",
-    "coverImageTooLarge": "Выберите изображение меньше 15 МБ."
+    "coverImageTooLarge": "Выберите изображение меньше 15 МБ.",
+    "attendanceVolunteerAlreadyAdded": "Этот волонтёр уже в списке посещаемости. Проверьте его результат на вкладке посещаемости."
   },
   "vacancies": {
     "title": "Вакансии",
@@ -1071,7 +1072,8 @@
       "opportunity_image_updated": "Фото вакансии изменено",
       "opportunity_image_removed": "Фото вакансии удалено",
       "opportunity_instructions_sent": "Инструкции отправлены принятым волонтёрам",
-      "past_event_roster_participants_added": "В прошедшее событие добавлены участники"
+      "past_event_roster_participants_added": "В прошедшее событие добавлены участники",
+      "attendance_volunteer_added": "Добавлен волонтёр в список посещаемости"
     },
     "you": "Вы",
     "families": {
@@ -1251,9 +1253,9 @@
       }
     },
     "sheet": {
-      "title": "{count, plural, one {# принятый волонтёр} few {# принятых волонтёра} other {# принятых волонтёров}}",
+      "title": "{count, plural, one {# волонтёр} few {# волонтёра} other {# волонтёров}}",
       "titleCompetition": "{count, plural, one {# участник} few {# участника} other {# участников}}",
-      "caption": "Посещаемость принятых волонтёров",
+      "caption": "Посещаемость волонтёров",
       "status": {
         "draft": "Черновик",
         "submitted": "На проверке",
@@ -1332,11 +1334,12 @@
         "saved": "Все изменения сохранены.",
         "save": "Сохранить черновик",
         "submit": "Проверить и отправить",
-        "apply": "Проверить и применить"
+        "apply": "Проверить и применить",
+        "awaitingSubmission": "Ожидается отправка результатов организатором на проверку."
       },
       "empty": {
-        "title": "Нет принятых волонтёров",
-        "description": "Посещаемость отмечается для принятых заявителей."
+        "title": "Волонтёров пока нет",
+        "description": "Здесь отображаются принятые волонтёры. Вы также можете добавить зарегистрированного участника."
       },
       "notOpen": {
         "title": "Посещаемость открывается за час до начала мероприятия",
@@ -1373,14 +1376,30 @@
           "correction_submitted": "Отправлено исправление",
           "changes_requested": "Запрошены правки",
           "verified": "Подтверждено",
-          "applied": "Отмечено администратором"
+          "applied": "Отмечено администратором",
+          "volunteer_added": "Волонтёр добавлен вручную"
         }
       },
       "savedToast": "Черновик сохранён.",
       "discardedToast": "Исправление отменено.",
       "submittedToast": "Отправлено на проверку.",
       "appliedToast": "Результаты применены. Часы и XP начислены.",
-      "incompleteNames": "Ещё не отмечены: {names}."
+      "incompleteNames": "Ещё не отмечены: {names}.",
+      "manuallyAdded": "Добавлен вручную",
+      "addVolunteer": {
+        "title": "Добавить волонтёра",
+        "description": "Найдите зарегистрированного пользователя. После добавления укажите посещение и фактические часы, затем отправьте на проверку.",
+        "searchLabel": "Имя или имя пользователя",
+        "search": "Найти",
+        "pending": "Подождите…",
+        "empty": "Зарегистрированные пользователи не найдены.",
+        "select": "Выберите волонтёра",
+        "alreadyAdded": "Уже добавлен",
+        "cancel": "Отмена",
+        "close": "Закрыть",
+        "add": "Добавить",
+        "success": "Волонтёр добавлен. Посещение ещё не отмечено."
+      }
     },
     "finish": {
       "titleSubmit": "Отправить посещаемость на проверку?",
@@ -1469,8 +1488,8 @@
       "instructionsNotFound": "Инструкции ещё не отправлялись.",
       "telegramGroupLinkInvalid": "Укажите ссылку Telegram, например https://t.me/your_group.",
       "attendanceNotOpen": "Посещаемость ещё не открыта.",
-      "attendanceSheetSubmitted": "Результаты у администратора, сейчас их нельзя изменить.",
-      "attendanceSheetNotSubmitted": "Эти результаты не отправлялись.",
+      "attendanceSheetSubmitted": "Посещаемость ожидает проверки.",
+      "attendanceSheetNotSubmitted": "Организатор должен отправить результаты перед проверкой.",
       "attendanceNoChanges": "Ничего не отличается от подтверждённых результатов.",
       "correctionReasonRequired": "Объясните, что меняется и почему.",
       "attendanceIncomplete": "В некоторых строках нет отметки или часов.",
@@ -1481,7 +1500,12 @@
       "duplicateAttendanceApplication": "Волонтёр указан дважды.",
       "competitionHoursNotAllowed": "Для конкурсов отмечается результат, а не часы.",
       "opportunityRewardsLocked": "Награды фиксируются после публикации вакансии.",
-      "opportunityNotEditable": "Сейчас эту вакансию нельзя изменить."
+      "opportunityNotEditable": "Сейчас эту вакансию нельзя изменить.",
+      "attendanceVolunteerAlreadyAdded": "Этот волонтёр уже в списке посещаемости. Проверьте его результат на вкладке посещаемости.",
+      "attendanceCorrectionRequired": "Запросите исправление, прежде чем добавлять волонтёров в проверенный список.",
+      "volunteerNotFound": "Этот пользователь недоступен.",
+      "attendanceCorrectionNotAvailable": "Исправление доступно только после проверки посещаемости.",
+      "attendanceInvalidHours": "Исправьте некорректные часы в списке посещаемости перед добавлением волонтёра."
     },
     "list": {
       "staged": "{decision} · не отправлено",

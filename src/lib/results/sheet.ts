@@ -8,7 +8,7 @@ import type { SheetRow, SheetValues, XpRules } from "@/lib/results/schemas";
 
 /** One row as the attendance desk edits it; hours stay text while typed. */
 export type EditableRow = {
-  applicationId: string;
+  attendanceId: string;
   outcome: SheetOutcome | null;
   hours: string;
   placement: Placement | null;
@@ -17,7 +17,7 @@ export type EditableRow = {
 
 /** What the backend stores for one row of a draft. */
 export type SheetEntry = {
-  applicationId: string;
+  attendanceId: string;
   outcome: SheetOutcome | null;
   hours?: number | null;
   placement?: Placement | null;
@@ -45,7 +45,7 @@ export function currentValues(row: SheetRow): SheetValues {
 export function editableRow(row: SheetRow): EditableRow {
   const values = currentValues(row);
   return {
-    applicationId: row.applicationId,
+    attendanceId: row.attendanceId,
     outcome: sheetOutcome(values.outcome),
     hours: hoursText(values.hours),
     placement: values.placement,
@@ -92,11 +92,11 @@ export function previewXp(
 }
 
 export function toEntry(row: EditableRow, kind: VacancyKind): SheetEntry {
-  if (row.outcome === null) return { applicationId: row.applicationId, outcome: null };
+  if (row.outcome === null) return { attendanceId: row.attendanceId, outcome: null };
   const attended = row.outcome === "attended";
   const hours = parseHours(row.hours);
   return {
-    applicationId: row.applicationId,
+    attendanceId: row.attendanceId,
     outcome: row.outcome,
     hours:
       attended && kind === "volunteering" && hours !== null && !Number.isNaN(hours)
@@ -124,7 +124,7 @@ export function changedEntries(
   kind: VacancyKind,
 ): SheetEntry[] {
   return rows.flatMap((row) => {
-    const before = saved.find((item) => item.applicationId === row.applicationId);
+    const before = saved.find((item) => item.attendanceId === row.attendanceId);
     return before && sameRow(before, row) ? [] : [toEntry(row, kind)];
   });
 }
