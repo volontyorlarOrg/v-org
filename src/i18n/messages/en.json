@@ -745,10 +745,10 @@
   },
   "attendance": {
     "title": "Attendance",
-    "description": "Confirm attendance and hours for volunteers you accepted.",
+    "description": "Record attendance and hours from one hour before each event starts. Hours and XP count only after results are verified.",
     "empty": {
       "title": "Nothing to confirm",
-      "description": "Accepted applications appear here when their attendance is still open."
+      "description": "Roll calls appear here from one hour before events with accepted volunteers start."
     },
     "table": {
       "volunteer": "Volunteer",
@@ -775,19 +775,19 @@
     "resolved": "Resolved {when}",
     "queue": {
       "waiting": "{count, plural, one {# volunteer to record} other {# volunteers to record}}",
-      "opensAt": "Opens {when}, once the event has ended.",
-      "opensUnknown": "Opens once the event has ended.",
+      "opensAt": "Opens {when}, one hour before the event starts.",
+      "opensUnknown": "Opens one hour before the event starts.",
       "resolvedCount": "{count, plural, one {# already recorded} other {# already recorded}}",
       "take": "Take roll call",
       "view": "Open",
-      "ended": "Ended {when}",
+      "opened": "Attendance opened {when}",
       "accepted": "{count, plural, one {# volunteer accepted} other {# volunteers accepted}}",
       "returned": "Returned for changes",
       "verifying": "With an administrator",
-      "age": "Ended {age} ago",
+      "age": "Attendance opened {age} ago",
       "ready": "All recorded, not yet submitted",
       "correct": "Correct results",
-      "finish": "Review and submit"
+      "finish": "Review attendance"
     },
     "roster": {
       "title": "Attendance",
@@ -816,10 +816,10 @@
     "sections": {
       "due": "Roll calls due",
       "dueLabel": "due",
-      "dueDescription": "Events that have ended with volunteers still unrecorded.",
+      "dueDescription": "Events open for attendance with volunteers still unrecorded.",
       "upcoming": "Coming up",
       "upcomingLabel": "upcoming",
-      "upcomingDescription": "Each roll call opens when its event ends.",
+      "upcomingDescription": "Each roll call opens one hour before its event starts.",
       "recorded": "Verified",
       "recordedLabel": "recorded",
       "verifying": "Awaiting verification",
@@ -1339,7 +1339,7 @@
         "description": "Attendance is recorded for the applicants you accept."
       },
       "notOpen": {
-        "title": "Attendance opens when the event starts",
+        "title": "Attendance opens one hour before the event starts",
         "description": "{count, plural, one {You can record the # accepted volunteer from {when}.} other {You can record the # accepted volunteers from {when}.}}"
       },
       "awaiting": {

@@ -72,7 +72,9 @@ test.describe("the shell", () => {
     ]) {
       await expect(nav.getByRole("link", { name, exact: false }).first()).toBeVisible();
     }
-    await expect(nav.getByRole("link", { name: "Applications", exact: true })).toHaveCount(0);
+    await expect(
+      nav.getByRole("link", { name: "Applications", exact: true }),
+    ).toHaveCount(0);
     const removed = await page.goto("/en/applications");
     expect(removed?.status()).toBe(404);
     await page.goto("/en/dashboard");
@@ -428,4 +430,66 @@ test.describe("my activity", () => {
     );
     await expect(page.locator("main")).not.toContainText("attendance.submitted");
   });
+});
+
+test("saves attendance and hours within one hour before the event starts", async ({
+  page,
+}) => {
+  await signIn(page);
+  const vacancyId = CITY_SPORTS_DAY;
+  const attendanceUrl = `/en/vacancies/${vacancyId}?tab=attendance`;
+  await page.request.post(`${STUB}/__stub/attendance-timing`, {
+    data: { vacancyId, minutesUntilStart: 61 },
+  });
+  await page.goto(attendanceUrl);
+  await expect(
+    page.getByText("Attendance opens one hour before the event starts"),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Save draft" })).toHaveCount(0);
+
+  await page.request.post(`${STUB}/__stub/attendance-timing`, {
+    data: { vacancyId, minutesUntilStart: 30 },
+  });
+  await page.goto("/en/attendance");
+  const due = page.locator("#due");
+  await due.locator(`a[href$="${vacancyId}?tab=attendance"]`).click();
+  await page.goto(`/en/vacancies/${vacancyId}`);
+  await page
+    .getByLabel("Attendance of Sardor Toshmatov")
+    .filter({ visible: true })
+    .selectOption("attended");
+  await page
+    .getByLabel("Hours worked by Sardor Toshmatov")
+    .filter({ visible: true })
+    .fill("4");
+  await page.getByRole("button", { name: "Save draft" }).click();
+  await expect(page.getByText("Draft saved.", { exact: true }).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "Review and submit" })).toBeDisabled();
+  await page.reload();
+  await expect(
+    page.getByLabel("Attendance of Sardor Toshmatov").filter({ visible: true }),
+  ).toHaveValue("attended");
+  await expect(
+    page.getByLabel("Hours worked by Sardor Toshmatov").filter({ visible: true }),
+  ).toHaveValue("4");
+  for (const theme of ["light", "dark"]) {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page
+      .context()
+      .addCookies([{ name: "theme", value: theme, url: new URL(page.url()).origin }]);
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+    await expect(
+      page.getByLabel("Hours worked by Sardor Toshmatov").filter({ visible: true }),
+    ).toHaveValue("4");
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: test.info().outputPath(`early-attendance-${theme}.png`),
+      fullPage: true,
+    });
+  }
 });
