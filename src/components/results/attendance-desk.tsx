@@ -21,6 +21,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 
+import { AddVolunteerDialog } from "@/components/results/add-volunteer-dialog";
 import { Avatar } from "@/components/portal/avatar";
 import { StatusBadge, attendanceStatus } from "@/components/portal/status-badge";
 import {
@@ -39,6 +40,7 @@ import {
   discardAttendanceDraftAction,
   finishAttendanceAction,
   saveAttendanceDraftAction,
+  startAttendanceCorrectionAction,
 } from "@/lib/results/actions";
 import type { AttendanceSheet, SheetRow } from "@/lib/results/schemas";
 import {
@@ -134,14 +136,14 @@ export function AttendanceDesk({
     [rows, kind, view.rules],
   );
   const byId = useMemo(
-    () => new Map(view.rows.map((row) => [row.applicationId, row])),
+    () => new Map(view.rows.map((row) => [row.attendanceId, row])),
     [view.rows],
   );
   const nameOf = (row: SheetRow | undefined) =>
     row?.volunteer.displayName?.trim() || row?.volunteer.username || "—";
   const problems: DialogProblem[] = rows.flatMap((row) => {
     const problem = rowProblem(row, kind);
-    return problem ? [{ name: nameOf(byId.get(row.applicationId)), problem }] : [];
+    return problem ? [{ name: nameOf(byId.get(row.attendanceId)), problem }] : [];
   });
   const placements = {
     winner: rows.filter(
@@ -169,7 +171,7 @@ export function AttendanceDesk({
 
   function update(ids: readonly string[], change: (row: EditableRow) => EditableRow) {
     setRows((state) =>
-      state.map((row) => (ids.includes(row.applicationId) ? change(row) : row)),
+      state.map((row) => (ids.includes(row.attendanceId) ? change(row) : row)),
     );
   }
 
@@ -231,7 +233,7 @@ export function AttendanceDesk({
           setFinishError(
             t("incompleteNames", {
               names: result.problems
-                .map((item) => nameOf(byId.get(item.applicationId)))
+                .map((item) => nameOf(byId.get(item.attendanceId)))
                 .join(", "),
             }),
           );
@@ -249,7 +251,7 @@ export function AttendanceDesk({
   }
 
   const correction = view.correction || (view.status === "verified" && editing);
-  const chosen = rows.filter((row) => selected.has(row.applicationId));
+  const chosen = rows.filter((row) => selected.has(row.attendanceId));
   const allChosen = rows.length > 0 && chosen.length === rows.length;
   const verifiedRows = view.rows.filter((row) => row.verified.outcome === "attended");
   const verifiedHours = view.rows.reduce(
@@ -265,13 +267,41 @@ export function AttendanceDesk({
     verified: { icon: BadgeCheck, tone: "live" as const },
   }[view.status];
 
-  if (view.rows.length === 0) {
+  const addVolunteer =
+    view.editable && view.status !== "verified" ? (
+      <AddVolunteerDialog
+        vacancyId={vacancyId}
+        taken={view.rows.map((row) => row.volunteer.id)}
+        disabled={pending}
+        beforeAdd={async () => {
+          if (rows.some((row) => rowProblem(row, kind) === "hoursInvalid")) {
+            toast.error(failure("attendanceInvalidHours"));
+            return false;
+          }
+          if (!dirty) return true;
+          const result = await saveAttendanceDraftAction(vacancyId, changes);
+          if (!result.ok) {
+            toast.error(failure(result.code));
+            return false;
+          }
+          adopt(result.data);
+          return true;
+        }}
+        onAdded={(next) => {
+          adopt(next);
+          setEditing(true);
+        }}
+      />
+    ) : null;
+
+  if (view.rows.length === 0 && (view.started || view.editable)) {
     return (
       <section className="sheet px-5 py-12 text-center">
         <p className="text-section text-ink">{t("empty.title")}</p>
         <p className="mx-auto mt-1 max-w-md text-sm text-ink-muted">
           {t("empty.description")}
         </p>
+        <div className="mt-4">{addVolunteer}</div>
       </section>
     );
   }
@@ -361,7 +391,18 @@ export function AttendanceDesk({
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => setEditing(true)}
+              disabled={pending}
+              onClick={() =>
+                startTransition(async () => {
+                  const result = await startAttendanceCorrectionAction(vacancyId);
+                  if (!result.ok) {
+                    toast.error(failure(result.code));
+                    return;
+                  }
+                  adopt(result.data);
+                  setEditing(true);
+                })
+              }
             >
               <PencilLine aria-hidden="true" />
               {verification ? t("verified.correct") : t("verified.edit")}
@@ -408,6 +449,7 @@ export function AttendanceDesk({
             tone={statusChip.tone}
             icon={statusChip.icon}
           />
+          <div className="ml-auto">{addVolunteer}</div>
           <p className="tabular w-full text-sm text-ink-muted">
             {editing
               ? [
@@ -538,7 +580,7 @@ export function AttendanceDesk({
               onChange={(event) =>
                 setSelected(
                   event.target.checked
-                    ? new Set(rows.map((row) => row.applicationId))
+                    ? new Set(rows.map((row) => row.attendanceId))
                     : new Set(),
                 )
               }
@@ -562,7 +604,7 @@ export function AttendanceDesk({
                       onChange={(event) =>
                         setSelected(
                           event.target.checked
-                            ? new Set(rows.map((row) => row.applicationId))
+                            ? new Set(rows.map((row) => row.attendanceId))
                             : new Set(),
                         )
                       }
@@ -596,7 +638,7 @@ export function AttendanceDesk({
             </thead>
             <tbody className="block md:table-row-group">
               {rows.map((row) => {
-                const source = byId.get(row.applicationId)!;
+                const source = byId.get(row.attendanceId)!;
                 const name = nameOf(source);
                 const problem = editing ? rowProblem(row, kind) : null;
                 const flagged = source.reviewNote;
@@ -614,7 +656,7 @@ export function AttendanceDesk({
                     : false;
                 return (
                   <tr
-                    key={row.applicationId}
+                    key={row.attendanceId}
                     data-flagged={flagged ? true : undefined}
                     className={cn(
                       "grid grid-cols-[2.75rem_minmax(0,1fr)] gap-y-2 border-b border-border py-3 last:border-0 md:table-row md:py-0",
@@ -627,11 +669,11 @@ export function AttendanceDesk({
                         <input
                           type="checkbox"
                           aria-label={t("select", { name })}
-                          checked={selected.has(row.applicationId)}
+                          checked={selected.has(row.attendanceId)}
                           onChange={(event) => {
                             const next = new Set(selected);
-                            if (event.target.checked) next.add(row.applicationId);
-                            else next.delete(row.applicationId);
+                            if (event.target.checked) next.add(row.attendanceId);
+                            else next.delete(row.attendanceId);
                             setSelected(next);
                           }}
                           className="mt-2.5 size-4 accent-action md:mt-0"
@@ -653,6 +695,11 @@ export function AttendanceDesk({
                           <span className="block truncate text-xs text-ink-muted">
                             @{source.volunteer.username}
                           </span>
+                          {source.manuallyAdded ? (
+                            <span className="block text-xs text-ink-muted">
+                              {t("manuallyAdded")}
+                            </span>
+                          ) : null}
                         </span>
                       </span>
                       {flagged ? (
@@ -673,7 +720,7 @@ export function AttendanceDesk({
                           value={row.outcome ?? ""}
                           onChange={(event) =>
                             setOutcome(
-                              [row.applicationId],
+                              [row.attendanceId],
                               (event.target.value || null) as SheetOutcome | null,
                             )
                           }
@@ -739,7 +786,7 @@ export function AttendanceDesk({
                               }
                               placeholder={attended ? t("hoursPlaceholder") : "—"}
                               onChange={(event) =>
-                                update([row.applicationId], (item) => ({
+                                update([row.attendanceId], (item) => ({
                                   ...item,
                                   hours: event.target.value,
                                 }))
@@ -766,7 +813,7 @@ export function AttendanceDesk({
                           value={attended ? (row.placement ?? "attendee") : ""}
                           disabled={!attended}
                           onChange={(event) =>
-                            update([row.applicationId], (item) => ({
+                            update([row.attendanceId], (item) => ({
                               ...item,
                               placement: event.target.value as Placement,
                             }))
@@ -807,17 +854,17 @@ export function AttendanceDesk({
                         <>
                           <label
                             className="sr-only"
-                            htmlFor={`note-${row.applicationId}`}
+                            htmlFor={`note-${row.attendanceId}`}
                           >
                             {t("noteFor", { name })}
                           </label>
                           <input
-                            id={`note-${row.applicationId}`}
+                            id={`note-${row.attendanceId}`}
                             value={row.note}
                             maxLength={300}
                             placeholder={t("notePlaceholder")}
                             onChange={(event) =>
-                              update([row.applicationId], (item) => ({
+                              update([row.attendanceId], (item) => ({
                                 ...item,
                                 note: event.target.value,
                               }))

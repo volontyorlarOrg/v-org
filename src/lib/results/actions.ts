@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { call, type CallResult } from "@/lib/results/call.server";
 import {
+  sheetRowSchema,
   attendanceSheetSchema,
   instructionsSchema,
   sentDecisionsSchema,
@@ -116,18 +117,10 @@ export async function finishAttendanceAction(
   vacancyId: string,
   { entries, note = "" }: { entries: SheetEntry[]; note?: string },
 ): Promise<CallResult<AttendanceSheet>> {
-  if (entries.length > 0) {
-    const saved = await call("saveAttendanceDraft", {
-      params: { id: vacancyId },
-      body: { entries },
-      schema: attendanceSheetSchema,
-    });
-    if (!saved.ok) return saved;
-  }
   return settled(
     await call("submitAttendance", {
       params: { id: vacancyId },
-      body: note.trim() ? { note: note.trim() } : {},
+      body: { entries, ...(note.trim() ? { note: note.trim() } : {}) },
       schema: attendanceSheetSchema,
     }),
   );
@@ -142,6 +135,39 @@ export async function updateRewardsAction(
       params: { id: vacancyId },
       body: rules,
       schema: z.object({ id: z.string() }).loose(),
+    }),
+  );
+}
+
+export async function searchAttendanceVolunteersAction(
+  vacancyId: string,
+  query: string,
+) {
+  return call("searchAttendanceVolunteers", {
+    params: { id: vacancyId },
+    body: { query },
+    schema: z.object({ items: z.array(sheetRowSchema.shape.volunteer) }),
+  });
+}
+
+export async function addAttendanceVolunteerAction(
+  vacancyId: string,
+  volunteerId: string,
+) {
+  return settled(
+    await call("addAttendanceVolunteer", {
+      params: { id: vacancyId },
+      body: { volunteerId },
+      schema: attendanceSheetSchema,
+    }),
+  );
+}
+
+export async function startAttendanceCorrectionAction(vacancyId: string) {
+  return settled(
+    await call("startAttendanceCorrection", {
+      params: { id: vacancyId },
+      schema: attendanceSheetSchema,
     }),
   );
 }
