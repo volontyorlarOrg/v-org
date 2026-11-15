@@ -114,6 +114,14 @@ export const scheduleSessionSchema = z.object({
 });
 
 export const vacancySchema = z.object({
+  manualAttendance: optional(
+    z.object({
+      total: z.number().int(),
+      awaiting: z.number().int(),
+      drafted: z.number().int(),
+      resolved: z.number().int(),
+    }),
+  ),
   id,
   slug: z.string(),
   title: z.string(),

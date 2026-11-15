@@ -362,3 +362,13 @@ describe("what is with the administrator", () => {
     ]);
   });
 });
+
+it("counts manually added participants in roll calls without inflating accepted applications", () => {
+  const event = vacancy({
+    startsAt: "2026-09-20T09:00:00.000Z",
+    manualAttendance: { total: 3, awaiting: 1, drafted: 1, resolved: 1 },
+  });
+  expect(rollCallsDue([], [event], NOW)).toMatchObject([
+    { vacancyId: event.id, awaiting: 1, drafted: 1, resolved: 1 },
+  ]);
+});

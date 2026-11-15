@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { vacancySchema, type Application } from "@/lib/api/schemas";
-import { groupAttendance, toRecordCount } from "@/lib/attendance/queue";
+import { groupAttendance, groupStage, toRecordCount } from "@/lib/attendance/queue";
 
 const NOW = new Date("2026-10-05T12:00:00.000Z");
 
@@ -178,4 +178,27 @@ it("offers the attendance queue from exactly one hour before the event", () => {
   } as Partial<Application>);
   expect(groupAttendance([accepted], new Date(NOW.getTime() - 1))[0]?.open).toBe(false);
   expect(groupAttendance([accepted], NOW)[0]?.open).toBe(true);
+});
+
+it("keeps a manually populated event in the attendance queue without applications", () => {
+  const event = vacancySchema.parse({
+    id: "manual",
+    slug: "manual",
+    title: "Manual event",
+    kind: "volunteering",
+    description: "Event",
+    region: "tashkent-city",
+    format: "onsite",
+    status: "open",
+    startsAt: "2026-10-01T09:00:00.000Z",
+    applicationDeadline: "2026-09-30T09:00:00.000Z",
+    createdAt: "2026-09-01T09:00:00.000Z",
+    updatedAt: "2026-09-01T09:00:00.000Z",
+    organizationId: "org",
+    manualAttendance: { total: 3, awaiting: 1, drafted: 1, resolved: 1 },
+  });
+  const groups = groupAttendance([], NOW, [event]);
+  expect(groups).toHaveLength(1);
+  expect(toRecordCount(groups[0]!)).toBe(1);
+  expect(groupStage(groups[0]!)).toBe("due");
 });

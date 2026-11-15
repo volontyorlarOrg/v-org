@@ -8,6 +8,7 @@ export type AttendanceGroup = {
   opensAt: Date | null;
   open: boolean;
   sheet: Vacancy["attendanceSheet"];
+  manual?: Vacancy["manualAttendance"];
   unresolved: Application[];
   resolved: Application[];
 };
@@ -50,6 +51,20 @@ export function groupAttendance(
     groups.set(vacancyId, group);
   }
 
+  for (const vacancy of vacancies) {
+    if (!vacancy.manualAttendance?.total) continue;
+    const group = groups.get(vacancy.id) ?? {
+      vacancyId: vacancy.id,
+      title: vacancy.title,
+      opensAt: attendanceOpensAt(vacancy),
+      open: isAttendanceOpen(vacancy, now),
+      sheet: vacancy.attendanceSheet,
+      unresolved: [],
+      resolved: [],
+    };
+    groups.set(vacancy.id, { ...group, manual: vacancy.manualAttendance });
+  }
+
   for (const group of groups.values()) {
     group.unresolved.sort((a, b) =>
       volunteerNameOf(a).localeCompare(volunteerNameOf(b)),
@@ -74,12 +89,20 @@ export function groupStage(group: AttendanceGroup): GroupStage {
   if (group.sheet?.status === "changes_requested") return "returned";
   if (group.sheet?.status === "submitted") return "verifying";
   if (group.sheet?.status === "verified" && !group.sheet.correction) return "verified";
-  if (!group.sheet && group.unresolved.length === 0) return "verified";
+  if (
+    !group.sheet &&
+    group.unresolved.length === 0 &&
+    !group.manual?.awaiting &&
+    !group.manual?.drafted
+  )
+    return "verified";
   return "due";
 }
 
 /** Rows with no outcome anywhere yet; a saved draft already has one. */
 export function toRecordCount(group: AttendanceGroup): number {
-  return group.unresolved.filter((application) => !application.attendance?.draftOutcome)
-    .length;
+  return (
+    group.unresolved.filter((application) => !application.attendance?.draftOutcome)
+      .length + (group.manual?.awaiting ?? 0)
+  );
 }

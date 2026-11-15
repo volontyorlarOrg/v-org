@@ -430,6 +430,7 @@ function reset() {
   ];
 
   state = {
+    manualAttendance: [],
     sessions: new Map(),
     vacancies,
     applications,
@@ -672,6 +673,28 @@ function presentVacancyListItem(item) {
   const acceptedRows = own.filter((row) => row.status === "accepted");
   return {
     ...presentVacancy(item),
+    manualAttendance: (() => {
+      const rows = state.manualAttendance.filter(
+        (row) => row.opportunityId === item.id,
+      );
+      if (!rows.length) return undefined;
+      return {
+        total: rows.length,
+        awaiting: rows.filter(
+          (row) =>
+            row.attendanceRecord.outcome === "awaiting_confirmation" &&
+            !row.attendanceRecord.draft,
+        ).length,
+        drafted: rows.filter(
+          (row) =>
+            row.attendanceRecord.outcome === "awaiting_confirmation" &&
+            row.attendanceRecord.draft,
+        ).length,
+        resolved: rows.filter(
+          (row) => row.attendanceRecord.outcome !== "awaiting_confirmation",
+        ).length,
+      };
+    })(),
     saved: item.saved,
     progress: {
       applications: own.filter((row) => row.status !== "draft").length,
@@ -742,9 +765,12 @@ function statistics() {
 
 function presentSheet(item) {
   const sheet = state.sheets.get(item.id);
-  const rows = state.applications.filter(
-    (row) => row.opportunityId === item.id && row.status === "accepted",
-  );
+  const rows = [
+    ...state.applications.filter(
+      (row) => row.opportunityId === item.id && row.status === "accepted",
+    ),
+    ...state.manualAttendance.filter((row) => row.opportunityId === item.id),
+  ];
   const now = new Date();
   const started = new Date(item.startsAt) <= now;
   const ended = new Date(item.endsAt ?? item.startsAt) <= now;
@@ -782,7 +808,8 @@ function presentSheet(item) {
       const person = VOLUNTEERS.find((candidate) => candidate.id === row.volunteerId);
       const record = row.attendanceRecord;
       return {
-        applicationId: row.id,
+        applicationId: row.manuallyAdded ? null : row.id,
+        manuallyAdded: Boolean(row.manuallyAdded),
         attendanceId: record.id,
         submittedAt: row.submittedAt,
         volunteer: {
@@ -1200,10 +1227,92 @@ route("POST", "/org/opportunities/:id/instructions/retry", ({ response, params }
   if (item) send(response, 200, presentInstructions(item));
 });
 
+route("POST", "/__return-attendance-correction", ({ response, body }) => {
+  const sheet = state.sheets.get(body.id);
+  Object.assign(sheet, {
+    status: "changes_requested",
+    reviewNote: "Check the replacement hours",
+  });
+  send(response, 200, { ok: true });
+});
+route("POST", "/__empty-attendance", ({ response, body }) => {
+  state.applications = state.applications.filter(
+    (row) => row.opportunityId !== body.id,
+  );
+  state.sheets.delete(body.id);
+  send(response, 200, { ok: true });
+});
 route("GET", "/org/opportunities/:id/attendance-sheet", ({ response, params }) => {
   const item = vacancyOr404(response, params[0]);
   if (item) send(response, 200, presentSheet(item));
 });
+route(
+  "POST",
+  "/org/opportunities/:id/attendance-sheet/volunteers/search",
+  ({ response, params, body }) => {
+    const item = vacancyOr404(response, params[0]);
+    if (!item) return;
+    const term = body.query.toLowerCase().replace(/^@/, "");
+    send(response, 200, {
+      items: VOLUNTEERS.filter((person) =>
+        `${person.displayName} ${person.username}`.toLowerCase().includes(term),
+      ).map(({ id, displayName, username }) => ({
+        id,
+        displayName,
+        username,
+        avatarUrl: null,
+      })),
+    });
+  },
+);
+route(
+  "POST",
+  "/org/opportunities/:id/attendance-sheet/correction",
+  ({ response, params }) => {
+    const item = vacancyOr404(response, params[0]);
+    if (!item) return;
+    const stored = state.sheets.get(item.id);
+    if (stored?.status !== "verified")
+      return fail(response, 409, "attendanceCorrectionNotAvailable");
+    Object.assign(stored, { status: "draft", correction: true });
+    send(response, 200, presentSheet(item));
+  },
+);
+route(
+  "POST",
+  "/org/opportunities/:id/attendance-sheet/volunteers",
+  ({ response, params, body }) => {
+    const item = vacancyOr404(response, params[0]);
+    if (!item) return;
+    const sheet = presentSheet(item);
+    if (sheet.status === "verified")
+      return fail(response, 409, "attendanceCorrectionRequired");
+    if (sheet.status === "submitted")
+      return fail(response, 409, "attendanceSheetSubmitted");
+    if (sheet.rows.some((row) => row.volunteer.id === body.volunteerId))
+      return fail(response, 409, "attendanceVolunteerAlreadyAdded");
+    const person = VOLUNTEERS.find((row) => row.id === body.volunteerId);
+    if (!person) return fail(response, 404, "volunteerNotFound");
+    state.manualAttendance.push({
+      opportunityId: item.id,
+      volunteerId: person.id,
+      manuallyAdded: true,
+      submittedAt: null,
+      attendanceRecord: {
+        id: randomUUID(),
+        outcome: "awaiting_confirmation",
+        confirmedHours: null,
+        placement: null,
+        note: null,
+        xpAwarded: 0,
+        resolvedAt: null,
+        draft: null,
+        reviewNote: null,
+      },
+    });
+    send(response, 200, presentSheet(item));
+  },
+);
 route(
   "PUT",
   "/org/opportunities/:id/attendance-sheet",
@@ -1216,7 +1325,11 @@ route(
     if (sheet.status === "submitted")
       return fail(response, 409, "attendanceSheetSubmitted");
     for (const entry of body.entries ?? []) {
-      const row = state.applications.find((row_) => row_.id === entry.applicationId);
+      const row = [...state.applications, ...state.manualAttendance].find((row_) =>
+        entry.attendanceId
+          ? row_.attendanceRecord?.id === entry.attendanceId
+          : row_.id === entry.applicationId,
+      );
       if (!row?.attendanceRecord) return fail(response, 404, "attendanceNotFound");
       row.attendanceRecord.draft = {
         outcome: entry.outcome,
@@ -1246,7 +1359,15 @@ route(
   ({ response, params }) => {
     const item = vacancyOr404(response, params[0]);
     if (!item) return;
-    for (const row of state.applications) {
+    const sheet = state.sheets.get(item.id);
+    if (sheet?.correction) {
+      state.manualAttendance = state.manualAttendance.filter(
+        (row) =>
+          row.opportunityId !== item.id || row.attendanceRecord.resolvedAt !== null,
+      );
+      Object.assign(sheet, { status: "verified", correction: false, reviewNote: null });
+    }
+    for (const row of [...state.applications, ...state.manualAttendance]) {
       if (row.opportunityId === item.id && row.attendanceRecord) {
         row.attendanceRecord.draft = null;
       }
@@ -1260,6 +1381,32 @@ route(
   ({ response, params, body }) => {
     const item = vacancyOr404(response, params[0]);
     if (!item) return;
+    const storedSheet = state.sheets.get(item.id);
+    if (storedSheet?.status === "submitted")
+      return fail(response, 409, "attendanceSheetSubmitted");
+    if (storedSheet?.correction && !body.note?.trim())
+      return fail(response, 409, "correctionReasonRequired");
+    const targets = (body.entries ?? []).map((entry) =>
+      [...state.applications, ...state.manualAttendance].find(
+        (row) =>
+          row.opportunityId === item.id &&
+          (entry.attendanceId
+            ? row.attendanceRecord?.id === entry.attendanceId
+            : row.id === entry.applicationId),
+      ),
+    );
+    if (targets.some((row) => !row)) return fail(response, 404, "attendanceNotFound");
+    for (const [index, entry] of (body.entries ?? []).entries()) {
+      targets[index].attendanceRecord.draft =
+        entry.outcome === null
+          ? null
+          : {
+              outcome: entry.outcome,
+              hours: entry.hours ?? null,
+              placement: entry.placement ?? null,
+              note: entry.note ?? null,
+            };
+    }
     const sheet = presentSheet(item);
     if (!sheet.ended) return fail(response, 409, "attendanceNotOpen");
     const unfinished = sheet.rows.filter(
@@ -1269,6 +1416,7 @@ route(
       return fail(response, 409, "attendanceIncomplete", {
         problems: unfinished.map((row) => ({
           applicationId: row.applicationId,
+          attendanceId: row.attendanceId,
           reason: "outcomeRequired",
         })),
       });
@@ -1518,6 +1666,8 @@ const OPEN_ROUTES = new Set([
   "/health/live",
   "/__reset",
   "/__organization",
+  "/__empty-attendance",
+  "/__return-attendance-correction",
   "/auth/org/login",
   "/auth/refresh",
 ]);
