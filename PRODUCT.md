@@ -16,7 +16,7 @@ Saving a published vacancy returns it to draft, off the volunteer app, until an 
 
 - **Decisions** are staged per applicant (accept, reject, hold) and reach applicants only through "Review and send", which rechecks withdrawn applications and capacity first. Hold keeps an application pending.
 - **Instructions** (a message and an optional Telegram group link) go to every accepted applicant through the bot and in-app, with per-person delivery status and an explicit retry that never duplicates a delivered message.
-- **Attendance** is a draft until the organization submits it. Hours and XP count only after an administrator verifies it; the administrator can return it with flagged rows. Corrections to verified results go through the same verification and re-score only the rows that changed.
+- **Attendance** and hour entry open one hour before the event starts. Saved attendance remains a draft until the organization submits it after the event ends. Hours and XP count only after an administrator verifies it; the administrator can return it with flagged rows. Corrections to verified results go through the same verification and re-score only the rows that changed.
 - **XP rewards** belong to each vacancy: XP per verified hour for volunteering, winner / contributor / attendee XP for competitions, and an unexcused no-show penalty. They can change until the vacancy is published.
 
 The dashboard, vacancy list, application list, attendance, activity, and volunteer directory reflect this same scope.

@@ -49,6 +49,7 @@ import {
   canEditVacancy,
   canSubmitForApproval,
   hasOpenedToVolunteers,
+  isAttendanceOpen,
   missingForApproval,
   vacancyStateOf,
 } from "@/lib/vacancies/approval";
@@ -156,19 +157,16 @@ export default async function VacancyPage({
       application.status === "submitted" || application.status === "under_review",
   );
 
-  // A vacancy opens on what needs doing: details until it is published,
-  // applications while it runs, attendance once the event has started. The other
-  // tabs would be dead ends until a vacancy has been in front of volunteers.
   const opened = hasOpenedToVolunteers(vacancy, rows.length);
   const published = state === "approved" || state === "archived";
-  const started = new Date(vacancy.startsAt) <= now;
+  const attendanceOpen = isAttendanceOpen(vacancy, now);
   const tab: VacancyTab = !opened
     ? "details"
     : isVacancyTab(requestedTab)
       ? requestedTab
       : !published
         ? "details"
-        : started && accepted.length > 0
+        : attendanceOpen && accepted.length > 0
           ? "attendance"
           : "applications";
   const tabHref = (value: VacancyTab) => `${vacancyHref(vacancy.id)}?tab=${value}`;

@@ -769,12 +769,15 @@ function presentSheet(item) {
     reviewedAt: sheet?.reviewedAt ?? null,
     reviewNote: sheet?.reviewNote ?? null,
     verifiedAt: sheet?.verifiedAt ?? null,
-    opensAt: item.startsAt,
+    opensAt: new Date(Date.parse(item.startsAt) - 60 * 60 * 1000).toISOString(),
     submittableAt: item.endsAt ?? item.startsAt,
     started,
     ended,
     requiresVerification: true,
-    editable: started && !item.archivedAt && status !== "submitted",
+    editable:
+      now.getTime() >= Date.parse(item.startsAt) - 60 * 60 * 1000 &&
+      !item.archivedAt &&
+      status !== "submitted",
     rows: rows.map((row) => {
       const person = VOLUNTEERS.find((candidate) => candidate.id === row.volunteerId);
       const record = row.attendanceRecord;
@@ -1208,7 +1211,8 @@ route(
     const item = vacancyOr404(response, params[0]);
     if (!item) return;
     const sheet = presentSheet(item);
-    if (!sheet.started) return fail(response, 409, "attendanceNotOpen");
+    if (Date.now() < Date.parse(sheet.opensAt))
+      return fail(response, 409, "attendanceNotOpen");
     if (sheet.status === "submitted")
       return fail(response, 409, "attendanceSheetSubmitted");
     for (const entry of body.entries ?? []) {
@@ -1531,6 +1535,16 @@ const server = createServer(async (request, response) => {
   if (path === "/__reset" && method === "POST") {
     reset();
     return send(response, 200, { ok: true });
+  }
+
+  if (path === "/__stub/attendance-timing" && method === "POST") {
+    const item = state.vacancies.find((candidate) => candidate.id === body.vacancyId);
+    if (!item) return send(response, 404, { code: "opportunityNotFound" });
+    item.startsAt = new Date(
+      Date.now() + body.minutesUntilStart * 60 * 1000,
+    ).toISOString();
+    item.endsAt = new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString();
+    return send(response, 200, item);
   }
 
   if (path === "/__organization" && method === "POST") {

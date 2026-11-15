@@ -276,7 +276,7 @@ export function AttendanceDesk({
     );
   }
 
-  if (!view.started) {
+  if (!view.started && !view.editable) {
     return (
       <section className="sheet px-5 py-12 text-center">
         <p className="text-section text-ink">{t("notOpen.title")}</p>
