@@ -36,3 +36,9 @@ Applicant data can include minors. Do not put personal data or tokens in URLs, l
 ## Out of scope for the first release
 
 Organization self-registration, multiple organization users, self-service password change, adding volunteers to Telegram groups on their behalf, and access to other organizations' vacancies.
+
+### Manually added attendance
+
+From one hour before an event starts, the attendance desk can search registered users by name or platform username and add a replacement. Added people carry a Manually added label and start unrecorded, with no hours or XP. Duplicate participants are blocked, including linked accounts. The organizer records attendance and actual hours and submits through the existing administrator verification process. Verified sheets require Request a correction first; additions then require re-verification. Original no-shows and application decisions stay unchanged. Cancelling a correction removes its unverified additions.
+
+Attendance edits are submitted atomically with the correction reason. Cancelling a returned correction restores the previous verified results. Invalid typed hours must be corrected before adding someone else, so opening the picker cannot erase them. A volunteer already present in attendance cannot be added again through a later acceptance decision.

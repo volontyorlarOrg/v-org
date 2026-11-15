@@ -205,7 +205,8 @@
     "finishBeforeStart": "The finish must come after the start.",
     "scheduleTooLong": "A vacancy can last up to 31 days.",
     "invalidOpportunitySchedule": "Those days and times do not fit together. Check the schedule.",
-    "coverImageTooLarge": "Choose an image under 15 MB."
+    "coverImageTooLarge": "Choose an image under 15 MB.",
+    "attendanceVolunteerAlreadyAdded": "This volunteer is already in attendance. Review their result on the Attendance tab."
   },
   "vacancies": {
     "title": "Vacancies",
@@ -1071,7 +1072,8 @@
       "opportunity_image_updated": "Vacancy photo changed",
       "opportunity_image_removed": "Vacancy photo removed",
       "opportunity_instructions_sent": "Instructions sent to accepted volunteers",
-      "past_event_roster_participants_added": "Participants added to a past event"
+      "past_event_roster_participants_added": "Participants added to a past event",
+      "attendance_volunteer_added": "Added a volunteer to attendance"
     },
     "you": "You",
     "families": {
@@ -1251,9 +1253,9 @@
       }
     },
     "sheet": {
-      "title": "{count, plural, one {# accepted volunteer} other {# accepted volunteers}}",
+      "title": "{count, plural, one {# volunteer} other {# volunteers}}",
       "titleCompetition": "{count, plural, one {# participant} other {# participants}}",
-      "caption": "Attendance of accepted volunteers",
+      "caption": "Volunteer attendance",
       "status": {
         "draft": "Draft",
         "submitted": "Awaiting verification",
@@ -1332,11 +1334,12 @@
         "saved": "All changes saved.",
         "save": "Save draft",
         "submit": "Review and submit",
-        "apply": "Review and apply"
+        "apply": "Review and apply",
+        "awaitingSubmission": "Waiting for the organizer to submit these results for verification."
       },
       "empty": {
-        "title": "No accepted volunteers",
-        "description": "Attendance is recorded for the applicants you accept."
+        "title": "No volunteers yet",
+        "description": "Accepted volunteers appear here. You can also add a registered user who participated."
       },
       "notOpen": {
         "title": "Attendance opens one hour before the event starts",
@@ -1373,14 +1376,30 @@
           "correction_submitted": "Correction submitted",
           "changes_requested": "Changes requested",
           "verified": "Verified",
-          "applied": "Recorded by an administrator"
+          "applied": "Recorded by an administrator",
+          "volunteer_added": "Volunteer added manually"
         }
       },
       "savedToast": "Draft saved.",
       "discardedToast": "Correction cancelled.",
       "submittedToast": "Submitted for verification.",
       "appliedToast": "Results applied. Hours and XP were added.",
-      "incompleteNames": "Still to record: {names}."
+      "incompleteNames": "Still to record: {names}.",
+      "manuallyAdded": "Manually added",
+      "addVolunteer": {
+        "title": "Add volunteer",
+        "description": "Find a registered user. After adding them, record their attendance and actual hours, then submit for verification.",
+        "searchLabel": "Name or username",
+        "search": "Search",
+        "pending": "Please wait…",
+        "empty": "No registered users found.",
+        "select": "Select a volunteer",
+        "alreadyAdded": "Already added",
+        "cancel": "Cancel",
+        "close": "Close",
+        "add": "Add",
+        "success": "Volunteer added. Attendance is not recorded yet."
+      }
     },
     "finish": {
       "titleSubmit": "Submit attendance for verification?",
@@ -1469,8 +1488,8 @@
       "instructionsNotFound": "No instructions have been sent yet.",
       "telegramGroupLinkInvalid": "Use a Telegram link such as https://t.me/your_group.",
       "attendanceNotOpen": "Attendance is not open yet.",
-      "attendanceSheetSubmitted": "These results are with an administrator and cannot be changed now.",
-      "attendanceSheetNotSubmitted": "These results have not been submitted.",
+      "attendanceSheetSubmitted": "Attendance is awaiting verification.",
+      "attendanceSheetNotSubmitted": "The organizer must submit these results before they can be verified.",
       "attendanceNoChanges": "Nothing differs from the verified results.",
       "correctionReasonRequired": "Explain what changes and why.",
       "attendanceIncomplete": "Some rows still need an outcome or hours.",
@@ -1481,7 +1500,12 @@
       "duplicateAttendanceApplication": "A volunteer was listed twice.",
       "competitionHoursNotAllowed": "Competitions record outcomes, not hours.",
       "opportunityRewardsLocked": "Rewards are fixed once the vacancy is published.",
-      "opportunityNotEditable": "This vacancy cannot be edited now."
+      "opportunityNotEditable": "This vacancy cannot be edited now.",
+      "attendanceVolunteerAlreadyAdded": "This volunteer is already in attendance. Review their result on the Attendance tab.",
+      "attendanceCorrectionRequired": "Request a correction before adding volunteers to verified attendance.",
+      "volunteerNotFound": "This registered user is unavailable.",
+      "attendanceCorrectionNotAvailable": "A correction is only available for verified attendance.",
+      "attendanceInvalidHours": "Correct the invalid hours in the attendance list before adding a volunteer."
     },
     "list": {
       "staged": "{decision} · not sent",

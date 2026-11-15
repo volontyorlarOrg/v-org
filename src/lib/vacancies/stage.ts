@@ -87,7 +87,7 @@ export function nextStepOf(vacancy: VacancyListItem, now: Date): NextStep {
     case "published":
       return step("manage", tab("applications"), progress.awaitingReview > 0);
     case "ended":
-      return progress.accepted > 0
+      return progress.accepted > 0 || (vacancy.manualAttendance?.total ?? 0) > 0
         ? step("attendance", tab("attendance"), true)
         : step("open", detail);
     case "results_returned":
