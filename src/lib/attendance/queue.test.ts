@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { vacancySchema, type Application } from "@/lib/api/schemas";
-import { groupAttendance, toRecordCount } from "@/lib/attendance/queue";
+import { groupAttendance, groupStage, toRecordCount } from "@/lib/attendance/queue";
 
 const NOW = new Date("2026-10-05T12:00:00.000Z");
 
@@ -63,7 +63,7 @@ describe("groupAttendance", () => {
     expect(groups[0]?.resolved.map((item) => item.id)).toEqual(["b"]);
   });
 
-  it("keeps a vacancy shut until its event has ended", () => {
+  it("keeps a vacancy shut more than one hour before its event starts", () => {
     const future = application("a", "v1", {
       opportunity: {
         id: "v1",
@@ -77,7 +77,7 @@ describe("groupAttendance", () => {
     expect(groupAttendance([future], NOW)[0]?.open).toBe(false);
   });
 
-  it("falls back to the start when a legacy record carries no end", () => {
+  it("opens one hour before the start when a legacy record carries no end", () => {
     const legacy = application("a", "v1", {
       opportunity: {
         id: "v1",
@@ -88,7 +88,7 @@ describe("groupAttendance", () => {
     } as Partial<Application>);
 
     const group = groupAttendance([legacy], NOW)[0];
-    expect(group?.opensAt?.toISOString()).toBe("2026-10-01T09:00:00.000Z");
+    expect(group?.opensAt?.toISOString()).toBe("2026-10-01T08:00:00.000Z");
     expect(group?.open).toBe(true);
   });
 
@@ -116,7 +116,7 @@ describe("groupAttendance", () => {
     const [group] = groupAttendance([listed], NOW, [vacancy]);
     expect(group?.open).toBe(false);
     expect(group?.title).toBe("Library day");
-    expect(group?.opensAt?.toISOString()).toBe("2026-11-01T15:00:00.000Z");
+    expect(group?.opensAt?.toISOString()).toBe("2026-11-01T08:00:00.000Z");
   });
 
   it("never calls a roll call due when the event's timing is unknown", () => {
@@ -164,4 +164,41 @@ describe("toRecordCount", () => {
     );
     expect(group && toRecordCount(group)).toBe(1);
   });
+});
+
+it("offers the attendance queue from exactly one hour before the event", () => {
+  const accepted = application("early", "v-early", {
+    opportunity: {
+      id: "v-early",
+      slug: "v-early",
+      title: "Early roll call",
+      startsAt: "2026-10-05T13:00:00.000Z",
+      endsAt: "2026-10-05T17:00:00.000Z",
+    },
+  } as Partial<Application>);
+  expect(groupAttendance([accepted], new Date(NOW.getTime() - 1))[0]?.open).toBe(false);
+  expect(groupAttendance([accepted], NOW)[0]?.open).toBe(true);
+});
+
+it("keeps a manually populated event in the attendance queue without applications", () => {
+  const event = vacancySchema.parse({
+    id: "manual",
+    slug: "manual",
+    title: "Manual event",
+    kind: "volunteering",
+    description: "Event",
+    region: "tashkent-city",
+    format: "onsite",
+    status: "open",
+    startsAt: "2026-10-01T09:00:00.000Z",
+    applicationDeadline: "2026-09-30T09:00:00.000Z",
+    createdAt: "2026-09-01T09:00:00.000Z",
+    updatedAt: "2026-09-01T09:00:00.000Z",
+    organizationId: "org",
+    manualAttendance: { total: 3, awaiting: 1, drafted: 1, resolved: 1 },
+  });
+  const groups = groupAttendance([], NOW, [event]);
+  expect(groups).toHaveLength(1);
+  expect(toRecordCount(groups[0]!)).toBe(1);
+  expect(groupStage(groups[0]!)).toBe("due");
 });

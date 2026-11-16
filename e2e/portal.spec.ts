@@ -328,7 +328,7 @@ test.describe("applicants and attendance", () => {
   }) => {
     await signIn(page);
     await page.goto(`/en/vacancies/${CITY_SPORTS_DAY}?tab=attendance`);
-    const sheet = page.getByRole("region", { name: "3 accepted volunteers" });
+    const sheet = page.getByRole("region", { name: "3 volunteers" });
     const search = sheet.getByRole("searchbox", { name: "Search by name or username" });
     const first = sheet.getByRole("combobox", {
       name: "Attendance of Dilnoza Karimova",
@@ -368,7 +368,7 @@ test.describe("applicants and attendance", () => {
   }) => {
     await signIn(page);
     await page.goto(`/en/vacancies/${CITY_SPORTS_DAY}?tab=attendance`);
-    const sheet = page.getByRole("region", { name: "3 accepted volunteers" });
+    const sheet = page.getByRole("region", { name: "3 volunteers" });
     const link = sheet.getByRole("link", {
       name: "View profile of Dilnoza Karimova (opens in a new tab)",
     });
@@ -494,4 +494,220 @@ test.describe("my activity", () => {
     );
     await expect(page.locator("main")).not.toContainText("attendance.submitted");
   });
+});
+
+test("saves attendance and hours within one hour before the event starts", async ({
+  page,
+}) => {
+  await signIn(page);
+  const vacancyId = CITY_SPORTS_DAY;
+  const attendanceUrl = `/en/vacancies/${vacancyId}?tab=attendance`;
+  await page.request.post(`${STUB}/__stub/attendance-timing`, {
+    data: { vacancyId, minutesUntilStart: 61 },
+  });
+  await page.goto(attendanceUrl);
+  await expect(
+    page.getByText("Attendance opens one hour before the event starts"),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Save draft" })).toHaveCount(0);
+
+  await page.request.post(`${STUB}/__stub/attendance-timing`, {
+    data: { vacancyId, minutesUntilStart: 30 },
+  });
+  await page.goto("/en/attendance");
+  const due = page.locator("#due");
+  await due.locator(`a[href$="${vacancyId}?tab=attendance"]`).click();
+  await page.goto(`/en/vacancies/${vacancyId}`);
+  await page
+    .getByLabel("Attendance of Sardor Toshmatov")
+    .filter({ visible: true })
+    .selectOption("attended");
+  await page
+    .getByLabel("Hours worked by Sardor Toshmatov")
+    .filter({ visible: true })
+    .fill("4");
+  await page.getByRole("button", { name: "Save draft" }).click();
+  await expect(page.getByText("Draft saved.", { exact: true }).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "Review and submit" })).toBeDisabled();
+  await page.reload();
+  await expect(
+    page.getByLabel("Attendance of Sardor Toshmatov").filter({ visible: true }),
+  ).toHaveValue("attended");
+  await expect(
+    page.getByLabel("Hours worked by Sardor Toshmatov").filter({ visible: true }),
+  ).toHaveValue("4");
+  for (const theme of ["light", "dark"]) {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page
+      .context()
+      .addCookies([{ name: "theme", value: theme, url: new URL(page.url()).origin }]);
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+    await expect(
+      page.getByLabel("Hours worked by Sardor Toshmatov").filter({ visible: true }),
+    ).toHaveValue("4");
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: test.info().outputPath(`early-attendance-${theme}.png`),
+      fullPage: true,
+    });
+  }
+});
+
+test.describe("manual attendance", () => {
+  test("adds to an empty roster and keeps the event in the attendance queue", async ({
+    page,
+    request,
+  }) => {
+    await request.post(`${STUB}/__empty-attendance`, { data: { id: CITY_SPORTS_DAY } });
+    await signIn(page);
+    await page.goto(`/en/vacancies/${CITY_SPORTS_DAY}?tab=attendance`, {
+      waitUntil: "networkidle",
+    });
+    await expect(page.getByText("No volunteers yet", { exact: true })).toBeVisible();
+    await page.getByRole("button", { name: "Add volunteer", exact: true }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog.getByLabel("Name or username").fill("Nodira");
+    await dialog.getByRole("button", { name: "Search", exact: true }).click();
+    await dialog.getByRole("radio").check();
+    await dialog.getByRole("button", { name: "Add", exact: true }).click();
+    await expect(page.getByText("Manually added", { exact: true })).toBeVisible();
+    // No application means no profile this organization may open.
+    await expect(page.getByRole("link", { name: /^View profile of / })).toHaveCount(0);
+    await page.goto("/en/attendance", { waitUntil: "networkidle" });
+    await expect(
+      page.locator("main").getByRole("link", { name: "City sports day", exact: true }),
+    ).toBeVisible();
+    await page.goto("/en/dashboard", { waitUntil: "networkidle" });
+    await expect(
+      page.getByRole("link", { name: "City sports day", exact: true }),
+    ).toBeVisible();
+  });
+
+  test("adds a replacement unrecorded, preserves edits, and submits actual hours for verification", async ({
+    page,
+  }) => {
+    await signIn(page);
+    await page.goto(`/en/vacancies/${CITY_SPORTS_DAY}?tab=attendance`, {
+      waitUntil: "networkidle",
+    });
+    await page.getByLabel("Attendance of Dilnoza Karimova").selectOption("no_show");
+    await page.getByLabel("Attendance of Sardor Toshmatov").selectOption("excused");
+    await page.getByRole("button", { name: "Add volunteer", exact: true }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog.getByLabel("Name or username").fill("Dilnoza");
+    await dialog.getByRole("button", { name: "Search", exact: true }).click();
+    await expect(dialog.getByText("Already added")).toBeVisible();
+    await expect(dialog.getByRole("radio")).toBeDisabled();
+    await dialog.getByLabel("Name or username").fill("nodira_a");
+    await dialog.getByRole("button", { name: "Search", exact: true }).click();
+    await dialog.getByRole("radio").check();
+    await dialog.getByRole("button", { name: "Add", exact: true }).click();
+    await expect(page.getByText("Manually added", { exact: true })).toBeVisible();
+    await expect(page.getByLabel("Attendance of Dilnoza Karimova")).toHaveValue(
+      "no_show",
+    );
+    await expect(page.getByLabel("Attendance of Nodira Alimova")).toHaveValue("");
+    await page.getByLabel("Attendance of Nodira Alimova").selectOption("attended");
+    await page.getByLabel("Hours worked by Nodira Alimova").fill("2.5");
+    await page.getByRole("button", { name: "Review and submit" }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: /^(Submit|Send)/ })
+      .click();
+    await expect(page.locator("main")).toContainText("Awaiting verification");
+    await expect(
+      page.getByRole("button", { name: "Add volunteer", exact: true }),
+    ).toHaveCount(0);
+  });
+
+  test("requires Request a correction before adding to verified attendance", async ({
+    page,
+  }) => {
+    await signIn(page);
+    await page.goto(`/en/vacancies/${vacancy(10)}?tab=attendance`, {
+      waitUntil: "networkidle",
+    });
+    await expect(
+      page.getByRole("button", { name: "Add volunteer", exact: true }),
+    ).toHaveCount(0);
+    await page
+      .getByRole("button", { name: "Request a correction", exact: true })
+      .click();
+    await page.getByRole("button", { name: "Add volunteer", exact: true }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog.getByLabel("Name or username").fill("Nodira");
+    await dialog.getByRole("button", { name: "Search", exact: true }).click();
+    await dialog.getByRole("radio").check();
+    await dialog.getByRole("button", { name: "Add", exact: true }).click();
+    await expect(page.getByLabel("Attendance of Nodira Alimova")).toHaveValue("");
+    await expect(page.getByLabel("Attendance of Aziza Nazarova")).toHaveValue(
+      "no_show",
+    );
+    await expect(page.locator("main")).toContainText("Manually added");
+  });
+});
+
+test("keeps invalid typed hours when adding is blocked", async ({ page }) => {
+  await signIn(page);
+  await page.goto(`/en/vacancies/${CITY_SPORTS_DAY}?tab=attendance`, {
+    waitUntil: "networkidle",
+  });
+  await page.getByLabel("Hours worked by Aziza Nazarova").fill("wrong");
+  await page.getByRole("button", { name: "Add volunteer", exact: true }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Name or username").fill("@n");
+  await expect(
+    dialog.getByRole("button", { name: "Search", exact: true }),
+  ).toBeDisabled();
+  await dialog.getByLabel("Name or username").fill("@Nodira");
+  await dialog.getByRole("button", { name: "Search", exact: true }).click();
+  await dialog.getByRole("radio").check();
+  await dialog.getByRole("button", { name: "Add", exact: true }).click();
+  await expect(
+    page.getByText(
+      "Correct the invalid hours in the attendance list before adding a volunteer.",
+    ),
+  ).toBeVisible();
+  await dialog.getByRole("button", { name: "Cancel", exact: true }).click();
+  await expect(page.getByLabel("Hours worked by Aziza Nazarova")).toHaveValue("wrong");
+  await expect(page.getByText("Manually added", { exact: true })).toHaveCount(0);
+});
+
+test("cancels a returned correction and removes its unverified replacement", async ({
+  page,
+  request,
+}) => {
+  await signIn(page);
+  const id = vacancy(10);
+  await page.goto(`/en/vacancies/${id}?tab=attendance`, { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Request a correction", exact: true }).click();
+  await page.getByRole("button", { name: "Add volunteer", exact: true }).click();
+  let dialog = page.getByRole("dialog");
+  await dialog.getByLabel("Name or username").fill("Nodira");
+  await dialog.getByRole("button", { name: "Search", exact: true }).click();
+  await dialog.getByRole("radio").check();
+  await dialog.getByRole("button", { name: "Add", exact: true }).click();
+  await page.getByLabel("Attendance of Nodira Alimova").selectOption("attended");
+  await page.getByLabel("Hours worked by Nodira Alimova").fill("3");
+  await page.getByRole("button", { name: "Review and submit", exact: true }).click();
+  dialog = page.getByRole("dialog");
+  await dialog.getByRole("textbox").fill("Replacement participated");
+  await dialog.getByRole("button", { name: /^(Submit|Send)/ }).click();
+  await expect(page.locator("main")).toContainText("Awaiting verification");
+  const returned = await request.post(`${STUB}/__return-attendance-correction`, {
+    data: { id },
+  });
+  expect(returned.ok()).toBe(true);
+  await page.reload({ waitUntil: "networkidle" });
+  await expect(page.getByText("Check the replacement hours")).toBeVisible();
+  await page.getByRole("button", { name: "Cancel correction", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Request a correction", exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Manually added", { exact: true })).toHaveCount(0);
 });
