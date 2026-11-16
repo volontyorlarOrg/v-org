@@ -45,14 +45,15 @@ export default async function ApplicationPage({
   const { locale, id } = await params;
   setRequestLocale(locale);
 
-  const [t, attendanceCopy, common, vocabulary, format, vacanciesCopy] = await Promise.all([
-    getTranslations("applications"),
-    getTranslations("attendance"),
-    getTranslations("common"),
-    getTranslations("vocabulary"),
-    getFormatter(),
-    getTranslations("vacancies"),
-  ]);
+  const [t, attendanceCopy, common, vocabulary, format, vacanciesCopy] =
+    await Promise.all([
+      getTranslations("applications"),
+      getTranslations("attendance"),
+      getTranslations("common"),
+      getTranslations("vocabulary"),
+      getFormatter(),
+      getTranslations("vacancies"),
+    ]);
   const languages = new Intl.DisplayNames([locale], { type: "language" });
   const back = { href: navHref("vacancies"), label: vacanciesCopy("title") };
 
@@ -313,7 +314,11 @@ export default async function ApplicationPage({
           ) : null}
 
           {snapshot ? (
-            <Panel title={t("detail.snapshot")} description={t("detail.snapshotNote")}>
+            <Panel
+              id="profile"
+              title={t("detail.snapshot")}
+              description={t("detail.snapshotNote")}
+            >
               <VolunteerProfile
                 identity={{
                   name,
