@@ -323,6 +323,70 @@ test.describe("a vacancy from draft to approval", () => {
 });
 
 test.describe("applicants and attendance", () => {
+  test("searches attendance without losing edits and selects only matching volunteers", async ({
+    page,
+  }) => {
+    await signIn(page);
+    await page.goto(`/en/vacancies/${CITY_SPORTS_DAY}?tab=attendance`);
+    const sheet = page.getByRole("region", { name: "3 volunteers" });
+    const search = sheet.getByRole("searchbox", { name: "Search by name or username" });
+    const first = sheet.getByRole("combobox", {
+      name: "Attendance of Dilnoza Karimova",
+    });
+    const second = sheet.getByRole("combobox", {
+      name: "Attendance of Sardor Toshmatov",
+    });
+    await first.selectOption("excused");
+    await sheet
+      .getByRole("checkbox", { name: "Select Dilnoza Karimova", exact: true })
+      .check();
+    await search.fill("  Sardor Toshmatov  ");
+    await expect(first).toHaveCount(0);
+    await expect(second).toBeVisible();
+    await expect(sheet.getByRole("toolbar")).toHaveCount(0);
+    await sheet
+      .getByRole("checkbox", { name: "Select every matching volunteer" })
+      .check();
+    await sheet.getByRole("button", { name: "No-show", exact: true }).click();
+    await search.fill("");
+    await expect(first).toHaveValue("excused");
+    await expect(second).toHaveValue("no_show");
+    await search.fill("@dilnoza");
+    await expect(first).toBeVisible();
+    await expect(second).toHaveCount(0);
+    await expect(sheet.getByRole("status")).toHaveText("Showing 1 of 3");
+    await search.fill("no-matching-volunteer");
+    await expect(sheet.getByText("No volunteers match this search.")).toBeVisible();
+    await sheet.getByRole("button", { name: "Clear search" }).click();
+    await expect(first).toHaveValue("excused");
+    await expect(second).toHaveValue("no_show");
+  });
+
+  test("opens the submitted volunteer profile from attendance in a new tab", async ({
+    page,
+    context,
+  }) => {
+    await signIn(page);
+    await page.goto(`/en/vacancies/${CITY_SPORTS_DAY}?tab=attendance`);
+    const sheet = page.getByRole("region", { name: "3 volunteers" });
+    const link = sheet.getByRole("link", {
+      name: "View profile of Dilnoza Karimova (opens in a new tab)",
+    });
+    await expect(link).toHaveAttribute(
+      "href",
+      /\/en\/applications\/[0-9a-f-]+#profile$/,
+    );
+    const popupPromise = context.waitForEvent("page");
+    await link.click();
+    const profile = await popupPromise;
+    await expect(
+      profile.getByRole("heading", { name: "Profile as submitted" }),
+    ).toBeVisible();
+    await expect(profile.locator("#profile")).toContainText("Dilnoza Karimova");
+    await expect(page.getByRole("searchbox")).toBeVisible();
+    await profile.close();
+  });
+
   test("stages a decision and sends it only through the review", async ({ page }) => {
     await signIn(page);
     await page.goto(`/en/vacancies/${WINTER_FAIR}?tab=applications`, {
@@ -512,6 +576,8 @@ test.describe("manual attendance", () => {
     await dialog.getByRole("radio").check();
     await dialog.getByRole("button", { name: "Add", exact: true }).click();
     await expect(page.getByText("Manually added", { exact: true })).toBeVisible();
+    // No application means no profile this organization may open.
+    await expect(page.getByRole("link", { name: /^View profile of / })).toHaveCount(0);
     await page.goto("/en/attendance", { waitUntil: "networkidle" });
     await expect(
       page.locator("main").getByRole("link", { name: "City sports day", exact: true }),
@@ -531,6 +597,8 @@ test.describe("manual attendance", () => {
     });
     await page.getByLabel("Attendance of Dilnoza Karimova").selectOption("no_show");
     await page.getByLabel("Attendance of Sardor Toshmatov").selectOption("excused");
+    const search = page.getByRole("searchbox", { name: "Search by name or username" });
+    await search.fill("Dilnoza");
     await page.getByRole("button", { name: "Add volunteer", exact: true }).click();
     const dialog = page.getByRole("dialog");
     await dialog.getByLabel("Name or username").fill("Dilnoza");
@@ -542,6 +610,7 @@ test.describe("manual attendance", () => {
     await dialog.getByRole("radio").check();
     await dialog.getByRole("button", { name: "Add", exact: true }).click();
     await expect(page.getByText("Manually added", { exact: true })).toBeVisible();
+    await expect(search).toHaveValue("");
     await expect(page.getByLabel("Attendance of Dilnoza Karimova")).toHaveValue(
       "no_show",
     );
