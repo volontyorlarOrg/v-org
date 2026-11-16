@@ -77,7 +77,10 @@ export default async function AttendancePage({
   const returned = (group: AttendanceGroup) =>
     stageOf.get(group.vacancyId) === "returned";
   const recordedCount = (group: AttendanceGroup) =>
-    group.resolved.length + group.unresolved.length - toRecordCount(group);
+    group.resolved.length +
+    group.unresolved.length +
+    (group.manual?.total ?? 0) -
+    toRecordCount(group);
   const dueScale = Math.max(
     1,
     ...due.map((group) => waited(group.opensAt, now)?.days ?? 0),
@@ -126,7 +129,7 @@ export default async function AttendancePage({
                     })
                   : t("queue.opensUnknown")
                 : group.opensAt
-                  ? t("queue.ended", { when: format.relativeTime(group.opensAt, now) })
+                  ? t("queue.opened", { when: format.relativeTime(group.opensAt, now) })
                   : undefined
             }
           />

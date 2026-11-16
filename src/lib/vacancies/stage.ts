@@ -1,6 +1,6 @@
 import type { VacancyListItem } from "@/lib/api/schemas";
 import { vacancyEditHref, vacancyHref } from "@/lib/routing/routes";
-import { isAttendanceOpen, vacancyStateOf } from "@/lib/vacancies/approval";
+import { hasEventEnded, vacancyStateOf } from "@/lib/vacancies/approval";
 
 /** Where a vacancy stands from the organization's point of view. */
 export const LIST_STAGES = [
@@ -52,7 +52,7 @@ export function progressOf(vacancy: VacancyListItem) {
 export function stageOf(vacancy: VacancyListItem, now: Date): ListStage {
   const state = vacancyStateOf(vacancy);
   if (state !== "approved") return state;
-  if (!isAttendanceOpen(vacancy, now)) return "published";
+  if (!hasEventEnded(vacancy, now)) return "published";
   const sheet = vacancy.attendanceSheet;
   if (sheet?.status === "changes_requested") return "results_returned";
   if (sheet?.status === "submitted") return "verifying";
@@ -87,7 +87,7 @@ export function nextStepOf(vacancy: VacancyListItem, now: Date): NextStep {
     case "published":
       return step("manage", tab("applications"), progress.awaitingReview > 0);
     case "ended":
-      return progress.accepted > 0
+      return progress.accepted > 0 || (vacancy.manualAttendance?.total ?? 0) > 0
         ? step("attendance", tab("attendance"), true)
         : step("open", detail);
     case "results_returned":

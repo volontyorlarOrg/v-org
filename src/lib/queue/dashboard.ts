@@ -2,8 +2,8 @@ import type { Application, Organization, Vacancy } from "@/lib/api/schemas";
 import { isSameTashkentDay } from "@/lib/datetime";
 import {
   approvalCandidateOf,
-  attendanceOpensAt,
-  isAttendanceOpen,
+  eventEndsAt,
+  hasEventEnded,
   missingForApproval,
   vacancyStateOf,
   type ApprovalRequirement,
@@ -140,7 +140,7 @@ export function rollCallsDue(
       startsAt: application.opportunity?.startsAt ?? "",
       endsAt: application.opportunity?.endsAt,
     };
-    if (!timing.startsAt || !isAttendanceOpen(timing, now)) continue;
+    if (!timing.startsAt || !hasEventEnded(timing, now)) continue;
     const sheet = vacancy?.attendanceSheet;
     if (sheet?.status === "submitted") continue;
     if (sheet?.status === "verified" && !sheet.correction) continue;
@@ -149,7 +149,7 @@ export function rollCallsDue(
       vacancyId: application.opportunityId,
       title:
         vacancy?.title ?? application.opportunity?.title ?? application.opportunityId,
-      endedAt: attendanceOpensAt(timing),
+      endedAt: eventEndsAt(timing),
       awaiting: 0,
       drafted: 0,
       resolved: 0,
@@ -161,6 +161,28 @@ export function rollCallsDue(
     else if (draft && draft !== "awaiting_confirmation") call.drafted += 1;
     else call.awaiting += 1;
     calls.set(application.opportunityId, call);
+  }
+
+  for (const vacancy of vacancies) {
+    const manual = vacancy.manualAttendance;
+    if (!manual?.total || !hasEventEnded(vacancy, now)) continue;
+    if (
+      vacancy.attendanceSheet?.status === "submitted" ||
+      vacancy.attendanceSheet?.status === "verified"
+    )
+      continue;
+    const call = calls.get(vacancy.id) ?? {
+      vacancyId: vacancy.id,
+      title: vacancy.title,
+      endedAt: eventEndsAt(vacancy),
+      awaiting: 0,
+      drafted: 0,
+      resolved: 0,
+    };
+    call.awaiting += manual.awaiting;
+    call.drafted += manual.drafted;
+    call.resolved += manual.resolved;
+    calls.set(vacancy.id, call);
   }
 
   return [...calls.values()]

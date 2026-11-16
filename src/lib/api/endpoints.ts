@@ -134,6 +134,21 @@ export const endpoints = {
     path: "/org/opportunities/{id}/attendance-sheet",
     contract: "published",
   },
+  searchAttendanceVolunteers: {
+    method: "POST",
+    path: "/org/opportunities/{id}/attendance-sheet/volunteers/search",
+    contract: "published",
+  },
+  addAttendanceVolunteer: {
+    method: "POST",
+    path: "/org/opportunities/{id}/attendance-sheet/volunteers",
+    contract: "published",
+  },
+  startAttendanceCorrection: {
+    method: "POST",
+    path: "/org/opportunities/{id}/attendance-sheet/correction",
+    contract: "published",
+  },
   saveAttendanceDraft: {
     method: "PUT",
     path: "/org/opportunities/{id}/attendance-sheet",
