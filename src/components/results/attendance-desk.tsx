@@ -300,6 +300,8 @@ export function AttendanceDesk({
         onAdded={(next) => {
           adopt(next);
           setEditing(true);
+          // A search left from before would hide the volunteer just added.
+          setQuery("");
         }}
       />
     ) : null;

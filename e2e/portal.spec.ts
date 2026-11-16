@@ -597,6 +597,8 @@ test.describe("manual attendance", () => {
     });
     await page.getByLabel("Attendance of Dilnoza Karimova").selectOption("no_show");
     await page.getByLabel("Attendance of Sardor Toshmatov").selectOption("excused");
+    const search = page.getByRole("searchbox", { name: "Search by name or username" });
+    await search.fill("Dilnoza");
     await page.getByRole("button", { name: "Add volunteer", exact: true }).click();
     const dialog = page.getByRole("dialog");
     await dialog.getByLabel("Name or username").fill("Dilnoza");
@@ -608,6 +610,7 @@ test.describe("manual attendance", () => {
     await dialog.getByRole("radio").check();
     await dialog.getByRole("button", { name: "Add", exact: true }).click();
     await expect(page.getByText("Manually added", { exact: true })).toBeVisible();
+    await expect(search).toHaveValue("");
     await expect(page.getByLabel("Attendance of Dilnoza Karimova")).toHaveValue(
       "no_show",
     );
