@@ -10,7 +10,6 @@ export function isVacancyTab(value: string | undefined): value is VacancyTab {
   return (VACANCY_TABS as readonly string[]).includes(value ?? "");
 }
 
-/** Details, Applications and Attendance as real pages of one vacancy. */
 export function VacancyTabs({
   label,
   active,
@@ -21,7 +20,10 @@ export function VacancyTabs({
   items: Array<{ tab: VacancyTab; label: string; href: string; badge?: ReactNode }>;
 }) {
   return (
-    <nav aria-label={label} className="-mb-2 overflow-x-auto border-b border-border">
+    <nav
+      aria-label={label}
+      className="relative -mb-2 overflow-x-auto border-b border-border"
+    >
       <ul className="flex w-max gap-1">
         {items.map((item) => (
           <li key={item.tab}>
@@ -30,10 +32,10 @@ export function VacancyTabs({
               scroll={false}
               aria-current={item.tab === active ? "page" : undefined}
               className={cn(
-                "inline-flex min-h-11 items-center gap-2 border-b-2 px-4 text-sm font-semibold transition-colors",
+                "inline-flex min-h-11 items-center gap-2 border-b-2 px-3.5 text-sm transition-colors",
                 item.tab === active
-                  ? "border-primary-ink text-primary-ink"
-                  : "border-transparent text-ink-muted hover:border-border-control hover:text-ink",
+                  ? "border-action font-semibold text-ink"
+                  : "border-transparent font-medium text-ink-muted hover:border-border-strong hover:text-ink",
               )}
             >
               {item.label}

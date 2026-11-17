@@ -102,6 +102,50 @@ export function nextStepOf(vacancy: VacancyListItem, now: Date): NextStep {
   }
 }
 
+export const BOARD_LANES = ["yours", "administrator", "live", "finished"] as const;
+
+export type BoardLane = (typeof BOARD_LANES)[number];
+
+/** The board groups vacancies by whose move it is, using the same next step as the list. */
+export function laneOf(vacancy: VacancyListItem, now: Date): BoardLane {
+  const next = nextStepOf(vacancy, now);
+  if (next.needsYou) return "yours";
+  if (next.stage === "pending_review" || next.stage === "verifying")
+    return "administrator";
+  if (next.stage === "published") return "live";
+  return "finished";
+}
+
+const LANE_ORDER: readonly ListStage[] = [
+  "changes_requested",
+  "results_returned",
+  "ended",
+  "published",
+  "draft",
+  "pending_review",
+  "verifying",
+  "results",
+  "rejected",
+  "archived",
+];
+
+export function laneVacancies(
+  vacancies: readonly VacancyListItem[],
+  now: Date,
+): Record<BoardLane, VacancyListItem[]> {
+  const lanes: Record<BoardLane, VacancyListItem[]> = {
+    yours: [],
+    administrator: [],
+    live: [],
+    finished: [],
+  };
+  const urgency = (vacancy: VacancyListItem) =>
+    LANE_ORDER.indexOf(stageOf(vacancy, now));
+  const ordered = [...vacancies].sort((a, b) => urgency(a) - urgency(b));
+  for (const vacancy of ordered) lanes[laneOf(vacancy, now)].push(vacancy);
+  return lanes;
+}
+
 export type VacancyListFilters = { q?: string; stage?: ListStage; saved?: boolean };
 
 function matches(vacancy: VacancyListItem, term: string): boolean {

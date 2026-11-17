@@ -1,5 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { getFormatter, getTranslations } from "next-intl/server";
+import type { ReactNode } from "react";
 
 import { ClearedToday } from "@/components/dashboard/cleared-today";
 import {
@@ -8,20 +9,14 @@ import {
   type JourneyWaiting,
 } from "@/components/dashboard/journey";
 import { RecentActivity } from "@/components/dashboard/recent-activity";
-import {
-  AgeLead,
-  QUEUE_ACTIONS,
-  QUEUE_EXPAND,
-  QueueMain,
-  QueueRow,
-  QueueSection,
-  QueueSide,
-} from "@/components/queue/queue";
+import { TodayHeader } from "@/components/dashboard/today-header";
+import { AgeLead } from "@/components/queue/queue";
+import { WorkCard, WorkItem } from "@/components/queue/work-card";
 import {
   InlineDecision,
   type DecisionOption,
 } from "@/components/register/inline-decision";
-import { Register, RegisterNote } from "@/components/register/register";
+import { Count, Register, RegisterNote } from "@/components/register/register";
 import { LoadFailure } from "@/components/states/load-failure";
 import { StatePanel } from "@/components/states/state-panel";
 import { buttonClass } from "@/components/ui/button";
@@ -32,7 +27,7 @@ import type { Statistics } from "@/lib/api/schemas";
 import { loadApplications } from "@/lib/applications/data.server";
 import { loadAuditDirectory } from "@/lib/audit/directory.server";
 import { getSession } from "@/lib/auth/session.server";
-import { waited, type Waited } from "@/lib/datetime";
+import { longestWait, waited, type Waited } from "@/lib/datetime";
 import { loadPastEventRosters } from "@/lib/past-event-rosters/data.server";
 import {
   applicationsByVacancy,
@@ -77,8 +72,12 @@ function administratorHref(item: WithAdministrator): string {
 
 export async function DashboardDesk({
   statistics,
+  title,
+  actions,
 }: {
   statistics: Loaded<Statistics>;
+  title: string;
+  actions?: ReactNode;
 }) {
   const [t, journey, submit, vocabulary, format, session] = await Promise.all([
     getTranslations("desk"),
@@ -101,6 +100,11 @@ export async function DashboardDesk({
 
   const now = new Date();
   const failure = firstFailure(vacancies, applications);
+  const today = format.dateTime(now, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
 
   const totals = isReady(statistics) ? statistics.data.totals : null;
   const statisticsFailure = failureOf(statistics);
@@ -161,6 +165,7 @@ export async function DashboardDesk({
   if (failure || !isReady(vacancies) || !isReady(applications)) {
     return (
       <>
+        <TodayHeader date={today} headline={title} actions={actions} />
         {statisticsFailure ? <LoadFailure failure={statisticsFailure} /> : null}
         <Journey
           {...journeyCopy}
@@ -218,17 +223,22 @@ export async function DashboardDesk({
     value ? format.relativeTime(new Date(value), now) : "";
   const ageText = (age: Waited) =>
     format.number(age.value, { style: "unit", unit: age.unit, unitDisplay: "narrow" });
+  const ageLong = (age: Waited) =>
+    format.number(age.value, { style: "unit", unit: age.unit, unitDisplay: "long" });
+  const oldestIn = (dates: readonly (string | Date | null | undefined)[]) => {
+    const longest = longestWait(dates, now);
+    return longest ? t("oldestNote", { age: ageText(longest) }) : undefined;
+  };
 
-  const myAges = [
-    ...desk.returned.map((entry) => waited(entry.receivedAt, now)),
-    ...returnedResults.map((item) => waited(item.returnedAt, now)),
-    ...decide.map((group) => waited(group.oldestAt, now)),
-    ...rollCalls.map((call) => waited(call.endedAt, now)),
-    ...desk.drafts.map((entry) => waited(entry.receivedAt, now)),
-  ].filter((age): age is Waited => age !== null);
-  const oldest = myAges.reduce<Waited | null>(
-    (longest, age) => (longest === null || age.days > longest.days ? age : longest),
-    null,
+  const oldest = longestWait(
+    [
+      ...desk.returned.map((entry) => entry.receivedAt),
+      ...returnedResults.map((item) => item.returnedAt),
+      ...decide.map((group) => group.oldestAt),
+      ...rollCalls.map((call) => call.endedAt),
+      ...desk.drafts.map((entry) => entry.receivedAt),
+    ],
+    now,
   );
   const scale = Math.max(1, oldest?.days ?? 1);
 
@@ -374,46 +384,51 @@ export async function DashboardDesk({
   const vacancyRow = (entry: VacancyEntry, section: "returned" | "drafts") => {
     const sideId = `${section}-${entry.vacancy.id}-state`;
     return (
-      <QueueRow key={entry.vacancy.id} lead={lead(entry.receivedAt)}>
-        <QueueMain
-          title={
-            <Link href={vacancyHref(entry.vacancy.id)} className={titleLink}>
-              {entry.vacancy.title}
-            </Link>
-          }
-          meta={vocabulary(`regions.${entry.vacancy.region}`)}
-        />
-        <QueueSide id={sideId}>
-          <span>
-            {section === "returned"
-              ? t("returned.when", { when: when(entry.receivedAt) })
-              : t("drafts.when", { when: when(entry.receivedAt) })}
-          </span>
-          {section === "returned" && entry.vacancy.approvalNote ? (
-            <span className="text-ink">
-              {t("returned.note", { note: entry.vacancy.approvalNote })}
-            </span>
-          ) : null}
-          {readiness(entry)}
-        </QueueSide>
-        <div className={`flex flex-wrap items-center gap-2 ${QUEUE_ACTIONS}`}>
-          <Link
-            href={vacancyEditHref(entry.vacancy.id)}
-            className={buttonClass({ size: "row", variant: "outline" })}
-          >
-            {t("desk.edit")}
-            <span className="sr-only"> — {entry.vacancy.title}</span>
+      <WorkItem
+        key={entry.vacancy.id}
+        lead={lead(entry.receivedAt)}
+        title={
+          <Link href={vacancyHref(entry.vacancy.id)} className={titleLink}>
+            {entry.vacancy.title}
           </Link>
-          <InlineDecision
-            action={submitVacancyForApprovalAction}
-            hidden={{ id: entry.vacancy.id }}
-            subject={entry.vacancy.title}
-            labels={labels}
-            options={sendOption(entry, sideId)}
-            expandClassName={QUEUE_EXPAND}
-          />
-        </div>
-      </QueueRow>
+        }
+        meta={vocabulary(`regions.${entry.vacancy.region}`)}
+        facts={
+          <span id={sideId} className="contents">
+            <span>
+              {section === "returned"
+                ? t("returned.when", { when: when(entry.receivedAt) })
+                : t("drafts.when", { when: when(entry.receivedAt) })}
+            </span>
+            {section === "returned" && entry.vacancy.approvalNote ? (
+              <span className="text-ink">
+                {t("returned.note", { note: entry.vacancy.approvalNote })}
+              </span>
+            ) : null}
+            {readiness(entry)}
+          </span>
+        }
+        actions={
+          <div className="flex flex-wrap items-start gap-2">
+            <Link
+              href={vacancyEditHref(entry.vacancy.id)}
+              className={buttonClass({ size: "row", variant: "outline" })}
+            >
+              {t("desk.edit")}
+              <span className="sr-only"> — {entry.vacancy.title}</span>
+            </Link>
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <InlineDecision
+                action={submitVacancyForApprovalAction}
+                hidden={{ id: entry.vacancy.id }}
+                subject={entry.vacancy.title}
+                labels={labels}
+                options={sendOption(entry, sideId)}
+              />
+            </div>
+          </div>
+        }
+      />
     );
   };
 
@@ -422,8 +437,27 @@ export async function DashboardDesk({
     ...elsewhere.map((item) => waited(item.since, now)?.days ?? 0),
   );
 
+  const allLink = (href: string, label: string) => (
+    <Link href={href} className={linkClass}>
+      {label}
+      <ArrowRight aria-hidden="true" className="size-4" />
+    </Link>
+  );
+
   return (
     <>
+      <TodayHeader
+        date={today}
+        headline={t("headline", { count: waiting })}
+        detail={
+          waiting === 0
+            ? t("headlineClear")
+            : oldest
+              ? t("headlineOldest", { age: ageLong(oldest) })
+              : undefined
+        }
+        actions={actions}
+      />
       {statisticsFailure ? <LoadFailure failure={statisticsFailure} /> : null}
       {unverified ? (
         <StatePanel
@@ -435,269 +469,267 @@ export async function DashboardDesk({
       ) : null}
       <Journey {...journeyCopy} stations={stations} />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_23rem] xl:items-start">
-        <div className="grid min-w-0 gap-6">
-          <Register
-            id="operations"
-            title={t("listTitle")}
-            description={
-              oldest
-                ? t("datelineOldest", {
-                    date: format.dateTime(now, {
-                      weekday: "long",
-                      day: "numeric",
-                      month: "long",
-                    }),
-                    age: ageText(oldest),
-                  })
-                : format.dateTime(now, {
-                    weekday: "long",
-                    day: "numeric",
-                    month: "long",
-                  })
-            }
-            count={waiting}
-            countLabel={t("waitingLabel")}
-            countTone="waiting"
-          >
-            {waiting === 0 ? (
-              <RegisterNote
-                title={t("clear.title")}
-                description={t("clear.description")}
-                action={
-                  <Link
-                    href={navHref("newVacancy")}
-                    className={buttonClass({ size: "sm", variant: "outline" })}
-                  >
-                    {t("clear.action")}
-                  </Link>
-                }
-              />
-            ) : null}
+      <section
+        id="operations"
+        aria-labelledby="operations-title"
+        className="grid gap-4"
+      >
+        <header className="flex flex-wrap items-center gap-2">
+          <h2 id="operations-title" className="text-section text-ink">
+            {t("listTitle")}
+          </h2>
+          <Count value={waiting} label={t("waitingLabel")} tone="waiting" />
+        </header>
 
+        {waiting === 0 ? (
+          <div className="sheet">
+            <RegisterNote
+              title={t("clear.title")}
+              description={t("clear.description")}
+              action={
+                <Link
+                  href={navHref("newVacancy")}
+                  className={buttonClass({ size: "sm", variant: "outline" })}
+                >
+                  {t("clear.action")}
+                </Link>
+              }
+            />
+          </div>
+        ) : (
+          <div className="-mb-4 gap-4 lg:columns-2 [&>*]:mb-4 [&>*]:break-inside-avoid">
             {desk.returned.length > 0 ? (
-              <QueueSection
+              <WorkCard
                 id="returned"
                 title={t("returned.title")}
                 count={desk.returned.length}
                 countLabel={t("returned.countLabel")}
+                note={oldestIn(desk.returned.map((entry) => entry.receivedAt))}
               >
                 {desk.returned.map((entry) => vacancyRow(entry, "returned"))}
-              </QueueSection>
+              </WorkCard>
             ) : null}
 
             {returnedResults.length > 0 ? (
-              <QueueSection
+              <WorkCard
                 id="returned-results"
                 title={t("returnedResults.title")}
                 count={returnedResults.length}
                 countLabel={t("returnedResults.countLabel")}
+                note={oldestIn(returnedResults.map((item) => item.returnedAt))}
               >
                 {returnedResults.map((item) => (
-                  <QueueRow key={item.vacancy.id} lead={lead(item.returnedAt)}>
-                    <QueueMain
-                      title={
-                        <Link
-                          href={`${vacancyHref(item.vacancy.id)}?tab=attendance`}
-                          className={titleLink}
-                        >
-                          {item.vacancy.title}
-                        </Link>
-                      }
-                      meta={vocabulary(`regions.${item.vacancy.region}`)}
-                    />
-                    <QueueSide>
+                  <WorkItem
+                    key={item.vacancy.id}
+                    lead={lead(item.returnedAt)}
+                    title={
+                      <Link
+                        href={`${vacancyHref(item.vacancy.id)}?tab=attendance`}
+                        className={titleLink}
+                      >
+                        {item.vacancy.title}
+                      </Link>
+                    }
+                    meta={vocabulary(`regions.${item.vacancy.region}`)}
+                    facts={
                       <span>
                         {t("returnedResults.when", { when: when(item.returnedAt) })}
                       </span>
-                    </QueueSide>
-                    <div className={`flex ${QUEUE_ACTIONS}`}>
-                      <Link
-                        href={`${vacancyHref(item.vacancy.id)}?tab=attendance`}
-                        className={buttonClass({ size: "row" })}
-                      >
-                        {t("returnedResults.open")}
-                        <span className="sr-only"> — {item.vacancy.title}</span>
-                      </Link>
-                    </div>
-                  </QueueRow>
+                    }
+                    actions={
+                      <div className="flex">
+                        <Link
+                          href={`${vacancyHref(item.vacancy.id)}?tab=attendance`}
+                          className={buttonClass({ size: "row" })}
+                        >
+                          {t("returnedResults.open")}
+                          <span className="sr-only"> — {item.vacancy.title}</span>
+                        </Link>
+                      </div>
+                    }
+                  />
                 ))}
-              </QueueSection>
+              </WorkCard>
             ) : null}
 
             {decide.length > 0 ? (
-              <QueueSection
+              <WorkCard
                 id="decide"
                 title={t("decide.title")}
                 count={waitingApplications}
                 countLabel={t("decide.countLabel")}
-                action={
-                  <Link
-                    href={navHref("vacancies")}
-                    className={linkClass}
-                  >
-                    {t("decide.all")}
-                    <ArrowRight aria-hidden="true" className="size-4" />
-                  </Link>
-                }
+                note={oldestIn(decide.map((group) => group.oldestAt))}
+                footer={allLink(navHref("vacancies"), t("decide.all"))}
               >
                 {decide.map((group) => (
-                  <QueueRow key={group.vacancyId} lead={lead(group.oldestAt)}>
-                    <QueueMain
-                      title={
-                        <Link href={vacancyHref(group.vacancyId)} className={titleLink}>
-                          {group.title}
-                        </Link>
-                      }
-                      meta={
-                        group.vacancy
-                          ? vocabulary(`regions.${group.vacancy.region}`)
-                          : undefined
-                      }
-                    />
-                    <QueueSide>
-                      <span className="font-medium text-ink">
-                        {t("decide.waiting", { count: group.waiting })}
-                      </span>
-                      <span>{t("decide.oldest", { when: when(group.oldestAt) })}</span>
-                      {group.staged > 0 ? (
-                        <span className="text-primary-ink">
-                          {t("decide.staged", { count: group.staged })}
-                        </span>
-                      ) : null}
-                    </QueueSide>
-                    <div className={`flex ${QUEUE_ACTIONS}`}>
-                      <Link
-                        href={`${vacancyHref(group.vacancyId)}?tab=applications`}
-                        className={buttonClass({ size: "row" })}
-                      >
-                        {t("decide.review")}
-                        <span className="sr-only"> — {group.title}</span>
+                  <WorkItem
+                    key={group.vacancyId}
+                    lead={lead(group.oldestAt)}
+                    title={
+                      <Link href={vacancyHref(group.vacancyId)} className={titleLink}>
+                        {group.title}
                       </Link>
-                    </div>
-                  </QueueRow>
+                    }
+                    meta={
+                      group.vacancy
+                        ? vocabulary(`regions.${group.vacancy.region}`)
+                        : undefined
+                    }
+                    facts={
+                      <>
+                        <span className="font-medium text-ink">
+                          {t("decide.waiting", { count: group.waiting })}
+                        </span>
+                        <span>
+                          {t("decide.oldest", { when: when(group.oldestAt) })}
+                        </span>
+                        {group.staged > 0 ? (
+                          <span className="text-primary-ink">
+                            {t("decide.staged", { count: group.staged })}
+                          </span>
+                        ) : null}
+                      </>
+                    }
+                    actions={
+                      <div className="flex">
+                        <Link
+                          href={`${vacancyHref(group.vacancyId)}?tab=applications`}
+                          className={buttonClass({ size: "row" })}
+                        >
+                          {t("decide.review")}
+                          <span className="sr-only"> — {group.title}</span>
+                        </Link>
+                      </div>
+                    }
+                  />
                 ))}
-              </QueueSection>
+              </WorkCard>
             ) : null}
 
             {rollCalls.length > 0 ? (
-              <QueueSection
+              <WorkCard
                 id="roll-calls"
                 title={t("rollCalls.title")}
                 count={rollCalls.length}
                 countLabel={t("rollCalls.countLabel")}
+                note={oldestIn(rollCalls.map((call) => call.endedAt))}
               >
                 {rollCalls.map((call) => (
-                  <QueueRow key={call.vacancyId} lead={lead(call.endedAt)}>
-                    <QueueMain
-                      title={
-                        <Link href={vacancyHref(call.vacancyId)} className={titleLink}>
-                          {call.title}
-                        </Link>
-                      }
-                      meta={
-                        call.endedAt
-                          ? t("rollCalls.ended", { when: when(call.endedAt) })
-                          : undefined
-                      }
-                    />
-                    <QueueSide>
-                      {call.awaiting > 0 ? (
-                        <span className="font-medium text-ink">
-                          {t("rollCalls.waiting", { count: call.awaiting })}
-                        </span>
-                      ) : (
-                        <span className="font-medium text-success-ink">
-                          {t("rollCalls.ready")}
-                        </span>
-                      )}
-                      {call.drafted + call.resolved > 0 ? (
-                        <span>
-                          {t("rollCalls.resolved", {
-                            count: call.drafted + call.resolved,
-                          })}
-                        </span>
-                      ) : null}
-                    </QueueSide>
-                    <div className={`flex ${QUEUE_ACTIONS}`}>
-                      <Link
-                        href={`${vacancyHref(call.vacancyId)}?tab=attendance`}
-                        className={buttonClass({ size: "row" })}
-                      >
-                        {call.awaiting > 0
-                          ? t("rollCalls.open")
-                          : t("rollCalls.finish")}
-                        <span className="sr-only"> — {call.title}</span>
+                  <WorkItem
+                    key={call.vacancyId}
+                    lead={lead(call.endedAt)}
+                    title={
+                      <Link href={vacancyHref(call.vacancyId)} className={titleLink}>
+                        {call.title}
                       </Link>
-                    </div>
-                  </QueueRow>
+                    }
+                    meta={
+                      call.endedAt
+                        ? t("rollCalls.ended", { when: when(call.endedAt) })
+                        : undefined
+                    }
+                    facts={
+                      <>
+                        {call.awaiting > 0 ? (
+                          <span className="font-medium text-ink">
+                            {t("rollCalls.waiting", { count: call.awaiting })}
+                          </span>
+                        ) : (
+                          <span className="font-medium text-success-ink">
+                            {t("rollCalls.ready")}
+                          </span>
+                        )}
+                        {call.drafted + call.resolved > 0 ? (
+                          <span>
+                            {t("rollCalls.resolved", {
+                              count: call.drafted + call.resolved,
+                            })}
+                          </span>
+                        ) : null}
+                      </>
+                    }
+                    actions={
+                      <div className="flex">
+                        <Link
+                          href={`${vacancyHref(call.vacancyId)}?tab=attendance`}
+                          className={buttonClass({ size: "row" })}
+                        >
+                          {call.awaiting > 0
+                            ? t("rollCalls.open")
+                            : t("rollCalls.finish")}
+                          <span className="sr-only"> — {call.title}</span>
+                        </Link>
+                      </div>
+                    }
+                  />
                 ))}
-              </QueueSection>
+              </WorkCard>
             ) : null}
 
             {desk.drafts.length > 0 ? (
-              <QueueSection
+              <WorkCard
                 id="drafts"
                 title={t("drafts.title")}
                 count={desk.drafts.length}
                 countLabel={t("drafts.countLabel")}
+                note={oldestIn(desk.drafts.map((entry) => entry.receivedAt))}
               >
                 {desk.drafts.map((entry) => vacancyRow(entry, "drafts"))}
-              </QueueSection>
+              </WorkCard>
             ) : null}
-          </Register>
+          </div>
+        )}
+      </section>
 
-          <RecentActivity
-            recent={recent}
-            directory={directory}
-            now={now}
-            href={navHref("activity")}
-            showActor={false}
-          />
-        </div>
+      <div className="grid items-start gap-4 lg:grid-cols-2">
+        <Register
+          id="with-administrator"
+          title={t("withAdmin.title")}
+          count={elsewhere.length}
+          countLabel={t("withAdmin.countLabel")}
+          description={t("withAdmin.description")}
+        >
+          {elsewhere.length === 0 ? (
+            <RegisterNote title={t("withAdmin.empty")} />
+          ) : (
+            <ol className="divide-y divide-border">
+              {elsewhere.slice(0, ADMINISTRATOR_ROWS).map((item) => (
+                <li
+                  key={`${item.kind}-${item.id}`}
+                  className="grid grid-cols-[2.75rem_minmax(0,1fr)] items-start gap-x-4 px-5 py-3.5"
+                >
+                  {lead(item.since, administratorScale)}
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold break-words text-ink">
+                      <Link href={administratorHref(item)} className={titleLink}>
+                        {item.title}
+                      </Link>
+                    </p>
+                    <p className="mt-0.5 text-[0.8125rem] text-ink-muted">
+                      {t(`withAdmin.kind.${item.kind}`)}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          )}
+          {elsewhere.length > ADMINISTRATOR_ROWS ? (
+            <p className="border-t border-border px-5 py-2.5 text-[0.8125rem] text-ink-muted">
+              {t("withAdmin.more", { count: elsewhere.length - ADMINISTRATOR_ROWS })}
+            </p>
+          ) : null}
+        </Register>
 
-        <div className="grid min-w-0 gap-6">
-          <Register
-            id="with-administrator"
-            title={t("withAdmin.title")}
-            count={elsewhere.length}
-            countLabel={t("withAdmin.countLabel")}
-            description={t("withAdmin.description")}
-          >
-            {elsewhere.length === 0 ? (
-              <RegisterNote title={t("withAdmin.empty")} />
-            ) : (
-              <ol className="divide-y divide-border">
-                {elsewhere.slice(0, ADMINISTRATOR_ROWS).map((item) => (
-                  <li
-                    key={`${item.kind}-${item.id}`}
-                    className="grid grid-cols-[3.25rem_minmax(0,1fr)] items-start gap-x-3 px-4 py-3"
-                  >
-                    {lead(item.since, administratorScale)}
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold break-words text-ink">
-                        <Link href={administratorHref(item)} className={titleLink}>
-                          {item.title}
-                        </Link>
-                      </p>
-                      <p className="mt-0.5 text-[0.8125rem] text-ink-muted">
-                        {t(`withAdmin.kind.${item.kind}`)}
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            )}
-            {elsewhere.length > ADMINISTRATOR_ROWS ? (
-              <p className="border-t border-border px-4 py-2.5 text-[0.8125rem] text-ink-muted">
-                {t("withAdmin.more", { count: elsewhere.length - ADMINISTRATOR_ROWS })}
-              </p>
-            ) : null}
-          </Register>
-
-          <ClearedToday cleared={cleared} />
-        </div>
+        <ClearedToday cleared={cleared} />
       </div>
+
+      <RecentActivity
+        recent={recent}
+        directory={directory}
+        now={now}
+        href={navHref("activity")}
+        showActor={false}
+      />
     </>
   );
 }

@@ -4,6 +4,8 @@ import type { VacancyListItem } from "@/lib/api/schemas";
 import {
   countByStage,
   filterVacancyList,
+  laneOf,
+  laneVacancies,
   nextStepOf,
   stageOf,
 } from "@/lib/vacancies/stage";
@@ -213,5 +215,67 @@ describe("filtering the list", () => {
       published: 0,
       saved: 0,
     });
+  });
+});
+
+describe("the board of vacancies", () => {
+  it("puts everything the organization has to move in its own lane", () => {
+    expect(laneOf(item({ id: "1", approvalStatus: "draft" }), DURING)).toBe("yours");
+    expect(laneOf(item({ id: "2", approvalStatus: "changes_requested" }), DURING)).toBe(
+      "yours",
+    );
+    expect(laneOf(item({ id: "3", ...live, progress }), DURING)).toBe("yours");
+    expect(laneOf(item({ id: "4", ...live, progress }), AFTER)).toBe("yours");
+  });
+
+  it("keeps what waits on the administrator apart from what is simply live", () => {
+    expect(laneOf(item({ id: "5", approvalStatus: "pending_review" }), DURING)).toBe(
+      "administrator",
+    );
+    expect(
+      laneOf(
+        item({ id: "6", ...live, progress: { ...progress, awaitingReview: 0 } }),
+        DURING,
+      ),
+    ).toBe("live");
+  });
+
+  it("closes rejected and archived vacancies into the finished lane", () => {
+    expect(laneOf(item({ id: "7", approvalStatus: "rejected" }), DURING)).toBe(
+      "finished",
+    );
+    expect(
+      laneOf(
+        item({ id: "8", ...live, archivedAt: "2026-10-01T00:00:00.000Z" }),
+        DURING,
+      ),
+    ).toBe("finished");
+  });
+
+  it("places every vacancy in exactly one lane", () => {
+    const vacancies = [
+      item({ id: "1", approvalStatus: "draft" }),
+      item({ id: "5", approvalStatus: "pending_review" }),
+      item({ id: "7", approvalStatus: "rejected" }),
+    ];
+    const lanes = laneVacancies(vacancies, DURING);
+    expect(Object.values(lanes).flat()).toHaveLength(vacancies.length);
+    expect(lanes.yours.map((vacancy) => vacancy.id)).toEqual(["1"]);
+  });
+
+  it("leads the organization's lane with what was returned, and leaves drafts last", () => {
+    const lanes = laneVacancies(
+      [
+        item({ id: "draft", approvalStatus: "draft" }),
+        item({ id: "live", ...live, progress }),
+        item({ id: "returned", approvalStatus: "changes_requested" }),
+      ],
+      DURING,
+    );
+    expect(lanes.yours.map((vacancy) => vacancy.id)).toEqual([
+      "returned",
+      "live",
+      "draft",
+    ]);
   });
 });
