@@ -20,7 +20,7 @@ export type RouteArea = "auth" | "portal" | "account";
 
 export type RouteGuard = "guest" | "session";
 
-export const NAV_GROUPS = ["overview", "volunteering", "people"] as const;
+export const HUBS = ["overview", "volunteering", "people"] as const;
 
 export const NAV_COUNTS = [
   "changesRequested",
@@ -30,7 +30,13 @@ export const NAV_COUNTS = [
 
 export type NavCount = (typeof NAV_COUNTS)[number];
 
-export type NavGroup = (typeof NAV_GROUPS)[number];
+export type Hub = (typeof HUBS)[number];
+
+export const HUB_ICONS: Record<Hub, string> = {
+  overview: "house",
+  volunteering: "clipboard-list",
+  people: "users",
+};
 
 export type AppRoute = {
   key: RouteKey;
@@ -38,7 +44,7 @@ export type AppRoute = {
   area: RouteArea;
   guard: RouteGuard;
   inNav: boolean;
-  group?: NavGroup;
+  hub?: Hub;
   count?: NavCount;
   icon: string;
 };
@@ -54,25 +60,26 @@ export const appRoutes: readonly AppRoute[] = [
   },
   {
     key: "dashboard",
+    hub: "overview",
     path: "/dashboard",
     area: "portal",
     guard: "session",
     inNav: true,
-    group: "overview",
     icon: "layout-dashboard",
   },
   {
     key: "vacancies",
+    hub: "volunteering",
     path: "/vacancies",
     area: "portal",
     guard: "session",
     inNav: true,
-    group: "volunteering",
     count: "changesRequested",
     icon: "clipboard-list",
   },
   {
     key: "newVacancy",
+    hub: "volunteering",
     path: "/vacancies/new",
     area: "portal",
     guard: "session",
@@ -81,49 +88,49 @@ export const appRoutes: readonly AppRoute[] = [
   },
   {
     key: "applications",
+    hub: "volunteering",
     path: "/applications",
     area: "portal",
     guard: "session",
     inNav: false,
-    group: "volunteering",
     count: "pendingReview",
     icon: "inbox",
   },
   {
     key: "attendance",
+    hub: "volunteering",
     path: "/attendance",
     area: "portal",
     guard: "session",
     inNav: true,
-    group: "volunteering",
     count: "attendanceDue",
     icon: "clipboard-check",
   },
   {
     key: "pastEvents",
+    hub: "volunteering",
     path: "/past-events",
     area: "portal",
     guard: "session",
     inNav: true,
-    group: "volunteering",
     icon: "calendar-clock",
   },
   {
     key: "users",
+    hub: "people",
     path: "/users",
     area: "portal",
     guard: "session",
     inNav: true,
-    group: "people",
     icon: "users",
   },
   {
     key: "participants",
+    hub: "people",
     path: "/participants",
     area: "portal",
     guard: "session",
     inNav: true,
-    group: "people",
     icon: "user-check",
   },
   {
@@ -136,6 +143,7 @@ export const appRoutes: readonly AppRoute[] = [
   },
   {
     key: "newPastEvent",
+    hub: "volunteering",
     path: "/past-events/new",
     area: "portal",
     guard: "session",
@@ -151,8 +159,30 @@ export const navRoutes = appRoutes.filter((route) => route.inNav);
 
 export const ACCOUNT_ROUTES: readonly RouteKey[] = ["activity"];
 
-export function navGroupRoutes(group: NavGroup): AppRoute[] {
-  return navRoutes.filter((route) => route.group === group);
+export const JUMP_CREATE: readonly { key: RouteKey; label: string }[] = [
+  { key: "newVacancy", label: "vacancies.new" },
+  { key: "newPastEvent", label: "nav.newPastEvent" },
+];
+
+export const JUMP_SEARCH: readonly RouteKey[] = [
+  "vacancies",
+  "users",
+  "participants",
+  "pastEvents",
+];
+
+export function hubRoutes(hub: Hub): AppRoute[] {
+  return navRoutes.filter((route) => route.hub === hub);
+}
+
+export function hubHref(hub: Hub): string {
+  const first = hubRoutes(hub)[0];
+  if (!first) throw new Error(`Empty portal hub: ${hub}`);
+  return first.path;
+}
+
+export function hubFor(pathname: string): Hub | null {
+  return routeFor(pathname)?.hub ?? null;
 }
 
 export function getRoute(key: RouteKey): AppRoute {

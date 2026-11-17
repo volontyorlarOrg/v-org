@@ -1,10 +1,10 @@
 import { Plus } from "lucide-react";
 import { Suspense } from "react";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { getFormatter, getTranslations, setRequestLocale } from "next-intl/server";
 import type { Metadata } from "next";
 
 import { DashboardDesk } from "@/components/dashboard/desk";
-import { PageHeader } from "@/components/states/page-header";
+import { TodayHeader } from "@/components/dashboard/today-header";
 import { DeskSkeleton } from "@/components/states/skeletons";
 import { buttonClass } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
@@ -26,28 +26,38 @@ export default async function DashboardPage({
 }: PageProps<"/[locale]/dashboard">) {
   const { locale } = await params;
   setRequestLocale(locale);
-
-  const [t, vacancies, statistics] = await Promise.all([
+  const [t, vacancies, format, statistics] = await Promise.all([
     getTranslations("dashboardHome"),
     getTranslations("vacancies"),
+    getFormatter(),
     loadStatistics(),
   ]);
 
+  const actions = (
+    <Link href={navHref("newVacancy")} className={buttonClass({ size: "sm" })}>
+      <Plus aria-hidden="true" />
+      {vacancies("new")}
+    </Link>
+  );
+
   return (
-    <>
-      <PageHeader
-        title={t("title")}
-        description={t("description")}
-        actions={
-          <Link href={navHref("newVacancy")} className={buttonClass({ size: "sm" })}>
-            <Plus aria-hidden="true" />
-            {vacancies("new")}
-          </Link>
-        }
-      />
-      <Suspense fallback={<DeskSkeleton label={t("loadingOperations")} />}>
-        <DashboardDesk statistics={statistics} />
-      </Suspense>
-    </>
+    <Suspense
+      fallback={
+        <>
+          <TodayHeader
+            date={format.dateTime(new Date(), {
+              weekday: "long",
+              day: "numeric",
+              month: "long",
+            })}
+            headline={t("title")}
+            actions={actions}
+          />
+          <DeskSkeleton label={t("loadingOperations")} />
+        </>
+      }
+    >
+      <DashboardDesk statistics={statistics} title={t("title")} actions={actions} />
+    </Suspense>
   );
 }

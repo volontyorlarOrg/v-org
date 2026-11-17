@@ -3,8 +3,6 @@
     "organizationName": "Volontyorlar",
     "portalName": "Tashkilot portali",
     "skipToContent": "Asosiy qismga oʻtish",
-    "openMenu": "Menyuni ochish",
-    "closeMenu": "Menyuni yopish",
     "language": "Interfeys tili",
     "theme": "Yorugʻ va qorongʻi rejimni almashtirish",
     "signOut": "Chiqish",
@@ -36,7 +34,7 @@
   },
   "nav": {
     "label": "Portal boʻlimlari",
-    "dashboard": "Boshqaruv paneli",
+    "dashboard": "Bugun",
     "vacancies": "Vakansiyalar",
     "applications": "Arizalar",
     "users": "Arizachilar",
@@ -50,11 +48,30 @@
     "participants": "Ishtirokchilar",
     "pastEvents": "Oʻtgan tadbirlar",
     "newPastEvent": "Oʻtgan tadbir yaratish",
-    "groups": {
-      "overview": "Umumiy koʻrinish",
+    "hubs": {
+      "overview": "Bosh sahifa",
       "volunteering": "Volontyorlik",
       "people": "Odamlar"
-    }
+    },
+    "sectionsOf": "«{hub}» sahifalari",
+    "hubWaiting": "{count} ta ish sizni kutmoqda",
+    "account": "Hisob",
+    "accountMenu": "Hisob va sozlamalar",
+    "darkTheme": "Qorongʻi rejim",
+    "accountCaption": "Tashkilot nomidan kirgansiz"
+  },
+  "jump": {
+    "open": "Oʻtish…",
+    "title": "Sahifa, amal yoki qidiruvga oʻtish",
+    "placeholder": "Boʻlim, amal yoki ism kiriting",
+    "empty": "«{query}» boʻyicha hech narsa topilmadi.",
+    "hint": "↑ ↓ — tanlash · Enter — ochish · Esc — yopish",
+    "groups": {
+      "pages": "Sahifalar",
+      "create": "Yaratish",
+      "search": "Qidiruv"
+    },
+    "searchIn": "{section}: «{query}» qidiruvi"
   },
   "auth": {
     "metaTitle": "Kirish",
@@ -577,7 +594,72 @@
       "rewardNoShow": "Sababsiz kelmaganlik uchun −{xp} XP",
       "rewardLater": "Vakansiya eʼlon qilinguncha ularni uning sahifasida oʻzgartirish mumkin"
     },
-    "approvedOn": "{date} tasdiqlangan"
+    "approvedOn": "{date} tasdiqlangan",
+    "track": {
+      "label": "Vakansiya hozir qaysi bosqichda",
+      "stages": {
+        "draft": "Qoralama",
+        "approval": "Tasdiqlash",
+        "applications": "Arizalar",
+        "event": "Tadbir",
+        "results": "Natijalar"
+      },
+      "notes": {
+        "created": "{date} yaratilgan",
+        "preparing": "Tayyorlanmoqda",
+        "waiting": "Tasdiqlashni kutmoqda",
+        "returned": "Oʻzgartirish uchun qaytarilgan",
+        "rejected": "Rad etilgan",
+        "approved": "{date} tasdiqlangan",
+        "closes": "{date} gacha qabul",
+        "closed": "{date} yopilgan",
+        "starts": "{date} boshlanadi",
+        "running": "Hozir oʻtmoqda",
+        "held": "{date} oʻtkazilgan",
+        "due": "Ishtirokni belgilash kerak",
+        "recording": "Ishtirok belgilanmoqda",
+        "submitted": "Tekshiruvga yuborilgan",
+        "correcting": "Tuzatilmoqda",
+        "verified": "Tekshirilgan",
+        "archived": "Shu yerda arxivlangan",
+        "later": "Hali oldinda"
+      },
+      "status": {
+        "done": "bajarilgan",
+        "current": "joriy bosqich",
+        "upcoming": "hali oldinda",
+        "stopped": "toʻxtatilgan"
+      }
+    },
+    "board": {
+      "view": {
+        "label": "Koʻrinish",
+        "board": "Doska",
+        "list": "Roʻyxat"
+      },
+      "lanes": {
+        "yours": {
+          "title": "Sizning navbatingiz",
+          "description": "Tugatiladigan qoralamalar, hal qilinadigan arizalar va belgilanadigan ishtirok."
+        },
+        "administrator": {
+          "title": "Administratorda",
+          "description": "Tasdiqlashni yoki natijalar tekshiruvini kutmoqda."
+        },
+        "live": {
+          "title": "Eʼlon qilingan",
+          "description": "Volontyorlar uchun ochiq. Hozir sizdan hech narsa kerak emas."
+        },
+        "finished": {
+          "title": "Yakunlangan",
+          "description": "Tekshirilgan, rad etilgan yoki arxivlangan."
+        }
+      },
+      "empty": "Hozircha bu yer boʻsh.",
+      "noMatches": "Bu yerda qidiruvga mos narsa yoʻq.",
+      "more": "Roʻyxatda yana {count} ta",
+      "applications": "{count} ta ariza"
+    }
   },
   "applications": {
     "title": "Arizalar",
@@ -1007,15 +1089,17 @@
     },
     "age": "{age} kutmoqda",
     "ageUnknown": "Kutish vaqti qayd etilmagan",
-    "datelineOldest": "{date} · eng uzoq kutayotgani {age}",
     "unverified": {
       "title": "Tashkilotingiz hali tasdiqlanmagan",
       "description": "Qoralamalarni tayyorlab saqlashingiz mumkin. Administrator tashkilotni tasdiqlagach, ularni maʼqullashga yuborish ochiladi."
-    }
+    },
+    "headline": "{count, plural, =0 {Sizni hech narsa kutmayapti} other {# ta ish sizni kutmoqda}}",
+    "headlineOldest": "Eng eskisi {age} kutmoqda. Quyidagi har bir karta kerakli qadamni ochadi.",
+    "headlineClear": "Qoralamalar, arizalar va ishtirok belgilari sizning harakatingiz kerak boʻlishi bilan shu yerda paydo boʻladi.",
+    "oldestNote": "eng eskisi — {age}"
   },
   "dashboardHome": {
-    "title": "Boshqaruv paneli",
-    "description": "Vakansiyalaringiz qayerda turgani va navbat kimda ekani.",
+    "title": "Bugun",
     "loadingOperations": "Sizni kutayotgan ishlar yuklanmoqda…"
   },
   "audit": {

@@ -113,6 +113,31 @@ describe("message catalogs", () => {
     }
   });
 
+  it("names every Jump to action in every locale, and searches only listed sections", async () => {
+    const { JUMP_CREATE, JUMP_SEARCH, navRoutes } =
+      await import("@/lib/routing/routes");
+
+    for (const locale of locales) {
+      const keys = new Set(flatten(load(locale)));
+      for (const { label } of JUMP_CREATE) {
+        expect(keys.has(label), `${locale}: ${label}`).toBe(true);
+      }
+    }
+    const listed = navRoutes.map((route) => route.key);
+    for (const key of JUMP_SEARCH) expect(listed, key).toContain(key);
+  });
+
+  it("names every hub on the rail the route registry declares, in every locale", async () => {
+    const { HUBS } = await import("@/lib/routing/routes");
+
+    for (const locale of locales) {
+      const keys = new Set(flatten(load(locale)));
+      for (const hub of HUBS) {
+        expect(keys.has(`nav.hubs.${hub}`), `${locale}: nav.hubs.${hub}`).toBe(true);
+      }
+    }
+  });
+
   it("has no sign-up or account-creation label anywhere in the catalog", () => {
     for (const locale of locales) {
       const forbidden = flatten(load(locale)).filter((key) =>

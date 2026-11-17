@@ -21,8 +21,12 @@ async function signIn(page: Page) {
   await page.waitForURL(/\/en\/dashboard/);
 }
 
-async function openRail(page: Page, isMobile: boolean) {
-  if (isMobile) await page.getByRole("button", { name: "Open the menu" }).click();
+async function openHub(page: Page, hub: string) {
+  await page
+    .getByRole("navigation", { name: "Portal sections" })
+    .getByRole("link", { name: hub })
+    .click();
+  await page.waitForURL(/\/en\/(?!dashboard)/);
 }
 
 test.beforeEach(async ({ request }) => {
@@ -41,10 +45,10 @@ test.describe("signing in", () => {
     await expect(page).toHaveURL(/\/en\/login/);
   });
 
-  test("returns to the entry after signing out", async ({ page, isMobile }) => {
+  test("returns to the entry after signing out", async ({ page }) => {
     await signIn(page);
-    await openRail(page, isMobile);
-    await page.getByRole("button", { name: "Sign out" }).first().click();
+    await page.getByRole("button", { name: "Account and settings" }).click();
+    await page.getByRole("button", { name: "Sign out" }).click();
     await page.waitForURL(/\/en\/login\?session=signedOut/);
   });
 
@@ -55,32 +59,55 @@ test.describe("signing in", () => {
 });
 
 test.describe("the shell", () => {
-  test("reaches every section from the rail, grouped as in the administrator portal", async ({
+  test("reaches every section through three hubs and their tabs, as in the administrator portal", async ({
     page,
-    isMobile,
   }) => {
     await signIn(page);
-    await openRail(page, isMobile);
-    const nav = page.getByRole("navigation", { name: "Portal sections" }).first();
-    for (const name of [
-      "Dashboard",
-      "Vacancies",
-      "Attendance",
-      "Past events",
-      "Applicants",
-      "Participants",
-    ]) {
-      await expect(nav.getByRole("link", { name, exact: false }).first()).toBeVisible();
+    const hubs = page.getByRole("navigation", { name: "Portal sections" });
+    for (const name of ["Home", "Volunteering", "People"]) {
+      await expect(hubs.getByRole("link", { name, exact: false })).toBeVisible();
+    }
+    await expect(hubs.getByRole("link")).toHaveCount(3);
+
+    await openHub(page, "Volunteering");
+    await expect(page).toHaveURL(/\/en\/vacancies$/);
+    const work = page.getByRole("navigation", { name: "Volunteering pages" });
+    for (const name of ["Vacancies", "Attendance", "Past events"]) {
+      await expect(work.getByRole("link", { name, exact: false })).toBeVisible();
     }
     await expect(
-      nav.getByRole("link", { name: "Applications", exact: true }),
+      work.getByRole("link", { name: "Applications", exact: true }),
     ).toHaveCount(0);
+
+    await openHub(page, "People");
+    await expect(page).toHaveURL(/\/en\/users$/);
+    const people = page.getByRole("navigation", { name: "People pages" });
+    for (const name of ["Applicants", "Participants"]) {
+      await expect(people.getByRole("link", { name, exact: false })).toBeVisible();
+    }
+
     const removed = await page.goto("/en/applications");
     expect(removed?.status()).toBe(404);
-    await page.goto("/en/dashboard");
-    await openRail(page, isMobile);
-    await expect(nav.getByText("Volunteering", { exact: true })).toBeVisible();
-    await expect(nav.getByText("People", { exact: true })).toBeVisible();
+  });
+
+  test("jumps to any page or search from the keyboard", async ({ page, isMobile }) => {
+    test.skip(isMobile, "the shortcut needs a keyboard");
+    await signIn(page);
+    await page.keyboard.press("ControlOrMeta+k");
+    const search = page.getByRole("combobox", {
+      name: "Jump to a page, an action or a search",
+    });
+    await search.fill("partic");
+    await expect(
+      page.getByRole("option", { name: /Participants/ }).first(),
+    ).toBeVisible();
+    await search.press("Enter");
+    await page.waitForURL(/\/en\/participants$/);
+
+    await page.keyboard.press("ControlOrMeta+k");
+    await search.fill("debate");
+    await page.getByRole("option", { name: "Vacancies matching “debate”" }).click();
+    await page.waitForURL(/\/en\/vacancies\?q=debate$/);
   });
 
   test("has dropped the terrain, the serif and the seals", async ({ page }) => {
@@ -126,10 +153,14 @@ test.describe("the dashboard", () => {
     expect(sum).toBeGreaterThan(0);
   });
 
-  test("leads each queue row with how long it has waited", async ({ page }) => {
+  test("says in its headline how much waits and for how long", async ({ page }) => {
     await signIn(page);
+    await expect(
+      page.getByRole("heading", { level: 1, name: /^\d+ things wait on you$/ }),
+    ).toBeVisible();
+    await expect(page.getByText(/^The oldest has waited \d+ days?\./)).toBeVisible();
     const desk = page.getByRole("region", { name: "Waiting on you" });
-    await expect(desk.getByText(/oldest waiting \d+/)).toBeVisible();
+    await expect(desk.getByText(/^oldest \d+d$/).first()).toBeVisible();
   });
 
   test("links what is with the administrator to a list that is really filtered", async ({
@@ -211,9 +242,35 @@ test.describe("the vacancy list", () => {
     );
   });
 
-  test("offers the next step on each row", async ({ page }) => {
+  test("sorts the board by whose move each vacancy is, with the next step on every card", async ({
+    page,
+  }) => {
     await signIn(page);
     await page.goto("/en/vacancies", { waitUntil: "networkidle" });
+    const yours = page.getByRole("region", { name: "Your move" });
+    const admin = page.getByRole("region", { name: "With the administrator" });
+    await expect(
+      yours.getByRole("link", { name: "Photo archive week", exact: true }),
+    ).toBeVisible();
+    await expect(
+      yours.getByRole("link", { name: "Autumn book drive", exact: true }),
+    ).toBeVisible();
+    await expect(
+      admin.getByRole("link", { name: "Winter clothing drive", exact: true }),
+    ).toBeVisible();
+    await expect(
+      yours.getByRole("link", { name: "Winter clothing drive" }),
+    ).toHaveCount(0);
+    const card = yours.getByRole("listitem").filter({
+      has: page.getByRole("link", { name: "City sports day", exact: true }),
+    });
+    await card.getByRole("link", { name: /Record attendance/ }).click();
+    await page.waitForURL(new RegExp(`${CITY_SPORTS_DAY}\\?tab=attendance`));
+  });
+
+  test("offers the next step on each row", async ({ page }) => {
+    await signIn(page);
+    await page.goto("/en/vacancies?view=list", { waitUntil: "networkidle" });
     const row = page.getByRole("row", { name: /City sports day/ });
     await row
       .getByRole("link", { name: /Record attendance/ })

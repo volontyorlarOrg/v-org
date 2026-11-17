@@ -3,8 +3,6 @@
     "organizationName": "Volontyorlar",
     "portalName": "Organization portal",
     "skipToContent": "Skip to content",
-    "openMenu": "Open the menu",
-    "closeMenu": "Close the menu",
     "language": "Interface language",
     "theme": "Switch between light and dark",
     "signOut": "Sign out",
@@ -36,7 +34,7 @@
   },
   "nav": {
     "label": "Portal sections",
-    "dashboard": "Dashboard",
+    "dashboard": "Today",
     "vacancies": "Vacancies",
     "applications": "Applications",
     "users": "Applicants",
@@ -50,11 +48,30 @@
     "participants": "Participants",
     "pastEvents": "Past events",
     "newPastEvent": "Create past event",
-    "groups": {
-      "overview": "Overview",
+    "hubs": {
+      "overview": "Home",
       "volunteering": "Volunteering",
       "people": "People"
-    }
+    },
+    "sectionsOf": "{hub} pages",
+    "hubWaiting": "{count, plural, one {# item waits on you} other {# items wait on you}}",
+    "account": "Account",
+    "accountMenu": "Account and settings",
+    "darkTheme": "Dark theme",
+    "accountCaption": "Signed in as your organization"
+  },
+  "jump": {
+    "open": "Jump to…",
+    "title": "Jump to a page, an action or a search",
+    "placeholder": "Type a page, an action or a name",
+    "empty": "Nothing matches “{query}”.",
+    "hint": "↑ ↓ to move · Enter to open · Esc to close",
+    "groups": {
+      "pages": "Pages",
+      "create": "Create",
+      "search": "Search"
+    },
+    "searchIn": "{section} matching “{query}”"
   },
   "auth": {
     "metaTitle": "Sign in",
@@ -577,7 +594,72 @@
       "rewardNoShow": "−{xp} XP for an unexcused no-show",
       "rewardLater": "You can change these on the vacancy page until it is published"
     },
-    "approvedOn": "Approved {date}"
+    "approvedOn": "Approved {date}",
+    "track": {
+      "label": "Where this vacancy stands",
+      "stages": {
+        "draft": "Draft",
+        "approval": "Approval",
+        "applications": "Applications",
+        "event": "Event",
+        "results": "Results"
+      },
+      "notes": {
+        "created": "Created {date}",
+        "preparing": "Being prepared",
+        "waiting": "Waiting for approval",
+        "returned": "Returned for changes",
+        "rejected": "Rejected",
+        "approved": "Approved {date}",
+        "closes": "Close {date}",
+        "closed": "Closed {date}",
+        "starts": "Starts {date}",
+        "running": "Under way",
+        "held": "Held {date}",
+        "due": "Attendance to record",
+        "recording": "Attendance being recorded",
+        "submitted": "Sent for verification",
+        "correcting": "Being corrected",
+        "verified": "Verified",
+        "archived": "Archived here",
+        "later": "Not yet"
+      },
+      "status": {
+        "done": "done",
+        "current": "current step",
+        "upcoming": "not reached yet",
+        "stopped": "stopped"
+      }
+    },
+    "board": {
+      "view": {
+        "label": "View",
+        "board": "Board",
+        "list": "List"
+      },
+      "lanes": {
+        "yours": {
+          "title": "Your move",
+          "description": "Drafts to finish, applicants to decide and attendance to record."
+        },
+        "administrator": {
+          "title": "With the administrator",
+          "description": "Waiting for approval or for results to be verified."
+        },
+        "live": {
+          "title": "Live",
+          "description": "Open to volunteers. Nothing needs you right now."
+        },
+        "finished": {
+          "title": "Finished",
+          "description": "Verified, rejected or archived."
+        }
+      },
+      "empty": "Nothing here right now.",
+      "noMatches": "Nothing here matches the search.",
+      "more": "{count} more in the list",
+      "applications": "{count, plural, one {# application} other {# applications}}"
+    }
   },
   "applications": {
     "title": "Applications",
@@ -1007,15 +1089,17 @@
     },
     "age": "Waiting {age}",
     "ageUnknown": "Waiting time not recorded",
-    "datelineOldest": "{date} · oldest waiting {age}",
     "unverified": {
       "title": "Your organization is not verified yet",
       "description": "You can prepare and save drafts. Sending them for approval opens once an administrator verifies the organization."
-    }
+    },
+    "headline": "{count, plural, =0 {Nothing waits on you} one {# thing waits on you} other {# things wait on you}}",
+    "headlineOldest": "The oldest has waited {age}. Each card below opens the step it needs.",
+    "headlineClear": "Drafts, applicants and roll calls appear here the moment they need you.",
+    "oldestNote": "oldest {age}"
   },
   "dashboardHome": {
-    "title": "Dashboard",
-    "description": "Where your vacancies stand and whose move it is.",
+    "title": "Today",
     "loadingOperations": "Loading what waits on you…"
   },
   "audit": {
