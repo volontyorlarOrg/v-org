@@ -23,7 +23,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { BoardCard, BoardLane } from "@/components/vacancies/list/board";
 import { RowMenu, type RowMenuItem } from "@/components/vacancies/list/row-menu";
 import { SaveToggle } from "@/components/vacancies/list/save-toggle";
 import { Link } from "@/i18n/navigation";
@@ -42,17 +41,12 @@ import { canEditNow, hasOpenedToVolunteers } from "@/lib/vacancies/approval";
 import { loadVacancies } from "@/lib/vacancies/data.server";
 import { storedVacancyImageUrl } from "@/lib/vacancies/image";
 import {
-  BOARD_LANES,
   LIST_STAGES,
   countByStage,
   filterVacancyList,
-  laneVacancies,
   nextStepOf,
   progressOf,
 } from "@/lib/vacancies/stage";
-
-const VIEWS = ["board", "list"] as const;
-const FINISHED_CARDS = 6;
 
 export const dynamic = "force-dynamic";
 
@@ -83,7 +77,6 @@ export default async function VacanciesPage({
   const q = readParam(query, "q");
   const stage = readOption(query, "state", LIST_STAGES);
   const saved = readParam(query, "saved") === "1";
-  const board = !stage && !saved && readOption(query, "view", VIEWS) !== "list";
   const now = new Date();
 
   const failure = failureOf(loaded);
@@ -96,18 +89,13 @@ export default async function VacanciesPage({
   const pageState = paginate(filtered, readPage(query), DEFAULT_PAGE_SIZE);
   const counts = countByStage(all, q, now);
   const listPath = navHref("vacancies");
-  const keep = {
-    q,
-    state: stage,
-    saved: saved ? "1" : undefined,
-    view: stage || saved ? undefined : "list",
-  };
+  const keep = { q, state: stage, saved: saved ? "1" : undefined };
 
   const tabs = [
     {
       key: "all",
       label: t("state.all"),
-      href: hrefWith(listPath, { q, view: "list" }),
+      href: hrefWith(listPath, { q }),
       count: counts.all,
       active: !stage && !saved,
     },
@@ -174,156 +162,22 @@ export default async function VacanciesPage({
 
   const filtering = Boolean(q || stage || saved);
 
-  const views = VIEWS.map((value) => ({
-    key: value,
-    label: t(`board.view.${value}`),
-    href: hrefWith(listPath, { q, view: value === "list" ? "list" : undefined }),
-    active: value === "board" ? board : !board,
-  }));
-
-  const chipOf = (vacancy: VacancyListItem) => {
-    const next = nextStepOf(vacancy, now);
-    const chip = stageStatus(next.stage);
-    return (
-      <StatusBadge
-        label={t(`list.stage.${next.stage}`)}
-        tone={chip.tone}
-        icon={chip.icon}
-      />
-    );
-  };
-  const nextLinkOf = (vacancy: VacancyListItem) => {
-    const next = nextStepOf(vacancy, now);
-    return (
-      <Link
-        href={next.href}
-        className={buttonClass({ size: "row", variant: "outline" })}
-      >
-        {t(`list.action.${next.action}`)}
-        <span className="sr-only"> — {vacancy.title}</span>
-      </Link>
-    );
-  };
-  const toolsOf = (vacancy: VacancyListItem) => (
-    <>
-      <SaveToggle
-        id={vacancy.id}
-        saved={vacancy.saved}
-        labels={{
-          save: t("list.save", { title: vacancy.title }),
-          unsave: t("list.unsave", { title: vacancy.title }),
-          failed: t("list.saveFailed"),
-        }}
-      />
-      <RowMenu
-        label={t("list.menu", { title: vacancy.title })}
-        items={menuOf(vacancy)}
-      />
-    </>
-  );
-  const lanes = laneVacancies(filterVacancyList(all, { q }, now), now);
-
   return (
     <>
       <PageHeader
         title={t("title")}
         description={t("description")}
         actions={
-          <>
-            <RegisterTabs label={t("board.view.label")} items={views} />
-            <Link href={navHref("newVacancy")} className={buttonClass({ size: "sm" })}>
-              <Plus aria-hidden="true" />
-              {t("new")}
-            </Link>
-          </>
+          <Link href={navHref("newVacancy")} className={buttonClass({ size: "sm" })}>
+            <Plus aria-hidden="true" />
+            {t("new")}
+          </Link>
         }
       />
 
       {failure ? <LoadFailure failure={failure} /> : null}
 
-      {isReady(loaded) && board ? (
-        <>
-          <RegisterSearch
-            action={`/${locale}${listPath}`}
-            label={t("list.search")}
-            submitLabel={common("search")}
-            value={q}
-          />
-          <div className="relative -mx-4 flex snap-x snap-mandatory scroll-px-4 items-start gap-3 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:px-6 md:mx-0 md:grid md:grid-cols-2 md:overflow-visible md:px-0 md:pb-0 xl:grid-cols-4">
-            {BOARD_LANES.map((lane) => {
-              const items = lanes[lane];
-              const shown =
-                lane === "finished" ? items.slice(0, FINISHED_CARDS) : items;
-              return (
-                <BoardLane
-                  key={lane}
-                  id={`lane-${lane}`}
-                  title={t(`board.lanes.${lane}.title`)}
-                  description={t(`board.lanes.${lane}.description`)}
-                  count={items.length}
-                  countLabel={t("countLabel")}
-                  tone={lane === "yours" ? "waiting" : "neutral"}
-                  empty={q ? t("board.noMatches") : t("board.empty")}
-                  footer={
-                    items.length > shown.length ? (
-                      <Link
-                        href={hrefWith(listPath, { q, view: "list" })}
-                        className="text-xs font-semibold text-primary-ink hover:underline"
-                      >
-                        {t("board.more", { count: items.length - shown.length })}
-                      </Link>
-                    ) : undefined
-                  }
-                >
-                  {shown.map((vacancy) => {
-                    const progress = progressOf(vacancy);
-                    return (
-                      <BoardCard
-                        key={vacancy.id}
-                        chip={chipOf(vacancy)}
-                        tools={toolsOf(vacancy)}
-                        title={
-                          <Link
-                            href={vacancyHref(vacancy.id)}
-                            className="hover:text-primary-ink hover:underline"
-                          >
-                            {vacancy.title}
-                          </Link>
-                        }
-                        meta={[
-                          format.dateTime(new Date(vacancy.startsAt), "day"),
-                          vocabulary(`regions.${vacancy.region}`),
-                        ].join(" · ")}
-                        facts={
-                          progress.applications > 0 ? (
-                            <>
-                              <span className="tabular">
-                                {t("board.applications", {
-                                  count: progress.applications,
-                                })}
-                              </span>
-                              {progress.awaitingReview > 0 ? (
-                                <span className="tabular inline-flex h-5 items-center rounded-sm bg-warning-muted px-1.5 font-medium text-warning-ink">
-                                  {t("table.waiting", {
-                                    count: progress.awaitingReview,
-                                  })}
-                                </span>
-                              ) : null}
-                            </>
-                          ) : undefined
-                        }
-                        action={nextLinkOf(vacancy)}
-                      />
-                    );
-                  })}
-                </BoardLane>
-              );
-            })}
-          </div>
-        </>
-      ) : null}
-
-      {isReady(loaded) && !board ? (
+      {isReady(loaded) ? (
         <Register
           title={
             saved ? t("list.saved") : stage ? t(`list.stage.${stage}`) : t("listTitle")
@@ -338,11 +192,7 @@ export default async function VacanciesPage({
                 label={t("list.search")}
                 submitLabel={common("search")}
                 value={q}
-                keep={{
-                  state: stage,
-                  saved: saved ? "1" : undefined,
-                  view: stage || saved ? undefined : "list",
-                }}
+                keep={{ state: stage, saved: saved ? "1" : undefined }}
               />
             </div>
           }
