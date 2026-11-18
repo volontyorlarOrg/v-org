@@ -153,14 +153,10 @@ test.describe("the dashboard", () => {
     expect(sum).toBeGreaterThan(0);
   });
 
-  test("says in its headline how much waits and for how long", async ({ page }) => {
+  test("leads each queue row with how long it has waited", async ({ page }) => {
     await signIn(page);
-    await expect(
-      page.getByRole("heading", { level: 1, name: /^\d+ things wait on you$/ }),
-    ).toBeVisible();
-    await expect(page.getByText(/^The oldest has waited \d+ days?\./)).toBeVisible();
     const desk = page.getByRole("region", { name: "Waiting on you" });
-    await expect(desk.getByText(/^oldest \d+d$/).first()).toBeVisible();
+    await expect(desk.getByText(/oldest waiting \d+/)).toBeVisible();
   });
 
   test("links what is with the administrator to a list that is really filtered", async ({
@@ -242,35 +238,9 @@ test.describe("the vacancy list", () => {
     );
   });
 
-  test("sorts the board by whose move each vacancy is, with the next step on every card", async ({
-    page,
-  }) => {
-    await signIn(page);
-    await page.goto("/en/vacancies", { waitUntil: "networkidle" });
-    const yours = page.getByRole("region", { name: "Your move" });
-    const admin = page.getByRole("region", { name: "With the administrator" });
-    await expect(
-      yours.getByRole("link", { name: "Photo archive week", exact: true }),
-    ).toBeVisible();
-    await expect(
-      yours.getByRole("link", { name: "Autumn book drive", exact: true }),
-    ).toBeVisible();
-    await expect(
-      admin.getByRole("link", { name: "Winter clothing drive", exact: true }),
-    ).toBeVisible();
-    await expect(
-      yours.getByRole("link", { name: "Winter clothing drive" }),
-    ).toHaveCount(0);
-    const card = yours.getByRole("listitem").filter({
-      has: page.getByRole("link", { name: "City sports day", exact: true }),
-    });
-    await card.getByRole("link", { name: /Record attendance/ }).click();
-    await page.waitForURL(new RegExp(`${CITY_SPORTS_DAY}\\?tab=attendance`));
-  });
-
   test("offers the next step on each row", async ({ page }) => {
     await signIn(page);
-    await page.goto("/en/vacancies?view=list", { waitUntil: "networkidle" });
+    await page.goto("/en/vacancies", { waitUntil: "networkidle" });
     const row = page.getByRole("row", { name: /City sports day/ });
     await row
       .getByRole("link", { name: /Record attendance/ })

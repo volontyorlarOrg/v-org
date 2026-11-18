@@ -24,7 +24,6 @@ import {
 } from "@/components/results/vacancy-tabs";
 import { LoadFailure } from "@/components/states/load-failure";
 import { PageHeader } from "@/components/states/page-header";
-import { VacancyTrack } from "@/components/vacancies/vacancy-track";
 import { StatePanel } from "@/components/states/state-panel";
 import { ArchiveVacancy } from "@/components/vacancies/archive-vacancy";
 import { ReadinessList } from "@/components/vacancies/readiness-list";
@@ -61,7 +60,6 @@ import {
 import { loadOrganizations, loadVacancy } from "@/lib/vacancies/data.server";
 import { errorCatalog } from "@/lib/vacancies/labels.server";
 import { stageOf } from "@/lib/vacancies/stage";
-import { TRACK_TONES, vacancyTrack } from "@/lib/vacancies/track";
 
 export const dynamic = "force-dynamic";
 
@@ -322,19 +320,6 @@ export default async function VacancyPage({
   const approved = state === "approved" && vacancy.approvalReviewedAt;
   const readinessId = "vacancy-readiness";
 
-  const track = vacancyTrack({ ...vacancy, state }, now).map((step) => ({
-    key: step.stage,
-    name: t(`track.stages.${step.stage}`),
-    note: step.at
-      ? t(`track.notes.${step.note}`, {
-          date: format.dateTime(new Date(step.at), "date"),
-        })
-      : t(`track.notes.${step.note}`, { date: "" }).trim(),
-    status: step.status,
-    statusLabel: t(`track.status.${step.status}`),
-    tone: TRACK_TONES[step.stage],
-  }));
-
   return (
     <>
       <PageHeader
@@ -427,18 +412,19 @@ export default async function VacancyPage({
         }
       />
 
-      <VacancyTrack label={t("track.label")} items={track} />
-
       {justSent && state === "pending_review" ? (
         <StatePanel role="status" tone="notice" title={t("wizard.sent")} />
       ) : null}
 
       {state === "pending_review" ? (
-        <section aria-labelledby="decision-title" className="sheet px-5 py-4">
+        <section
+          aria-labelledby="decision-title"
+          className="rounded-xl border border-border bg-surface-soft px-4 py-3.5"
+        >
           <div className="flex min-w-0 gap-3">
             <span
               aria-hidden="true"
-              className="grid size-9 shrink-0 place-items-center rounded-lg bg-surface-sunk text-ink-muted"
+              className="grid size-9 shrink-0 place-items-center rounded-md bg-surface text-primary-ink"
             >
               <Hourglass className="size-4" strokeWidth={2} />
             </span>
