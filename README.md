@@ -2,7 +2,7 @@
 
 The private portal for organizations that publish volunteering vacancies on Volontyorlar. An administrator creates the organization and its account together, with a permanent login name and password. The organization cannot change that password; an administrator can replace it or block the account.
 
-This repository owns the UI at `org.volontyorlar.uz`. `v-backend` owns authentication, permissions, approval, and records; `v-admin` owns account issuance and vacancy approval. This portal uses the component system and visual language of `v-admin` ("The Line"); see [DESIGN.md](DESIGN.md).
+This repository owns the UI at `org.volontyorlar.uz`. `v-backend` owns authentication, permissions, approval, and records; `v-admin` owns account issuance and vacancy approval. This portal uses the component system and visual language of `v-admin` ("The Line").
 
 ## Workflow
 
@@ -13,7 +13,7 @@ This repository owns the UI at `org.volontyorlar.uz`. `v-backend` owns authentic
 5. After an event ends, record attendance and submit the results. Hours and XP count only after an administrator verifies them.
 6. Record past events with their participants; an administrator approves them before any volunteer sees them.
 
-The **Dashboard** opens on the volunteer journey, then what waits on the organization, oldest first, beside what is with the administrator and what was decided today. See [docs/DASHBOARD.md](docs/DASHBOARD.md) and, for how each record travels to the administrator portal and back, [docs/INFORMATION_FLOW.md](docs/INFORMATION_FLOW.md).
+The **Dashboard** opens on the volunteer journey, then what waits on the organization, oldest first, beside what is with the administrator and what was decided today.
 
 ## Local development
 
@@ -24,5 +24,3 @@ Run `npm ci` and `npm run dev`. The server binds to `127.0.0.1:3004` and loads t
 ## Security boundary
 
 All portal reads and writes go through server-side API calls. Tokens stay in an encrypted, HttpOnly cookie. The backend checks account status and scopes vacancies, applications, attendance, volunteers, counts, and activity to the account. Replacing a password or blocking an account revokes existing sessions.
-
-See [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md), and [docs/RELEASE.md](docs/RELEASE.md).
