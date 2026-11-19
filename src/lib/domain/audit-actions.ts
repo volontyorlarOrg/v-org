@@ -10,6 +10,7 @@ export const AUDIT_ACTIONS = [
   "opportunity.rejected",
   "opportunity.archived",
   "opportunity.instructions_sent",
+  "opportunity.volunteers_exported",
   "application.submitted",
   "application.under_review",
   "application.accepted",

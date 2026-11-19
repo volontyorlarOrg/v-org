@@ -1242,6 +1242,39 @@ route("POST", "/__empty-attendance", ({ response, body }) => {
   state.sheets.delete(body.id);
   send(response, 200, { ok: true });
 });
+const EXPORT_DEFAULTS = ["fullName", "telegram", "phone"];
+const exportFields = (extra) =>
+  ["fullName", "telegram", "phone", "username", "region", "school", ...extra].map(
+    (key) => ({ key, selected: EXPORT_DEFAULTS.includes(key) }),
+  );
+const exportRequests = [];
+route("GET", "/org/volunteer-exports/options", ({ response }) => {
+  send(response, 200, {
+    formats: ["pdf", "xlsx", "txt"],
+    applications: exportFields(["applicationStatus", "appliedAt"]),
+    attendance: exportFields(["attendance", "hours", "placement", "addedManually"]),
+    googleSheets: false,
+  });
+});
+route(
+  "POST",
+  "/org/opportunities/:id/volunteer-exports",
+  ({ response, params, body }) => {
+    const item = vacancyOr404(response, params[0]);
+    if (!item) return;
+    exportRequests.push({ id: item.id, ...body });
+    const text = `${body.labels.title}\r\n${body.fields.map((field) => body.labels.columns[field]).join(" | ")}\r\n1. Dilnoza Karimova | @dilnoza | +998 90 000 00 00\r\n`;
+    response.writeHead(200, {
+      "content-type": "text/plain; charset=utf-8",
+      "content-disposition": 'attachment; filename="volunteers-stub.txt"',
+      "x-export-rows": "1",
+    });
+    response.end(text);
+  },
+);
+route("GET", "/__exports", ({ response }) => {
+  send(response, 200, { items: exportRequests });
+});
 route("GET", "/org/opportunities/:id/attendance-sheet", ({ response, params }) => {
   const item = vacancyOr404(response, params[0]);
   if (item) send(response, 200, presentSheet(item));
@@ -1668,6 +1701,7 @@ const OPEN_ROUTES = new Set([
   "/__organization",
   "/__empty-attendance",
   "/__return-attendance-correction",
+  "/__exports",
   "/auth/org/login",
   "/auth/refresh",
 ]);

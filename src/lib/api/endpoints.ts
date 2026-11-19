@@ -165,6 +165,27 @@ export const endpoints = {
     contract: "published",
   },
 
+  volunteerExportOptions: {
+    method: "GET",
+    path: "/org/volunteer-exports/options",
+    contract: "published",
+  },
+  exportVolunteers: {
+    method: "POST",
+    path: "/org/opportunities/{id}/volunteer-exports",
+    contract: "published",
+  },
+  authorizeGoogleSheetsExport: {
+    method: "POST",
+    path: "/org/opportunities/{id}/volunteer-exports/google/authorization",
+    contract: "published",
+  },
+  createGoogleSheetsExport: {
+    method: "POST",
+    path: "/org/volunteer-exports/google",
+    contract: "published",
+  },
+
   users: { method: "GET", path: "/org/users", contract: "published" },
   user: { method: "GET", path: "/org/users/{id}", contract: "published" },
 

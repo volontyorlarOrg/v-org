@@ -22,10 +22,12 @@ import { Avatar } from "@/components/portal/avatar";
 import { StatusBadge, applicationStatus } from "@/components/portal/status-badge";
 import { ApplicantDrawer } from "@/components/results/applicant-drawer";
 import { DecisionSelect } from "@/components/results/decision-select";
+import { ExportVolunteersDialog } from "@/components/results/export-volunteers-dialog";
 import { SendDecisionsDialog } from "@/components/results/send-decisions-dialog";
 import { Button } from "@/components/ui/button";
 import { compactInputClass } from "@/components/ui/input";
 import type { StagedDecision } from "@/lib/domain/vocabulary";
+import type { ExportOptions } from "@/lib/exports/schemas";
 import { sendDecisionsAction, stageDecisionsAction } from "@/lib/results/actions";
 import {
   DESK_FILTERS,
@@ -53,11 +55,13 @@ export function ApplicationsDesk({
   capacity,
   archived,
   applicants,
+  exportOptions,
 }: {
   vacancyId: string;
   capacity: number | null;
   archived: boolean;
   applicants: readonly DeskApplicant[];
+  exportOptions: ExportOptions | null;
 }) {
   const t = useTranslations("results.desk");
   const errors = useTranslations("results.errors");
@@ -227,6 +231,16 @@ export function ApplicationsDesk({
                 className="pointer-events-none absolute top-1/2 right-3.5 size-3.5 -translate-y-1/2 text-ink-muted"
               />
             </label>
+            {exportOptions ? (
+              <ExportVolunteersDialog
+                vacancyId={vacancyId}
+                list="applications"
+                options={exportOptions}
+                count={visible.length}
+                filter={filter}
+                query={query}
+              />
+            ) : null}
           </div>
         </header>
 

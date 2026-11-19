@@ -504,7 +504,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Change the optional leaderboard and public-profile consents */
+        /** Change the optional leaderboard consent */
         put: operations["LegalAccountController_choose"];
         post?: never;
         delete?: never;
@@ -2007,6 +2007,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/admin/verification/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read a volunteer verification assignment */
+        get: operations["AdminVerificationController_get"];
+        /** Assign or revoke volunteer verification and affiliation */
+        put: operations["AdminVerificationController_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/essays": {
         parameters: {
             query?: never;
@@ -2399,6 +2417,74 @@ export interface paths {
         put?: never;
         /** Return submitted results to the organization */
         post: operations["AdminResultsController_requestChanges"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/org/volunteer-exports/options": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Export formats and the fields each list offers */
+        get: operations["VolunteerExportsController_options"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/org/opportunities/{id}/volunteer-exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Download the selected fields of an own vacancy list as a file */
+        post: operations["VolunteerExportsController_file"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/org/opportunities/{id}/volunteer-exports/google/authorization": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start Google authorization for a private spreadsheet export */
+        post: operations["VolunteerExportsController_googleAuthorization"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/org/volunteer-exports/google": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create the private Google spreadsheet the authorization allowed */
+        post: operations["VolunteerExportsController_google"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3287,12 +3373,15 @@ export interface components {
         ConsentDto: {
             /** @default false */
             leaderboard: boolean;
-            /** @default false */
-            publicProfile: boolean;
+            /**
+             * @deprecated
+             * @description Legacy compatibility; publication is required by the current consent.
+             */
+            publicProfile?: boolean;
             /** @enum {string} */
             locale: "uz" | "ru" | "en";
             /** @enum {string} */
-            version: "2026-11-14";
+            version: "2026-11-18";
             /** @enum {boolean} */
             accepted: true;
         };
@@ -3314,8 +3403,11 @@ export interface components {
         ConsentChoicesDto: {
             /** @default false */
             leaderboard: boolean;
-            /** @default false */
-            publicProfile: boolean;
+            /**
+             * @deprecated
+             * @description Legacy compatibility; publication is required by the current consent.
+             */
+            publicProfile?: boolean;
         };
         LegalRequestViewDto: {
             id: string;
@@ -3375,8 +3467,11 @@ export interface components {
             notifyDecisions?: boolean;
             profileToOrganisers?: boolean;
             levelPublic?: boolean;
-            /** @default false */
-            publicProfileEnabled: boolean;
+            /**
+             * @deprecated
+             * @description Legacy compatibility; the public profile cannot be disabled independently.
+             */
+            publicProfileEnabled?: boolean;
         };
         CheckpointDto: {
             /**
@@ -3496,7 +3591,9 @@ export interface components {
             /** @default [] */
             links: string[];
             /** @description Optional parts kept off the profile others see. Omit to keep the stored choice. */
-            hiddenFields?: ("region" | "hometownRegion" | "city" | "school" | "gradeYear" | "languages" | "phone" | "telegram" | "instagram" | "linkedin" | "links" | "joined" | "activity")[];
+            hiddenFields?: ("bio" | "region" | "hometownRegion" | "city" | "school" | "gradeYear" | "languages" | "phone" | "telegram" | "instagram" | "linkedin" | "links" | "joined" | "activity")[];
+            /** @description Confirms publishing contact details that were previously hidden. */
+            confirmContactPublication?: boolean;
         };
         CreateOrganizationDto: {
             name: string;
@@ -3964,7 +4061,18 @@ export interface components {
         ResolveVacancyAttendanceDto: {
             records: components["schemas"]["AttendanceResolutionDto"][];
         };
+        VerificationOrganizationDto: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            logoUrl: string | null;
+        };
+        VerificationDto: {
+            verified: boolean;
+            organization: components["schemas"]["VerificationOrganizationDto"] | null;
+        };
         LeaderboardEntryDto: {
+            verification: components["schemas"]["VerificationDto"];
             /** @example 1 */
             rank: number;
             /** @example Aziza Karimova */
@@ -3979,6 +4087,7 @@ export interface components {
             isCurrentUser: boolean;
         };
         LeaderboardViewerDto: {
+            verification: components["schemas"]["VerificationDto"];
             /** @example 42 */
             rank: number | null;
             /** @example Dilnoza Karimova */
@@ -4176,6 +4285,14 @@ export interface components {
             summary: components["schemas"]["AnalyticsSummaryDto"];
             daily: components["schemas"]["AnalyticsDayDto"][];
         };
+        UpdateVerificationDto: {
+            verified: boolean;
+            /**
+             * Format: uuid
+             * @description Kept only while the volunteer is verified; revoking verification clears it.
+             */
+            organizationId: string | null;
+        };
         SaveEssayDto: {
             title?: string;
             prompt?: string;
@@ -4251,6 +4368,85 @@ export interface components {
         RequestAttendanceChangesDto: {
             note: string;
             flags?: components["schemas"]["AttendanceFlagDto"][];
+        };
+        ExportFieldOptionDto: {
+            /** @enum {string} */
+            key: "fullName" | "telegram" | "phone" | "username" | "region" | "hometownRegion" | "city" | "school" | "gradeYear" | "languages" | "instagram" | "linkedin" | "links" | "bio" | "applicationStatus" | "appliedAt" | "attendance" | "hours" | "placement" | "addedManually";
+            selected: boolean;
+        };
+        VolunteerExportOptionsDto: {
+            formats: ("pdf" | "xlsx" | "txt" | "google_sheets")[];
+            applications: components["schemas"]["ExportFieldOptionDto"][];
+            attendance: components["schemas"]["ExportFieldOptionDto"][];
+            /** @description Whether Google Sheets export is configured on this deployment. */
+            googleSheets: boolean;
+        };
+        ExportLabelsDto: {
+            title: string;
+            subtitle: string;
+            /** @description Column headings keyed by field. */
+            columns: {
+                [key: string]: string;
+            };
+            /** @description Words for coded values, keyed region.<code>, status.<status>, outcome.<outcome>, placement.<placement> and yes. */
+            values: {
+                [key: string]: string;
+            };
+        };
+        VolunteerFileExportDto: {
+            /** @enum {string} */
+            list: "applications" | "attendance";
+            fields: ("fullName" | "telegram" | "phone" | "username" | "region" | "hometownRegion" | "city" | "school" | "gradeYear" | "languages" | "instagram" | "linkedin" | "links" | "bio" | "applicationStatus" | "appliedAt" | "attendance" | "hours" | "placement" | "addedManually")[];
+            /**
+             * @description The applications desk filter; ignored for attendance.
+             * @enum {string}
+             */
+            filter?: "all" | "undecided" | "ready" | "hold" | "accepted" | "rejected" | "withdrawn";
+            /** @description The desk search. */
+            query?: string;
+            /** @enum {string} */
+            locale: "uz" | "ru" | "en";
+            /** @enum {string} */
+            format: "pdf" | "xlsx" | "txt";
+            labels: components["schemas"]["ExportLabelsDto"];
+        };
+        GoogleSheetsAuthorizationDto: {
+            /** @enum {string} */
+            list: "applications" | "attendance";
+            fields: ("fullName" | "telegram" | "phone" | "username" | "region" | "hometownRegion" | "city" | "school" | "gradeYear" | "languages" | "instagram" | "linkedin" | "links" | "bio" | "applicationStatus" | "appliedAt" | "attendance" | "hours" | "placement" | "addedManually")[];
+            /**
+             * @description The applications desk filter; ignored for attendance.
+             * @enum {string}
+             */
+            filter?: "all" | "undecided" | "ready" | "hold" | "accepted" | "rejected" | "withdrawn";
+            /** @description The desk search. */
+            query?: string;
+            /** @enum {string} */
+            locale: "uz" | "ru" | "en";
+            /**
+             * @description One of GOOGLE_SHEETS_REDIRECT_URIS.
+             * @example https://org.volontyorlar.uz/api/exports/google/callback
+             */
+            redirectUri: string;
+        };
+        GoogleSheetsAuthorizationResultDto: {
+            authorizationUrl: string;
+            /** @description Bind it to the browser that started export. */
+            state: string;
+        };
+        GoogleSheetsExportDto: {
+            code: string;
+            state: string;
+            labels: components["schemas"]["ExportLabelsDto"];
+        };
+        GoogleSheetsExportResultDto: {
+            spreadsheetId: string;
+            spreadsheetUrl: string;
+            rows: number;
+            /** @enum {string} */
+            list: "applications" | "attendance";
+            /** Format: uuid */
+            opportunityId: string;
         };
         BulkAwardVolunteerDto: {
             /** Format: uuid */
@@ -4706,6 +4902,7 @@ export interface components {
             countsTowardProgress: boolean;
         };
         PublicProfileDto: {
+            verification: components["schemas"]["VerificationDto"];
             /** @example Aziza Karimova */
             displayName: string;
             /** @example aziza_volunteer */
@@ -14670,6 +14867,164 @@ export interface operations {
             };
         };
     };
+    AdminVerificationController_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerificationDto"];
+                };
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requested resource was not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    AdminVerificationController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateVerificationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerificationDto"];
+                };
+            };
+            /** @description Malformed request body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requested resource was not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request body exceeds the configured limit */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     EssaysController_list: {
         parameters: {
             query?: never;
@@ -16991,6 +17346,327 @@ export interface operations {
             };
             /** @description Resource state or uniqueness conflict */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request body exceeds the configured limit */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VolunteerExportsController_options: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VolunteerExportOptionsDto"];
+                };
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VolunteerExportsController_file: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VolunteerFileExportDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Malformed request body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requested resource was not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource state or uniqueness conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request body exceeds the configured limit */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VolunteerExportsController_googleAuthorization: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GoogleSheetsAuthorizationDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoogleSheetsAuthorizationResultDto"];
+                };
+            };
+            /** @description Malformed request body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Requested resource was not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Resource state or uniqueness conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request body exceeds the configured limit */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request validation failed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Request rate limit exceeded */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unexpected server error */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authentication or an upstream dependency is unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    VolunteerExportsController_google: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GoogleSheetsExportDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoogleSheetsExportResultDto"];
+                };
+            };
+            /** @description Malformed request body */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Missing or invalid credentials */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Authenticated account cannot perform this operation */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

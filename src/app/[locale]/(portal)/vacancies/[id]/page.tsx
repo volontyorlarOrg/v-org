@@ -14,6 +14,7 @@ import { InlineDecision } from "@/components/register/inline-decision";
 import { Count } from "@/components/register/register";
 import { ApplicationsDesk } from "@/components/results/applications-desk";
 import { AttendanceDesk } from "@/components/results/attendance-desk";
+import { ExportNotice } from "@/components/results/export-notice";
 import { InstructionsPanel } from "@/components/results/instructions-panel";
 import { ResultsCopy } from "@/components/results/results-copy";
 import { RewardsPanel } from "@/components/results/rewards-panel";
@@ -34,6 +35,8 @@ import { failureOf, isReady } from "@/lib/api/load";
 import { loadApplications } from "@/lib/applications/data.server";
 import { isAttendanceResolved } from "@/lib/applications/filters";
 import { SENT_APPLICATION_STATUSES, canArchive } from "@/lib/domain/vocabulary";
+import { loadExportOptions } from "@/lib/exports/google.server";
+import { readNotice } from "@/lib/exports/notice.server";
 import { decisionLabels } from "@/lib/queue/decisions.server";
 import {
   deskApplicants,
@@ -171,11 +174,21 @@ export default async function VacancyPage({
           : "applications";
   const tabHref = (value: VacancyTab) => `${vacancyHref(vacancy.id)}?tab=${value}`;
 
-  const [labels, instructions, sheet] = await Promise.all([
-    decisionLabels(),
-    tab === "applications" && accepted.length > 0 ? loadInstructions(vacancy.id) : null,
-    tab === "attendance" ? loadAttendanceSheet(vacancy.id) : null,
-  ]);
+  const [labels, instructions, sheet, exportOptionsLoaded, exportNotice, exportsCopy] =
+    await Promise.all([
+      decisionLabels(),
+      tab === "applications" && accepted.length > 0
+        ? loadInstructions(vacancy.id)
+        : null,
+      tab === "attendance" ? loadAttendanceSheet(vacancy.id) : null,
+      tab === "details" ? null : loadExportOptions(),
+      readNotice(vacancy.id),
+      getTranslations("exports"),
+    ]);
+  const exportOptions =
+    exportOptionsLoaded && isReady(exportOptionsLoaded)
+      ? exportOptionsLoaded.data
+      : null;
 
   const readinessLabels = {
     met: t("approval.met"),
@@ -411,6 +424,29 @@ export default async function VacancyPage({
           </>
         }
       />
+
+      {exportNotice?.status === "created" ? (
+        <ExportNotice
+          tone="done"
+          title={exportsCopy("sheetCreated.title")}
+          description={exportsCopy("sheetCreated.description", {
+            count: exportNotice.rows,
+          })}
+          link={{ href: exportNotice.url, label: exportsCopy("sheetCreated.open") }}
+        />
+      ) : exportNotice?.status === "failed" ? (
+        <ExportNotice
+          tone="failed"
+          title={exportsCopy("sheetFailed")}
+          description={
+            exportsCopy.has(`errors.${exportNotice.code}`)
+              ? exportsCopy(`errors.${exportNotice.code}`)
+              : errors.has(exportNotice.code)
+                ? errors(exportNotice.code)
+                : errors("server")
+          }
+        />
+      ) : null}
 
       {justSent && state === "pending_review" ? (
         <StatePanel role="status" tone="notice" title={t("wizard.sent")} />
@@ -662,6 +698,7 @@ export default async function VacancyPage({
                 capacity={vacancy.capacity ?? null}
                 archived={state === "archived"}
                 applicants={await deskApplicants(rows)}
+                exportOptions={exportOptions}
               />
               {accepted.length > 0 && instructions && isReady(instructions) ? (
                 <div className="xl:sticky xl:top-6">
@@ -689,6 +726,7 @@ export default async function VacancyPage({
               key={`${sheet.data.status}:${sheet.data.revision}:${sheet.data.correction}:${sheet.data.verifiedAt ?? ""}`}
               vacancyId={vacancy.id}
               initial={sheet.data}
+              exportOptions={exportOptions}
               dates={{
                 opens: format.dateTime(new Date(sheet.data.opensAt), "stamp"),
                 submittable: format.dateTime(

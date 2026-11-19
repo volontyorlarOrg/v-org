@@ -24,6 +24,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { AddVolunteerDialog } from "@/components/results/add-volunteer-dialog";
+import { ExportVolunteersDialog } from "@/components/results/export-volunteers-dialog";
 import { Avatar } from "@/components/portal/avatar";
 import { StatusBadge, attendanceStatus } from "@/components/portal/status-badge";
 import {
@@ -57,6 +58,7 @@ import {
   summarise,
   type EditableRow,
 } from "@/lib/results/sheet";
+import type { ExportOptions } from "@/lib/exports/schemas";
 import { applicationHref } from "@/lib/routing/routes";
 import { cn } from "@/lib/utils";
 
@@ -102,12 +104,14 @@ export function AttendanceDesk({
   initial,
   dates,
   startEditing = false,
+  exportOptions = null,
 }: {
   vacancyId: string;
   initial: AttendanceSheet;
   dates: SheetDates;
   /** An administrator adjusting a submission before verifying it. */
   startEditing?: boolean;
+  exportOptions?: ExportOptions | null;
 }) {
   const t = useTranslations("results.sheet");
   const outcomeLabel = useTranslations("attendance.outcome");
@@ -461,7 +465,19 @@ export function AttendanceDesk({
             tone={statusChip.tone}
             icon={statusChip.icon}
           />
-          <div className="ml-auto">{addVolunteer}</div>
+          <div className="ml-auto flex flex-wrap items-center gap-2">
+            {exportOptions ? (
+              <ExportVolunteersDialog
+                vacancyId={vacancyId}
+                list="attendance"
+                options={exportOptions}
+                count={visibleRows.length}
+                query={query}
+                unsaved={dirty}
+              />
+            ) : null}
+            {addVolunteer}
+          </div>
           <p className="tabular w-full text-sm text-ink-muted">
             {editing
               ? [

@@ -389,6 +389,46 @@ test.describe("applicants and attendance", () => {
     await expect(second).toHaveValue("no_show");
   });
 
+  test("exports the attendance list as searched, with name, Telegram and phone preselected", async ({
+    page,
+  }) => {
+    await signIn(page);
+    await page.goto(`/en/vacancies/${CITY_SPORTS_DAY}?tab=attendance`, {
+      waitUntil: "networkidle",
+    });
+    const sheet = page.getByRole("region", { name: "3 volunteers" });
+    await sheet
+      .getByRole("searchbox", { name: "Search by name or username" })
+      .fill("@dilnoza");
+    await sheet.getByRole("button", { name: "Export volunteers" }).click();
+    const dialog = page.getByRole("dialog", { name: "Export volunteers" });
+    await expect(dialog).toContainText(
+      "1 volunteer matches the current search and filter",
+    );
+    await expect(dialog.getByRole("checkbox", { name: "Full name" })).toBeChecked();
+    await expect(dialog.getByRole("checkbox", { name: "Telegram" })).toBeChecked();
+    await expect(dialog.getByRole("checkbox", { name: "Phone number" })).toBeChecked();
+    await expect(dialog.getByRole("checkbox", { name: "School" })).not.toBeChecked();
+    await expect(dialog.getByRole("radio", { name: /Google Sheets/ })).toBeDisabled();
+    await dialog.getByRole("radio", { name: /Text \(TXT\)/ }).check();
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      dialog.getByRole("button", { name: "Download Text (TXT)" }).click(),
+    ]);
+    expect(download.suggestedFilename()).toBe("volunteers-stub.txt");
+    await expect(page.getByText("Exported 1 volunteer.")).toBeVisible();
+    const { items } = await (await page.request.get(`${STUB}/__exports`)).json();
+    expect(items.at(-1)).toMatchObject({
+      id: CITY_SPORTS_DAY,
+      list: "attendance",
+      format: "txt",
+      fields: ["fullName", "telegram", "phone"],
+      query: "@dilnoza",
+      locale: "en",
+      labels: { columns: { fullName: "Full name", telegram: "Telegram" } },
+    });
+  });
+
   test("opens the submitted volunteer profile from attendance in a new tab", async ({
     page,
     context,
